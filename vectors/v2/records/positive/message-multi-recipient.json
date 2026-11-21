@@ -1,0 +1,47 @@
+{
+  "name": "positive/message-multi-recipient",
+  "description": "Core message addressed to two recipients; verified here as Carol.",
+  "spec": "§4.2",
+  "context": {
+    "mode": "admission",
+    "now": "2026-11-20T12:00:00Z",
+    "receiver": "acct:carol@vectors.test",
+    "typ": "darep-event+jws",
+    "understood": [
+      "https://darep.org/ext/core/v2",
+      "https://darep.org/ext/work/v2",
+      "https://darep.org/ext/reschedule/v2"
+    ]
+  },
+  "jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTIwMjYtMTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.ewogImRhcmVwIjogIjIiLAogImlkIjogIjRjNDNhYzg4LTBmYWYtNDliNi05ZGRjLWNhZWIzYTAwMDczMyIsCiAic291cmNlIjogImFjY3Q6Ym9iQHZlY3RvcnMudGVzdCIsCiAidHlwZSI6ICJodHRwczovL2RhcmVwLm9yZy9leHQvY29yZS92MiNtZXNzYWdlIiwKICJ0aW1lIjogIjIwMjYtMTEtMjBUMTE6NTg6MDBaIiwKICJ0byI6IFsKICAiYWNjdDpjYXJvbEB2ZWN0b3JzLnRlc3QiLAogICJhY2N0OmRhdmVAdmVjdG9ycy50ZXN0IgogXSwKICJ0aHJlYWQiOiAiNGM0M2FjODgtMGZhZi00OWI2LTlkZGMtY2FlYjNhMDAwNzMzIiwKICJpblJlcGx5VG8iOiBudWxsLAogImV4cGlyZXMiOiAiMjAyNi0xMS0yN1QxMTo1ODowMFoiLAogImV4dCI6IHt9LAogInJlcXVpcmVkIjogW10sCiAiZ3JhbnQiOiB7CiAgImlkIjogImdyYW50LTdmM2EiLAogICJhY3RvciI6ICJhZ2VudCIKIH0sCiAiZGF0YSI6IHsKICAidGV4dCI6ICJUd28gcmVjaXBpZW50cyByZWNlaXZlIHRoZSBzYW1lIHNpZ25lZCBieXRlcy4iCiB9Cn0K.z9uAb_DBHCV0X2P1C2oX6UJXlb1alSs9kasuqv1CSoqwV-e7ljTNU3GeBg-A4hDiWQI1VQo32g-ObQKRsn287A",
+  "headerUtf8": "{\"alg\":\"ES256\",\"kid\":\"https://bob.vectors.test/.well-known/darep/bob#sig-2026-11\",\"typ\":\"darep-event+jws\"}",
+  "payloadUtf8": "{\n \"darep\": \"2\",\n \"id\": \"4c43ac88-0faf-49b6-9ddc-caeb3a000733\",\n \"source\": \"acct:bob@vectors.test\",\n \"type\": \"https://darep.org/ext/core/v2#message\",\n \"time\": \"2026-11-20T11:58:00Z\",\n \"to\": [\n  \"acct:carol@vectors.test\",\n  \"acct:dave@vectors.test\"\n ],\n \"thread\": \"4c43ac88-0faf-49b6-9ddc-caeb3a000733\",\n \"inReplyTo\": null,\n \"expires\": \"2026-11-27T11:58:00Z\",\n \"ext\": {},\n \"required\": [],\n \"grant\": {\n  \"id\": \"grant-7f3a\",\n  \"actor\": \"agent\"\n },\n \"data\": {\n  \"text\": \"Two recipients receive the same signed bytes.\"\n }\n}\n",
+  "payloadSha256": "c9a4568e55f5bb43d06e5d1a563f0143e5a72d1fedf63c53f3df63487272ccbd",
+  "expected": {
+    "verdict": "accept",
+    "kid": "https://bob.vectors.test/.well-known/darep/bob#sig-2026-11",
+    "record": {
+      "darep": "2",
+      "id": "4c43ac88-0faf-49b6-9ddc-caeb3a000733",
+      "source": "acct:bob@vectors.test",
+      "type": "https://darep.org/ext/core/v2#message",
+      "time": "2026-11-20T11:58:00Z",
+      "to": [
+        "acct:carol@vectors.test",
+        "acct:dave@vectors.test"
+      ],
+      "thread": "4c43ac88-0faf-49b6-9ddc-caeb3a000733",
+      "inReplyTo": null,
+      "expires": "2026-11-27T11:58:00Z",
+      "ext": {},
+      "required": [],
+      "grant": {
+        "id": "grant-7f3a",
+        "actor": "agent"
+      },
+      "data": {
+        "text": "Two recipients receive the same signed bytes."
+      }
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "name": "negative/revoked-key",
+  "description": "A revoked key signs a record dated inside its original validity window.",
+  "spec": "§5.4",
+  "context": {
+    "mode": "evidence",
+    "now": "2026-11-20T12:00:00Z",
+    "typ": "darep-event+jws"
+  },
+  "jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTIwMjYtMDEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.ewogImRhcmVwIjogIjIiLAogImlkIjogIjlhYTMyZjc0LTEwMTYtNDY2ZC1iNjZkLWFiMGUxMjUyYjc3MiIsCiAic291cmNlIjogImFjY3Q6Ym9iQHZlY3RvcnMudGVzdCIsCiAidHlwZSI6ICJodHRwczovL2RhcmVwLm9yZy9leHQvd29yay92MiNoYW5kb2ZmIiwKICJ0aW1lIjogIjIwMjYtMDQtMTVUMDA6MDA6MDBaIiwKICJ0byI6IFsKICAiYWNjdDpjYXJvbEB2ZWN0b3JzLnRlc3QiCiBdLAogInRocmVhZCI6ICI5YWEzMmY3NC0xMDE2LTQ2NmQtYjY2ZC1hYjBlMTI1MmI3NzIiLAogImluUmVwbHlUbyI6IG51bGwsCiAiZXhwaXJlcyI6ICIyMDI2LTA0LTE2VDAwOjAwOjAwWiIsCiAiZXh0Ijoge30sCiAicmVxdWlyZWQiOiBbCiAgImh0dHBzOi8vZGFyZXAub3JnL2V4dC93b3JrL3YyIgogXSwKICJncmFudCI6IHsKICAiaWQiOiAiZ3JhbnQtN2YzYSIsCiAgImFjdG9yIjogImFnZW50IgogfSwKICJkYXRhIjogewogICJzdW1tYXJ5IjogIuWQiOaIkOmgkOimvSDwn5eTIiwKICAibmV4dFN0ZXAiOiAi5qC45bCN6I236Jit5paH5qiZ57Gk44CMw6nDqW7jgI3jgIIiLAogICJleHBlY3RlZFJlc3VsdCI6ICLlm57opobkuIDlgIvmmI7norrntZDmnpzjgIIiCiB9Cn0K.lE3iPPF0mMKIdcozZKJk3dwE16yBBSo_GyXfmV6o9IRM7aqsehPyCYv7qwSZdZFesHgSF5FHNaMRZEKqfXVLLA",
+  "headerUtf8": "{\"alg\":\"ES256\",\"kid\":\"https://bob.vectors.test/.well-known/darep/bob#sig-2026-01\",\"typ\":\"darep-event+jws\"}",
+  "payloadUtf8": "{\n \"darep\": \"2\",\n \"id\": \"9aa32f74-1016-466d-b66d-ab0e1252b772\",\n \"source\": \"acct:bob@vectors.test\",\n \"type\": \"https://darep.org/ext/work/v2#handoff\",\n \"time\": \"2026-04-15T00:00:00Z\",\n \"to\": [\n  \"acct:carol@vectors.test\"\n ],\n \"thread\": \"9aa32f74-1016-466d-b66d-ab0e1252b772\",\n \"inReplyTo\": null,\n \"expires\": \"2026-04-16T00:00:00Z\",\n \"ext\": {},\n \"required\": [\n  \"https://darep.org/ext/work/v2\"\n ],\n \"grant\": {\n  \"id\": \"grant-7f3a\",\n  \"actor\": \"agent\"\n },\n \"data\": {\n  \"summary\": \"合成預覽 🗓\",\n  \"nextStep\": \"核對荷蘭文標籤「één」。\",\n  \"expectedResult\": \"回覆一個明確結果。\"\n }\n}\n",
+  "payloadSha256": "930942d1938ea997e1aa6821883ba293dd658f42c004a14222ecaa2d7160b7dc",
+  "expected": {
+    "verdict": "reject",
+    "code": "key-not-valid"
+  }
+}

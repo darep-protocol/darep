@@ -1,0 +1,86 @@
+{
+  "vector": "delivery/receiver/reject-unsupported-version",
+  "generatedBy": "vectors/v2/delivery/generate.mjs",
+  "testOnly": true,
+  "role": "receiver",
+  "clock": "Each step has \"at\": the receiver clock at that moment. Runners inject it. A receiver with a real clock checks storedAt format only.",
+  "description": "A correctly signed record with darep \"3\".",
+  "spec": [
+    "delivery.md §3.1",
+    "delivery.md §5.1",
+    "https-binding.md §2.3",
+    "https-binding.md §3"
+  ],
+  "decisions": [
+    "D6"
+  ],
+  "receiver": {
+    "address": "acct:carol@vectors.test",
+    "inbox": "https://carol.vectors.test/darep/v2/inbox",
+    "signingKeys": [
+      "https://carol.vectors.test/.well-known/darep/carol#sig-1",
+      "https://carol.vectors.test/.well-known/darep/carol#rcpt-1"
+    ],
+    "pinned": [
+      "acct:bob@vectors.test",
+      "acct:dave@vectors.test"
+    ],
+    "extensions": [
+      "https://darep.org/ext/core/v2"
+    ]
+  },
+  "records": {
+    "r": {
+      "envelope": {
+        "darep": "3",
+        "id": "ac4ef7c8-20e4-4b6b-b6f0-b262288fbfef",
+        "type": "https://darep.org/ext/core/v2#message",
+        "source": "acct:bob@vectors.test",
+        "to": [
+          "acct:carol@vectors.test"
+        ],
+        "thread": "ac4ef7c8-20e4-4b6b-b6f0-b262288fbfef",
+        "inReplyTo": null,
+        "time": "2026-11-20T10:00:00Z",
+        "expires": "2026-11-27T10:00:00Z",
+        "ext": {},
+        "required": [],
+        "grant": {
+          "id": "grant-vectors-bob",
+          "actor": "agent"
+        },
+        "data": {
+          "text": "Check the label."
+        }
+      },
+      "payloadUtf8": "{\"darep\":\"3\",\"id\":\"ac4ef7c8-20e4-4b6b-b6f0-b262288fbfef\",\"type\":\"https://darep.org/ext/core/v2#message\",\"source\":\"acct:bob@vectors.test\",\"to\":[\"acct:carol@vectors.test\"],\"thread\":\"ac4ef7c8-20e4-4b6b-b6f0-b262288fbfef\",\"inReplyTo\":null,\"time\":\"2026-11-20T10:00:00Z\",\"expires\":\"2026-11-27T10:00:00Z\",\"ext\":{},\"required\":[],\"grant\":{\"id\":\"grant-vectors-bob\",\"actor\":\"agent\"},\"data\":{\"text\":\"Check the label.\"}}",
+      "payloadSha256": "e26d47f780c03417b01bb4afd3769d823d192f6359d8543ba002132d73891481",
+      "recordBytes": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.eyJkYXJlcCI6IjMiLCJpZCI6ImFjNGVmN2M4LTIwZTQtNGI2Yi1iNmYwLWIyNjIyODhmYmZlZiIsInR5cGUiOiJodHRwczovL2RhcmVwLm9yZy9leHQvY29yZS92MiNtZXNzYWdlIiwic291cmNlIjoiYWNjdDpib2JAdmVjdG9ycy50ZXN0IiwidG8iOlsiYWNjdDpjYXJvbEB2ZWN0b3JzLnRlc3QiXSwidGhyZWFkIjoiYWM0ZWY3YzgtMjBlNC00YjZiLWI2ZjAtYjI2MjI4OGZiZmVmIiwiaW5SZXBseVRvIjpudWxsLCJ0aW1lIjoiMjAyNi0xMS0yMFQxMDowMDowMFoiLCJleHBpcmVzIjoiMjAyNi0xMS0yN1QxMDowMDowMFoiLCJleHQiOnt9LCJyZXF1aXJlZCI6W10sImdyYW50Ijp7ImlkIjoiZ3JhbnQtdmVjdG9ycy1ib2IiLCJhY3RvciI6ImFnZW50In0sImRhdGEiOnsidGV4dCI6IkNoZWNrIHRoZSBsYWJlbC4ifX0.ZutzF3izcKspxLtTAHfdMBDioxBEZpy6wTciJnpBSu09ne_ONYIszBC5uPacq1RM-fo5gMOKoZmke0s6XF0E0A"
+    }
+  },
+  "steps": [
+    {
+      "at": "2026-11-20T10:00:30Z",
+      "request": {
+        "method": "POST",
+        "url": "https://carol.vectors.test/darep/v2/inbox",
+        "headers": {
+          "content-type": "application/jose",
+          "darep-recipient": "acct:carol@vectors.test"
+        },
+        "body": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.eyJkYXJlcCI6IjMiLCJpZCI6ImFjNGVmN2M4LTIwZTQtNGI2Yi1iNmYwLWIyNjIyODhmYmZlZiIsInR5cGUiOiJodHRwczovL2RhcmVwLm9yZy9leHQvY29yZS92MiNtZXNzYWdlIiwic291cmNlIjoiYWNjdDpib2JAdmVjdG9ycy50ZXN0IiwidG8iOlsiYWNjdDpjYXJvbEB2ZWN0b3JzLnRlc3QiXSwidGhyZWFkIjoiYWM0ZWY3YzgtMjBlNC00YjZiLWI2ZjAtYjI2MjI4OGZiZmVmIiwiaW5SZXBseVRvIjpudWxsLCJ0aW1lIjoiMjAyNi0xMS0yMFQxMDowMDowMFoiLCJleHBpcmVzIjoiMjAyNi0xMS0yN1QxMDowMDowMFoiLCJleHQiOnt9LCJyZXF1aXJlZCI6W10sImdyYW50Ijp7ImlkIjoiZ3JhbnQtdmVjdG9ycy1ib2IiLCJhY3RvciI6ImFnZW50In0sImRhdGEiOnsidGV4dCI6IkNoZWNrIHRoZSBsYWJlbC4ifX0.ZutzF3izcKspxLtTAHfdMBDioxBEZpy6wTciJnpBSu09ne_ONYIszBC5uPacq1RM-fo5gMOKoZmke0s6XF0E0A"
+      },
+      "expect": {
+        "status": 400,
+        "contentType": "application/problem+json",
+        "problem": {
+          "type": "https://darep.org/problems/unsupported-version",
+          "status": 400,
+          "code": "unsupported-version"
+        },
+        "stored": false,
+        "receipt": null
+      }
+    }
+  ]
+}

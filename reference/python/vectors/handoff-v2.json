@@ -1,0 +1,104 @@
+{
+  "description": "Python-signed Wire v2 handoff and the Python receiver's storage receipt. TEST ONLY.",
+  "generator": "reference/python/make_vector.py",
+  "identities": [
+    {
+      "addresses": [
+        "acct:carol@python.test"
+      ],
+      "darep": "2",
+      "id": "https://python.test/.well-known/darep/carol",
+      "keys": [
+        {
+          "id": "https://python.test/.well-known/darep/carol#record-2026-11",
+          "publicKeyJwk": {
+            "crv": "P-256",
+            "kty": "EC",
+            "x": "cM-iPeWnxZRpA5D6NZjdkXyXQ0UMy3cAyaRB9E7gXAs",
+            "y": "qEJW8YGrj02wHfSmXPRF0yKUtDy5ilW4LVtJmzc3YAo"
+          },
+          "purpose": [
+            "record"
+          ],
+          "validFrom": "2026-11-21T16:45:54Z"
+        },
+        {
+          "id": "https://python.test/.well-known/darep/carol#provider-2026-11",
+          "publicKeyJwk": {
+            "crv": "P-256",
+            "kty": "EC",
+            "x": "_5FxvPqfze9NmUr_wy1S1494-u1JQgD9LWhtIDvhe0g",
+            "y": "vWkbuXp2Bj6TnCHnt5pLuBplZev_YuS8Jwbhoo9nEQM"
+          },
+          "purpose": [
+            "provider"
+          ],
+          "validFrom": "2026-11-21T16:45:54Z"
+        }
+      ],
+      "updated": "2026-11-21T16:45:54Z"
+    },
+    {
+      "addresses": [
+        "acct:bob@python.test"
+      ],
+      "darep": "2",
+      "id": "https://python.test/.well-known/darep/bob",
+      "keys": [
+        {
+          "id": "https://python.test/.well-known/darep/bob#record-2026-11",
+          "publicKeyJwk": {
+            "crv": "P-256",
+            "kty": "EC",
+            "x": "3mNOSBQKIicT2wcysFC1Snkl0S6bhGkIkFWRKSjmCUs",
+            "y": "4LgOtYQmaoX3EsIRZNFgkY180M_mUhWk3xusA18X5ao"
+          },
+          "purpose": [
+            "record"
+          ],
+          "validFrom": "2026-11-21T16:45:54Z"
+        },
+        {
+          "id": "https://python.test/.well-known/darep/bob#provider-2026-11",
+          "publicKeyJwk": {
+            "crv": "P-256",
+            "kty": "EC",
+            "x": "Kjbka-2n_Lio88wVK8Bn5rvy_L7JXRsU03yzSbNd3Fo",
+            "y": "ja04bd4FTZqeyJfRSn3FMCCtRAov5gviTF-5qkG-1cA"
+          },
+          "purpose": [
+            "provider"
+          ],
+          "validFrom": "2026-11-21T16:45:54Z"
+        }
+      ],
+      "updated": "2026-11-21T16:45:54Z"
+    }
+  ],
+  "event": {
+    "jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vcHl0aG9uLnRlc3QvLndlbGwta25vd24vZGFyZXAvY2Fyb2wjcmVjb3JkLTIwMjYtMTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.ewogICJkYXJlcCI6ICIyIiwKICAiaWQiOiAiYjYzMGJlZmMtOTEzZS00Y2FmLWI0MjEtMmM4ZGYxNGIyZDUyIiwKICAic291cmNlIjogImFjY3Q6Y2Fyb2xAcHl0aG9uLnRlc3QiLAogICJ0eXBlIjogImh0dHBzOi8vZGFyZXAub3JnL2V4dC93b3JrL3YyI2hhbmRvZmYiLAogICJ0aW1lIjogIjIwMjYtMTEtMjFUMTY6NDU6NTQuODk0WiIsCiAgInRvIjogWwogICAgImFjY3Q6Ym9iQHB5dGhvbi50ZXN0IgogIF0sCiAgInRocmVhZCI6ICJiNjMwYmVmYy05MTNlLTRjYWYtYjQyMS0yYzhkZjE0YjJkNTIiLAogICJpblJlcGx5VG8iOiBudWxsLAogICJleHBpcmVzIjogIjIwMjYtMTEtMjhUMTY6NDU6NTQuODk0WiIsCiAgImV4dCI6IHt9LAogICJyZXF1aXJlZCI6IFsKICAgICJodHRwczovL2RhcmVwLm9yZy9leHQvd29yay92MiIKICBdLAogICJncmFudCI6IHsKICAgICJpZCI6ICJncmFudC12ZWN0b3IiLAogICAgImFjdG9yIjogImFnZW50IgogIH0sCiAgImRhdGEiOiB7CiAgICAic3VtbWFyeSI6ICJQeXRob24g57C9572y55qE5Lqk5o6lIPCfl5MiLAogICAgIm5leHRTdGVwIjogIkNoZWNrIHRoZSBsYWJlbCDCq8Opw6luwrsuIiwKICAgICJleHBlY3RlZFJlc3VsdCI6ICJPbmUgY2xlYXIgYW5zd2VyLiIKICB9Cn0K.A8nufohN-aj-h2T1_m6DjqRAU4tpQHW3_MmpYiMLzeAf9yO2DgAFxKDze_S0AfRGQwFSiEO-zLrgrga9_Elbkw",
+    "payloadUtf8": "{\n  \"darep\": \"2\",\n  \"id\": \"b630befc-913e-4caf-b421-2c8df14b2d52\",\n  \"source\": \"acct:carol@python.test\",\n  \"type\": \"https://darep.org/ext/work/v2#handoff\",\n  \"time\": \"2026-11-21T16:45:54.894Z\",\n  \"to\": [\n    \"acct:bob@python.test\"\n  ],\n  \"thread\": \"b630befc-913e-4caf-b421-2c8df14b2d52\",\n  \"inReplyTo\": null,\n  \"expires\": \"2026-11-28T16:45:54.894Z\",\n  \"ext\": {},\n  \"required\": [\n    \"https://darep.org/ext/work/v2\"\n  ],\n  \"grant\": {\n    \"id\": \"grant-vector\",\n    \"actor\": \"agent\"\n  },\n  \"data\": {\n    \"summary\": \"Python 簽署的交接 🗓\",\n    \"nextStep\": \"Check the label «één».\",\n    \"expectedResult\": \"One clear answer.\"\n  }\n}\n",
+    "payloadSha256": "11b2fa4fe69552a16d3928497578e8e0c52674b4121c800bfac2b9c20c82316a",
+    "context": {
+      "mode": "admission",
+      "now": "2026-11-21T16:45:54.894Z",
+      "receiver": "acct:bob@python.test",
+      "typ": "darep-event+jws",
+      "understood": [
+        "https://darep.org/ext/core/v2",
+        "https://darep.org/ext/work/v2"
+      ]
+    }
+  },
+  "receipt": {
+    "jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vcHl0aG9uLnRlc3QvLndlbGwta25vd24vZGFyZXAvYm9iI3Byb3ZpZGVyLTIwMjYtMTEiLCJ0eXAiOiJkYXJlcC1yZWNlaXB0K2p3cyJ9.eyJkYXJlcCI6IjIiLCJpZCI6ImRmMjg4NGRjLWVlNTYtNGU0My04NjA5LTI5MDdmYWUxMzA0ZiIsInNvdXJjZSI6ImFjY3Q6Ym9iQHB5dGhvbi50ZXN0IiwidHlwZSI6Imh0dHBzOi8vZGFyZXAub3JnL2V4dC9jb3JlL3YyI3JlY2VpcHQiLCJ0aW1lIjoiMjAyNi0xMS0yMVQxNjo0NTo1NC44OTlaIiwidG8iOlsiYWNjdDpjYXJvbEBweXRob24udGVzdCJdLCJ0aHJlYWQiOiJiNjMwYmVmYy05MTNlLTRjYWYtYjQyMS0yYzhkZjE0YjJkNTIiLCJpblJlcGx5VG8iOiJiNjMwYmVmYy05MTNlLTRjYWYtYjQyMS0yYzhkZjE0YjJkNTIiLCJleHQiOnt9LCJyZXF1aXJlZCI6W10sImRhdGEiOnsic2hhMjU2IjoiMTFiMmZhNGZlNjk1NTJhMTZkMzkyODQ5NzU3OGU4ZTBjNTI2NzRiNDEyMWM4MDBiZmFjMmI5YzIwYzgyMzE2YSIsInN0b3JlZEF0IjoiMjAyNi0xMS0yMVQxNjo0NTo1NC44OTlaIn19.fzwNrjlgVzSzIRD3xdNAqQyfAzGlcHxbZ_ZZHIVvdC4jY8KnGSIHxha1FsT6xP6VNQdYgHC0IL4x1lmCqM0t-Q",
+    "context": {
+      "mode": "admission",
+      "now": "2026-11-21T16:45:54.894Z",
+      "receiver": "acct:carol@python.test",
+      "typ": "darep-receipt+jws",
+      "understood": [],
+      "answered": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vcHl0aG9uLnRlc3QvLndlbGwta25vd24vZGFyZXAvY2Fyb2wjcmVjb3JkLTIwMjYtMTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.ewogICJkYXJlcCI6ICIyIiwKICAiaWQiOiAiYjYzMGJlZmMtOTEzZS00Y2FmLWI0MjEtMmM4ZGYxNGIyZDUyIiwKICAic291cmNlIjogImFjY3Q6Y2Fyb2xAcHl0aG9uLnRlc3QiLAogICJ0eXBlIjogImh0dHBzOi8vZGFyZXAub3JnL2V4dC93b3JrL3YyI2hhbmRvZmYiLAogICJ0aW1lIjogIjIwMjYtMTEtMjFUMTY6NDU6NTQuODk0WiIsCiAgInRvIjogWwogICAgImFjY3Q6Ym9iQHB5dGhvbi50ZXN0IgogIF0sCiAgInRocmVhZCI6ICJiNjMwYmVmYy05MTNlLTRjYWYtYjQyMS0yYzhkZjE0YjJkNTIiLAogICJpblJlcGx5VG8iOiBudWxsLAogICJleHBpcmVzIjogIjIwMjYtMTEtMjhUMTY6NDU6NTQuODk0WiIsCiAgImV4dCI6IHt9LAogICJyZXF1aXJlZCI6IFsKICAgICJodHRwczovL2RhcmVwLm9yZy9leHQvd29yay92MiIKICBdLAogICJncmFudCI6IHsKICAgICJpZCI6ICJncmFudC12ZWN0b3IiLAogICAgImFjdG9yIjogImFnZW50IgogIH0sCiAgImRhdGEiOiB7CiAgICAic3VtbWFyeSI6ICJQeXRob24g57C9572y55qE5Lqk5o6lIPCfl5MiLAogICAgIm5leHRTdGVwIjogIkNoZWNrIHRoZSBsYWJlbCDCq8Opw6luwrsuIiwKICAgICJleHBlY3RlZFJlc3VsdCI6ICJPbmUgY2xlYXIgYW5zd2VyLiIKICB9Cn0K.A8nufohN-aj-h2T1_m6DjqRAU4tpQHW3_MmpYiMLzeAf9yO2DgAFxKDze_S0AfRGQwFSiEO-zLrgrga9_Elbkw"
+    }
+  }
+}

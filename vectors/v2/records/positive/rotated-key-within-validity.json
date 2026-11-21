@@ -1,0 +1,50 @@
+{
+  "name": "positive/rotated-key-within-validity",
+  "description": "Signed with Bob's retired key at a time inside its validity window. Rotation does not invalidate earlier signatures (§5.4).",
+  "spec": "§5.4",
+  "context": {
+    "mode": "admission",
+    "now": "2026-11-20T12:00:00Z",
+    "receiver": "acct:carol@vectors.test",
+    "typ": "darep-event+jws",
+    "understood": [
+      "https://darep.org/ext/core/v2",
+      "https://darep.org/ext/work/v2",
+      "https://darep.org/ext/reschedule/v2"
+    ]
+  },
+  "jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTIwMjYtMDUiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.ewogImRhcmVwIjogIjIiLAogImlkIjogIjRmNjFkNDU3LWMyN2MtNDRhYy04NTQ4LWM0OWZjYjVjYWExMCIsCiAic291cmNlIjogImFjY3Q6Ym9iQHZlY3RvcnMudGVzdCIsCiAidHlwZSI6ICJodHRwczovL2RhcmVwLm9yZy9leHQvd29yay92MiNoYW5kb2ZmIiwKICJ0aW1lIjogIjIwMjYtMTEtMTRUMTI6MDA6MDBaIiwKICJ0byI6IFsKICAiYWNjdDpjYXJvbEB2ZWN0b3JzLnRlc3QiCiBdLAogInRocmVhZCI6ICI0ZjYxZDQ1Ny1jMjdjLTQ0YWMtODU0OC1jNDlmY2I1Y2FhMTAiLAogImluUmVwbHlUbyI6IG51bGwsCiAiZXhwaXJlcyI6ICIyMDI2LTExLTIxVDEyOjAwOjAwWiIsCiAiZXh0Ijoge30sCiAicmVxdWlyZWQiOiBbCiAgImh0dHBzOi8vZGFyZXAub3JnL2V4dC93b3JrL3YyIgogXSwKICJncmFudCI6IHsKICAiaWQiOiAiZ3JhbnQtN2YzYSIsCiAgImFjdG9yIjogImFnZW50IgogfSwKICJkYXRhIjogewogICJzdW1tYXJ5IjogIuWQiOaIkOmgkOimvSDwn5eTIiwKICAibmV4dFN0ZXAiOiAi5qC45bCN6I236Jit5paH5qiZ57Gk44CMw6nDqW7jgI3jgIIiLAogICJleHBlY3RlZFJlc3VsdCI6ICLlm57opobkuIDlgIvmmI7norrntZDmnpzjgIIiCiB9Cn0K.0gylLU1CSEggPRScqhniPOFLxGWKE-NGiYYapkmYFLKqZQlBdr-SNtro3ziUA-4J0HRQrsc9P0YeTxXXCIgIWA",
+  "headerUtf8": "{\"alg\":\"ES256\",\"kid\":\"https://bob.vectors.test/.well-known/darep/bob#sig-2026-05\",\"typ\":\"darep-event+jws\"}",
+  "payloadUtf8": "{\n \"darep\": \"2\",\n \"id\": \"4f61d457-c27c-44ac-8548-c49fcb5caa10\",\n \"source\": \"acct:bob@vectors.test\",\n \"type\": \"https://darep.org/ext/work/v2#handoff\",\n \"time\": \"2026-11-14T12:00:00Z\",\n \"to\": [\n  \"acct:carol@vectors.test\"\n ],\n \"thread\": \"4f61d457-c27c-44ac-8548-c49fcb5caa10\",\n \"inReplyTo\": null,\n \"expires\": \"2026-11-21T12:00:00Z\",\n \"ext\": {},\n \"required\": [\n  \"https://darep.org/ext/work/v2\"\n ],\n \"grant\": {\n  \"id\": \"grant-7f3a\",\n  \"actor\": \"agent\"\n },\n \"data\": {\n  \"summary\": \"合成預覽 🗓\",\n  \"nextStep\": \"核對荷蘭文標籤「één」。\",\n  \"expectedResult\": \"回覆一個明確結果。\"\n }\n}\n",
+  "payloadSha256": "e265421d5e20122d36278ca2ef225d856779659da9dea7bf96f0a882a74e19ae",
+  "expected": {
+    "verdict": "accept",
+    "kid": "https://bob.vectors.test/.well-known/darep/bob#sig-2026-05",
+    "record": {
+      "darep": "2",
+      "id": "4f61d457-c27c-44ac-8548-c49fcb5caa10",
+      "source": "acct:bob@vectors.test",
+      "type": "https://darep.org/ext/work/v2#handoff",
+      "time": "2026-11-14T12:00:00Z",
+      "to": [
+        "acct:carol@vectors.test"
+      ],
+      "thread": "4f61d457-c27c-44ac-8548-c49fcb5caa10",
+      "inReplyTo": null,
+      "expires": "2026-11-21T12:00:00Z",
+      "ext": {},
+      "required": [
+        "https://darep.org/ext/work/v2"
+      ],
+      "grant": {
+        "id": "grant-7f3a",
+        "actor": "agent"
+      },
+      "data": {
+        "summary": "合成預覽 🗓",
+        "nextStep": "核對荷蘭文標籤「één」。",
+        "expectedResult": "回覆一個明確結果。"
+      }
+    }
+  }
+}

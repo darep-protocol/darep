@@ -1,0 +1,24 @@
+{
+  "name": "negative/rejection-missing-code",
+  "description": "Signed rejection whose data carries detail but omits code (§4.5).",
+  "spec": "§4.5",
+  "context": {
+    "mode": "admission",
+    "now": "2026-11-20T12:00:00Z",
+    "receiver": "acct:bob@vectors.test",
+    "typ": "darep-rejection+jws",
+    "understood": [
+      "https://darep.org/ext/core/v2",
+      "https://darep.org/ext/work/v2",
+      "https://darep.org/ext/reschedule/v2"
+    ]
+  },
+  "jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vY2Fyb2wudmVjdG9ycy50ZXN0Ly53ZWxsLWtub3duL2RhcmVwL2Nhcm9sI2tleS0yMDI2LTExIiwidHlwIjoiZGFyZXAtcmVqZWN0aW9uK2p3cyJ9.eyJkYXJlcCI6IjIiLCJpZCI6ImExNTg5YzRjLWI5YmItNDZkYy05NTJjLTA1ZTllNjliMmQ1MSIsInNvdXJjZSI6ImFjY3Q6Y2Fyb2xAdmVjdG9ycy50ZXN0IiwidHlwZSI6Imh0dHBzOi8vZGFyZXAub3JnL2V4dC9jb3JlL3YyI3JlamVjdGlvbiIsInRpbWUiOiIyMDI2LTExLTIwVDExOjU5OjAwWiIsInRvIjpbImFjY3Q6Ym9iQHZlY3RvcnMudGVzdCJdLCJ0aHJlYWQiOiIzM2FiMTA3Ny05NWE4LTQxODMtYTc5OC04MDVkYTNjMWYxYzEiLCJpblJlcGx5VG8iOiIzM2FiMTA3Ny05NWE4LTQxODMtYTc5OC04MDVkYTNjMWYxYzEiLCJleHBpcmVzIjoiMjAyNi0xMS0yN1QxMTo1OTowMFoiLCJleHQiOnt9LCJyZXF1aXJlZCI6W10sImRhdGEiOnsiZGV0YWlsIjoiTm8gY29kZSB3YXMgc3VwcGxpZWQuIn19.eH5pewNRoO3zwCC3BvXRApcPfVmVuEBRMJtzz1Jy9qSexYJFnol_rOp_DA6eLxqDpCm_g_Yc82JflGHio9Vdgg",
+  "headerUtf8": "{\"alg\":\"ES256\",\"kid\":\"https://carol.vectors.test/.well-known/darep/carol#key-2026-11\",\"typ\":\"darep-rejection+jws\"}",
+  "payloadUtf8": "{\"darep\":\"2\",\"id\":\"a1589c4c-b9bb-46dc-952c-05e9e69b2d51\",\"source\":\"acct:carol@vectors.test\",\"type\":\"https://darep.org/ext/core/v2#rejection\",\"time\":\"2026-11-20T11:59:00Z\",\"to\":[\"acct:bob@vectors.test\"],\"thread\":\"33ab1077-95a8-4183-a798-805da3c1f1c1\",\"inReplyTo\":\"33ab1077-95a8-4183-a798-805da3c1f1c1\",\"expires\":\"2026-11-27T11:59:00Z\",\"ext\":{},\"required\":[],\"data\":{\"detail\":\"No code was supplied.\"}}",
+  "payloadSha256": "23d720049ea9cabb6d8383ed5a1e06baa5944d66544c65f9c457f61acdc76993",
+  "expected": {
+    "verdict": "reject",
+    "code": "malformed"
+  }
+}

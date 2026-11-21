@@ -1,0 +1,24 @@
+{
+  "name": "negative/required-empty-fragment",
+  "description": "A required entry ends with a trailing #, which is forbidden even though WHATWG .hash is empty.",
+  "spec": "§3.2 K-1, §6.1 U-1",
+  "context": {
+    "mode": "admission",
+    "now": "2026-11-20T12:00:00Z",
+    "receiver": "acct:carol@vectors.test",
+    "typ": "darep-event+jws",
+    "understood": [
+      "https://darep.org/ext/core/v2",
+      "https://darep.org/ext/work/v2",
+      "https://darep.org/ext/reschedule/v2"
+    ]
+  },
+  "jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTIwMjYtMTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.ewogImRhcmVwIjogIjIiLAogImlkIjogIjE2MTE4YTYxLWRjYzItNGQ3MS05NTNlLTljMDdkMTA0MmZhNCIsCiAic291cmNlIjogImFjY3Q6Ym9iQHZlY3RvcnMudGVzdCIsCiAidHlwZSI6ICJodHRwczovL2RhcmVwLm9yZy9leHQvd29yay92MiNoYW5kb2ZmIiwKICJ0aW1lIjogIjIwMjYtMTEtMjBUMTE6NTg6MDBaIiwKICJ0byI6IFsKICAiYWNjdDpjYXJvbEB2ZWN0b3JzLnRlc3QiCiBdLAogInRocmVhZCI6ICIxNjExOGE2MS1kY2MyLTRkNzEtOTUzZS05YzA3ZDEwNDJmYTQiLAogImluUmVwbHlUbyI6IG51bGwsCiAiZXhwaXJlcyI6ICIyMDI2LTExLTI3VDExOjU4OjAwWiIsCiAiZXh0Ijoge30sCiAicmVxdWlyZWQiOiBbCiAgImh0dHBzOi8vZXhhbXBsZS50ZXN0L2V4dC90cmFjZS92MSMiCiBdLAogImdyYW50IjogewogICJpZCI6ICJncmFudC03ZjNhIiwKICAiYWN0b3IiOiAiYWdlbnQiCiB9LAogImRhdGEiOiB7CiAgInN1bW1hcnkiOiAi5ZCI5oiQ6aCQ6Ka9IPCfl5MiLAogICJuZXh0U3RlcCI6ICLmoLjlsI3ojbfomK3mlofmqJnnsaTjgIzDqcOpbuOAjeOAgiIsCiAgImV4cGVjdGVkUmVzdWx0IjogIuWbnuimhuS4gOWAi-aYjueiuue1kOaenOOAgiIKIH0KfQo.4jNxO_NLWu0tkBLZmt4eFbbGsx1Te2t48hXjou8yYloyAVu1-brQMt8Pmcx0PnB-G-m0nHq7H9JFPaOfNBNvPw",
+  "headerUtf8": "{\"alg\":\"ES256\",\"kid\":\"https://bob.vectors.test/.well-known/darep/bob#sig-2026-11\",\"typ\":\"darep-event+jws\"}",
+  "payloadUtf8": "{\n \"darep\": \"2\",\n \"id\": \"16118a61-dcc2-4d71-953e-9c07d1042fa4\",\n \"source\": \"acct:bob@vectors.test\",\n \"type\": \"https://darep.org/ext/work/v2#handoff\",\n \"time\": \"2026-11-20T11:58:00Z\",\n \"to\": [\n  \"acct:carol@vectors.test\"\n ],\n \"thread\": \"16118a61-dcc2-4d71-953e-9c07d1042fa4\",\n \"inReplyTo\": null,\n \"expires\": \"2026-11-27T11:58:00Z\",\n \"ext\": {},\n \"required\": [\n  \"https://example.test/ext/trace/v1#\"\n ],\n \"grant\": {\n  \"id\": \"grant-7f3a\",\n  \"actor\": \"agent\"\n },\n \"data\": {\n  \"summary\": \"合成預覽 🗓\",\n  \"nextStep\": \"核對荷蘭文標籤「één」。\",\n  \"expectedResult\": \"回覆一個明確結果。\"\n }\n}\n",
+  "payloadSha256": "a79be212cc37c8a9600064cd33ab6ee022f692bed176dc5c6fc27ed3cd4a4006",
+  "expected": {
+    "verdict": "reject",
+    "code": "malformed"
+  }
+}

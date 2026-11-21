@@ -1,0 +1,24 @@
+{
+  "name": "negative/duplicate-payload-member",
+  "description": "Validly signed payload that lists \"to\" twice. Parsers disagree on which wins, so it is rejected.",
+  "spec": "§2.2",
+  "context": {
+    "mode": "admission",
+    "now": "2026-11-20T12:00:00Z",
+    "receiver": "acct:carol@vectors.test",
+    "typ": "darep-event+jws",
+    "understood": [
+      "https://darep.org/ext/core/v2",
+      "https://darep.org/ext/work/v2",
+      "https://darep.org/ext/reschedule/v2"
+    ]
+  },
+  "jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTIwMjYtMTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.ewogImRhcmVwIjogIjIiLAogImlkIjogIjMzYWIxMDc3LTk1YTgtNDE4My1hNzk4LTgwNWRhM2MxZjFjMSIsCiAic291cmNlIjogImFjY3Q6Ym9iQHZlY3RvcnMudGVzdCIsCiAidHlwZSI6ICJodHRwczovL2RhcmVwLm9yZy9leHQvd29yay92MiNoYW5kb2ZmIiwKICJ0aW1lIjogIjIwMjYtMTEtMjBUMTE6NTg6MDBaIiwKICJ0byI6IFsKICAiYWNjdDpjYXJvbEB2ZWN0b3JzLnRlc3QiCiBdLAogInRvIjogWwogICJhY2N0OmRhdmVAdmVjdG9ycy50ZXN0IgogXSwKICJ0aHJlYWQiOiAiMzNhYjEwNzctOTVhOC00MTgzLWE3OTgtODA1ZGEzYzFmMWMxIiwKICJpblJlcGx5VG8iOiBudWxsLAogImV4cGlyZXMiOiAiMjAyNi0xMS0yN1QxMTo1ODowMFoiLAogImV4dCI6IHt9LAogInJlcXVpcmVkIjogWwogICJodHRwczovL2RhcmVwLm9yZy9leHQvd29yay92MiIKIF0sCiAiZ3JhbnQiOiB7CiAgImlkIjogImdyYW50LTdmM2EiLAogICJhY3RvciI6ICJhZ2VudCIKIH0sCiAiZGF0YSI6IHsKICAic3VtbWFyeSI6ICLlkIjmiJDpoJDopr0g8J-XkyIsCiAgIm5leHRTdGVwIjogIuaguOWwjeiNt-iYreaWh-aomeexpOOAjMOpw6lu44CN44CCIiwKICAiZXhwZWN0ZWRSZXN1bHQiOiAi5Zue6KaG5LiA5YCL5piO56K657WQ5p6c44CCIgogfQp9Cg.unWrHPWi-C_CmUcgrgU_Jdbdv8fU_zq_IZo1u3sd6tgOAnyAHccP8TI9Z8y_Frp8Y_XQu9FxWtxTDQk0Dgk9ww",
+  "headerUtf8": "{\"alg\":\"ES256\",\"kid\":\"https://bob.vectors.test/.well-known/darep/bob#sig-2026-11\",\"typ\":\"darep-event+jws\"}",
+  "payloadUtf8": "{\n \"darep\": \"2\",\n \"id\": \"33ab1077-95a8-4183-a798-805da3c1f1c1\",\n \"source\": \"acct:bob@vectors.test\",\n \"type\": \"https://darep.org/ext/work/v2#handoff\",\n \"time\": \"2026-11-20T11:58:00Z\",\n \"to\": [\n  \"acct:carol@vectors.test\"\n ],\n \"to\": [\n  \"acct:dave@vectors.test\"\n ],\n \"thread\": \"33ab1077-95a8-4183-a798-805da3c1f1c1\",\n \"inReplyTo\": null,\n \"expires\": \"2026-11-27T11:58:00Z\",\n \"ext\": {},\n \"required\": [\n  \"https://darep.org/ext/work/v2\"\n ],\n \"grant\": {\n  \"id\": \"grant-7f3a\",\n  \"actor\": \"agent\"\n },\n \"data\": {\n  \"summary\": \"合成預覽 🗓\",\n  \"nextStep\": \"核對荷蘭文標籤「één」。\",\n  \"expectedResult\": \"回覆一個明確結果。\"\n }\n}\n",
+  "payloadSha256": "b91762335fce47780c74bf3f756b26b22a9f898a3073e536e6b722bcdad75882",
+  "expected": {
+    "verdict": "reject",
+    "code": "malformed"
+  }
+}

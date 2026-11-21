@@ -1,0 +1,44 @@
+{
+  "name": "positive/evidence-mode-expired",
+  "description": "The same check in evidence mode: an expired record is still a valid signed record (§7.3).",
+  "spec": "§7.3",
+  "context": {
+    "mode": "evidence",
+    "now": "2026-11-20T12:00:00Z",
+    "typ": "darep-event+jws"
+  },
+  "jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTIwMjYtMTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.ewogImRhcmVwIjogIjIiLAogImlkIjogIjQwNWE5Mzc0LTM4NDctNGU0MS1hODk5LTE2YTA3Y2VjN2I5MiIsCiAic291cmNlIjogImFjY3Q6Ym9iQHZlY3RvcnMudGVzdCIsCiAidHlwZSI6ICJodHRwczovL2RhcmVwLm9yZy9leHQvd29yay92MiNoYW5kb2ZmIiwKICJ0aW1lIjogIjIwMjYtMTEtMDJUMDg6MDA6MDBaIiwKICJ0byI6IFsKICAiYWNjdDpjYXJvbEB2ZWN0b3JzLnRlc3QiCiBdLAogInRocmVhZCI6ICI0MDVhOTM3NC0zODQ3LTRlNDEtYTg5OS0xNmEwN2NlYzdiOTIiLAogImluUmVwbHlUbyI6IG51bGwsCiAiZXhwaXJlcyI6ICIyMDI2LTExLTA5VDA4OjAwOjAwWiIsCiAiZXh0Ijoge30sCiAicmVxdWlyZWQiOiBbCiAgImh0dHBzOi8vZGFyZXAub3JnL2V4dC93b3JrL3YyIgogXSwKICJncmFudCI6IHsKICAiaWQiOiAiZ3JhbnQtN2YzYSIsCiAgImFjdG9yIjogImFnZW50IgogfSwKICJkYXRhIjogewogICJzdW1tYXJ5IjogIuWQiOaIkOmgkOimvSDwn5eTIiwKICAibmV4dFN0ZXAiOiAi5qC45bCN6I236Jit5paH5qiZ57Gk44CMw6nDqW7jgI3jgIIiLAogICJleHBlY3RlZFJlc3VsdCI6ICLlm57opobkuIDlgIvmmI7norrntZDmnpzjgIIiCiB9Cn0K.qMIOhLe78wus5_sU4_yoSw_PCSe_TC8r4sKIQgkHKN10LaZfmxMG69M93RFRYS1R3oLW8pO9XFQ1xiw06YnhEQ",
+  "headerUtf8": "{\"alg\":\"ES256\",\"kid\":\"https://bob.vectors.test/.well-known/darep/bob#sig-2026-11\",\"typ\":\"darep-event+jws\"}",
+  "payloadUtf8": "{\n \"darep\": \"2\",\n \"id\": \"405a9374-3847-4e41-a899-16a07cec7b92\",\n \"source\": \"acct:bob@vectors.test\",\n \"type\": \"https://darep.org/ext/work/v2#handoff\",\n \"time\": \"2026-11-02T08:00:00Z\",\n \"to\": [\n  \"acct:carol@vectors.test\"\n ],\n \"thread\": \"405a9374-3847-4e41-a899-16a07cec7b92\",\n \"inReplyTo\": null,\n \"expires\": \"2026-11-09T08:00:00Z\",\n \"ext\": {},\n \"required\": [\n  \"https://darep.org/ext/work/v2\"\n ],\n \"grant\": {\n  \"id\": \"grant-7f3a\",\n  \"actor\": \"agent\"\n },\n \"data\": {\n  \"summary\": \"合成預覽 🗓\",\n  \"nextStep\": \"核對荷蘭文標籤「één」。\",\n  \"expectedResult\": \"回覆一個明確結果。\"\n }\n}\n",
+  "payloadSha256": "a5b9d7e0d2251ab9dbbcdeca59450f332c67f43e1fa16ec0bd6d0abf78e73230",
+  "expected": {
+    "verdict": "accept",
+    "kid": "https://bob.vectors.test/.well-known/darep/bob#sig-2026-11",
+    "record": {
+      "darep": "2",
+      "id": "405a9374-3847-4e41-a899-16a07cec7b92",
+      "source": "acct:bob@vectors.test",
+      "type": "https://darep.org/ext/work/v2#handoff",
+      "time": "2026-11-02T08:00:00Z",
+      "to": [
+        "acct:carol@vectors.test"
+      ],
+      "thread": "405a9374-3847-4e41-a899-16a07cec7b92",
+      "inReplyTo": null,
+      "expires": "2026-11-09T08:00:00Z",
+      "ext": {},
+      "required": [
+        "https://darep.org/ext/work/v2"
+      ],
+      "grant": {
+        "id": "grant-7f3a",
+        "actor": "agent"
+      },
+      "data": {
+        "summary": "合成預覽 🗓",
+        "nextStep": "核對荷蘭文標籤「één」。",
+        "expectedResult": "回覆一個明確結果。"
+      }
+    }
+  }
+}

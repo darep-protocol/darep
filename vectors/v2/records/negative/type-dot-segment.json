@@ -1,0 +1,24 @@
+{
+  "name": "negative/type-dot-segment",
+  "description": "type URI path contains a dot segment (.), which K-1 forbids.",
+  "spec": "§3.2 K-1, §6.1 U-2",
+  "context": {
+    "mode": "admission",
+    "now": "2026-11-20T12:00:00Z",
+    "receiver": "acct:carol@vectors.test",
+    "typ": "darep-event+jws",
+    "understood": [
+      "https://darep.org/ext/core/v2",
+      "https://darep.org/ext/work/v2",
+      "https://darep.org/ext/reschedule/v2"
+    ]
+  },
+  "jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTIwMjYtMTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.ewogImRhcmVwIjogIjIiLAogImlkIjogImRjZGU0NjIwLWNiZTktNDBmNi05ZWE0LTI1MGNjZTQyOWYzNSIsCiAic291cmNlIjogImFjY3Q6Ym9iQHZlY3RvcnMudGVzdCIsCiAidHlwZSI6ICJodHRwczovL2V4YW1wbGUudGVzdC9leHQvLi9wb2xsL3YxI3ZvdGUiLAogInRpbWUiOiAiMjAyNi0xMS0yMFQxMTo1ODowMFoiLAogInRvIjogWwogICJhY2N0OmNhcm9sQHZlY3RvcnMudGVzdCIKIF0sCiAidGhyZWFkIjogImRjZGU0NjIwLWNiZTktNDBmNi05ZWE0LTI1MGNjZTQyOWYzNSIsCiAiaW5SZXBseVRvIjogbnVsbCwKICJleHBpcmVzIjogIjIwMjYtMTEtMjdUMTE6NTg6MDBaIiwKICJleHQiOiB7fSwKICJyZXF1aXJlZCI6IFtdLAogImdyYW50IjogewogICJpZCI6ICJncmFudC03ZjNhIiwKICAiYWN0b3IiOiAiYWdlbnQiCiB9LAogImRhdGEiOiB7CiAgInN1bW1hcnkiOiAi5ZCI5oiQ6aCQ6Ka9IPCfl5MiLAogICJuZXh0U3RlcCI6ICLmoLjlsI3ojbfomK3mlofmqJnnsaTjgIzDqcOpbuOAjeOAgiIsCiAgImV4cGVjdGVkUmVzdWx0IjogIuWbnuimhuS4gOWAi-aYjueiuue1kOaenOOAgiIKIH0KfQo.WKkxOtf4FNz25FSFbSwfzjovHUfncD2a-poRXXCZHNcjI80BpCt67y2FxIim5wFjnV86XLbgbMatRlMDlMhxTw",
+  "headerUtf8": "{\"alg\":\"ES256\",\"kid\":\"https://bob.vectors.test/.well-known/darep/bob#sig-2026-11\",\"typ\":\"darep-event+jws\"}",
+  "payloadUtf8": "{\n \"darep\": \"2\",\n \"id\": \"dcde4620-cbe9-40f6-9ea4-250cce429f35\",\n \"source\": \"acct:bob@vectors.test\",\n \"type\": \"https://example.test/ext/./poll/v1#vote\",\n \"time\": \"2026-11-20T11:58:00Z\",\n \"to\": [\n  \"acct:carol@vectors.test\"\n ],\n \"thread\": \"dcde4620-cbe9-40f6-9ea4-250cce429f35\",\n \"inReplyTo\": null,\n \"expires\": \"2026-11-27T11:58:00Z\",\n \"ext\": {},\n \"required\": [],\n \"grant\": {\n  \"id\": \"grant-7f3a\",\n  \"actor\": \"agent\"\n },\n \"data\": {\n  \"summary\": \"合成預覽 🗓\",\n  \"nextStep\": \"核對荷蘭文標籤「één」。\",\n  \"expectedResult\": \"回覆一個明確結果。\"\n }\n}\n",
+  "payloadSha256": "358593c820e952813c2cf3e4258efd749093597295c3bb1bb613264bdca470fc",
+  "expected": {
+    "verdict": "reject",
+    "code": "malformed"
+  }
+}

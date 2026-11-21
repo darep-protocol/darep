@@ -1,0 +1,46 @@
+Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Copyright 2026 Rev.Vision and DAREP contributors
+
+The explanatory documents in this repository are licensed under the Creative
+Commons Attribution 4.0 International License. The full legal code is at:
+
+    https://creativecommons.org/licenses/by/4.0/legalcode
+
+You may share and adapt these documents for any purpose, including
+commercially, as long as you give appropriate credit, provide a link to the
+license, and indicate if changes were made.
+
+Files covered by this license
+-----------------------------
+
+  README.md
+  CHANGELOG.md
+  CONTRIBUTING.md
+  GOVERNANCE.md
+  TRADEMARK.md
+  SECURITY.md
+  vectors/README.md
+  vectors/v2/records/README.md
+  vectors/v2/delivery/README.md
+  reference/node/README.md
+  reference/python/README.md
+
+Files NOT covered by this license
+---------------------------------
+
+Everything else is licensed under the Apache License 2.0 (see LICENSE),
+including:
+
+  - the specification in spec/ (records.md, delivery.md, https-binding.md,
+    decisions-wire-v2.md);
+  - all code, the test vectors and their generators;
+  - the CI configuration.
+
+Apache-2.0 section 3 grants a patent license from each contributor only for
+claims licensable by that contributor that are necessarily infringed by their
+contributions alone or in combination with the Work to which they were
+submitted, subject to that section's terms. It is not blanket patent clearance
+for implementing DAREP. No broader patent commitment is made.
+
+A new explanatory document is covered once it is added to the list above.

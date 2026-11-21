@@ -1,0 +1,86 @@
+{
+  "vector": "delivery/receiver/reject-signer-mismatch",
+  "generatedBy": "vectors/v2/delivery/generate.mjs",
+  "testOnly": true,
+  "role": "receiver",
+  "clock": "Each step has \"at\": the receiver clock at that moment. Runners inject it. A receiver with a real clock checks storedAt format only.",
+  "description": "Signed with dave's pinned key but claiming source acct:bob@vectors.test.",
+  "spec": [
+    "delivery.md §3.1",
+    "delivery.md §5.1",
+    "https-binding.md §2.3",
+    "https-binding.md §3"
+  ],
+  "decisions": [
+    "D6"
+  ],
+  "receiver": {
+    "address": "acct:carol@vectors.test",
+    "inbox": "https://carol.vectors.test/darep/v2/inbox",
+    "signingKeys": [
+      "https://carol.vectors.test/.well-known/darep/carol#sig-1",
+      "https://carol.vectors.test/.well-known/darep/carol#rcpt-1"
+    ],
+    "pinned": [
+      "acct:bob@vectors.test",
+      "acct:dave@vectors.test"
+    ],
+    "extensions": [
+      "https://darep.org/ext/core/v2"
+    ]
+  },
+  "records": {
+    "r": {
+      "envelope": {
+        "darep": "2",
+        "id": "3d337fe1-4d0f-4a5a-8601-6ffef7c9a418",
+        "type": "https://darep.org/ext/core/v2#message",
+        "source": "acct:bob@vectors.test",
+        "to": [
+          "acct:carol@vectors.test"
+        ],
+        "thread": "3d337fe1-4d0f-4a5a-8601-6ffef7c9a418",
+        "inReplyTo": null,
+        "time": "2026-11-20T10:00:00Z",
+        "expires": "2026-11-27T10:00:00Z",
+        "ext": {},
+        "required": [],
+        "grant": {
+          "id": "grant-vectors-bob",
+          "actor": "agent"
+        },
+        "data": {
+          "text": "Check the label."
+        }
+      },
+      "payloadUtf8": "{\"darep\":\"2\",\"id\":\"3d337fe1-4d0f-4a5a-8601-6ffef7c9a418\",\"type\":\"https://darep.org/ext/core/v2#message\",\"source\":\"acct:bob@vectors.test\",\"to\":[\"acct:carol@vectors.test\"],\"thread\":\"3d337fe1-4d0f-4a5a-8601-6ffef7c9a418\",\"inReplyTo\":null,\"time\":\"2026-11-20T10:00:00Z\",\"expires\":\"2026-11-27T10:00:00Z\",\"ext\":{},\"required\":[],\"grant\":{\"id\":\"grant-vectors-bob\",\"actor\":\"agent\"},\"data\":{\"text\":\"Check the label.\"}}",
+      "payloadSha256": "1aa06846d947a9e702585730f8d653c70de2deb40cae74ce6530a3fb2e06da4d",
+      "recordBytes": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vZGF2ZS52ZWN0b3JzLnRlc3QvLndlbGwta25vd24vZGFyZXAvZGF2ZSNzaWctMSIsInR5cCI6ImRhcmVwLWV2ZW50K2p3cyJ9.eyJkYXJlcCI6IjIiLCJpZCI6IjNkMzM3ZmUxLTRkMGYtNGE1YS04NjAxLTZmZmVmN2M5YTQxOCIsInR5cGUiOiJodHRwczovL2RhcmVwLm9yZy9leHQvY29yZS92MiNtZXNzYWdlIiwic291cmNlIjoiYWNjdDpib2JAdmVjdG9ycy50ZXN0IiwidG8iOlsiYWNjdDpjYXJvbEB2ZWN0b3JzLnRlc3QiXSwidGhyZWFkIjoiM2QzMzdmZTEtNGQwZi00YTVhLTg2MDEtNmZmZWY3YzlhNDE4IiwiaW5SZXBseVRvIjpudWxsLCJ0aW1lIjoiMjAyNi0xMS0yMFQxMDowMDowMFoiLCJleHBpcmVzIjoiMjAyNi0xMS0yN1QxMDowMDowMFoiLCJleHQiOnt9LCJyZXF1aXJlZCI6W10sImdyYW50Ijp7ImlkIjoiZ3JhbnQtdmVjdG9ycy1ib2IiLCJhY3RvciI6ImFnZW50In0sImRhdGEiOnsidGV4dCI6IkNoZWNrIHRoZSBsYWJlbC4ifX0.pFKefo1va4A_c8xk7y1xx5DvNKF0NzZupMETGINv5vPs5-PuziVXRMqLqvwFhU95Jx7omKGNvSP7MoJUBJJtFg"
+    }
+  },
+  "steps": [
+    {
+      "at": "2026-11-20T10:00:30Z",
+      "request": {
+        "method": "POST",
+        "url": "https://carol.vectors.test/darep/v2/inbox",
+        "headers": {
+          "content-type": "application/jose",
+          "darep-recipient": "acct:carol@vectors.test"
+        },
+        "body": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vZGF2ZS52ZWN0b3JzLnRlc3QvLndlbGwta25vd24vZGFyZXAvZGF2ZSNzaWctMSIsInR5cCI6ImRhcmVwLWV2ZW50K2p3cyJ9.eyJkYXJlcCI6IjIiLCJpZCI6IjNkMzM3ZmUxLTRkMGYtNGE1YS04NjAxLTZmZmVmN2M5YTQxOCIsInR5cGUiOiJodHRwczovL2RhcmVwLm9yZy9leHQvY29yZS92MiNtZXNzYWdlIiwic291cmNlIjoiYWNjdDpib2JAdmVjdG9ycy50ZXN0IiwidG8iOlsiYWNjdDpjYXJvbEB2ZWN0b3JzLnRlc3QiXSwidGhyZWFkIjoiM2QzMzdmZTEtNGQwZi00YTVhLTg2MDEtNmZmZWY3YzlhNDE4IiwiaW5SZXBseVRvIjpudWxsLCJ0aW1lIjoiMjAyNi0xMS0yMFQxMDowMDowMFoiLCJleHBpcmVzIjoiMjAyNi0xMS0yN1QxMDowMDowMFoiLCJleHQiOnt9LCJyZXF1aXJlZCI6W10sImdyYW50Ijp7ImlkIjoiZ3JhbnQtdmVjdG9ycy1ib2IiLCJhY3RvciI6ImFnZW50In0sImRhdGEiOnsidGV4dCI6IkNoZWNrIHRoZSBsYWJlbC4ifX0.pFKefo1va4A_c8xk7y1xx5DvNKF0NzZupMETGINv5vPs5-PuziVXRMqLqvwFhU95Jx7omKGNvSP7MoJUBJJtFg"
+      },
+      "expect": {
+        "status": 403,
+        "contentType": "application/problem+json",
+        "problem": {
+          "type": "https://darep.org/problems/signer-mismatch",
+          "status": 403,
+          "code": "signer-mismatch"
+        },
+        "stored": false,
+        "receipt": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,159 @@
+{
+  "vector": "delivery/receiver/reject-wrong-recipient",
+  "generatedBy": "vectors/v2/delivery/generate.mjs",
+  "testOnly": true,
+  "role": "receiver",
+  "clock": "Each step has \"at\": the receiver clock at that moment. Runners inject it. A receiver with a real clock checks storedAt format only.",
+  "description": "Three ways to name the wrong recipient: a record addressed only to dave delivered with Darep-Recipient carol (R12), a request with no Darep-Recipient header (C1), and Darep-Recipient naming an address carol's provider does not host (C1 before signature verification on a multi-tenant receiver, or R12 after signature verification).",
+  "spec": [
+    "delivery.md §3.1",
+    "delivery.md §5.1",
+    "https-binding.md §2.3",
+    "https-binding.md §3"
+  ],
+  "decisions": [
+    "D6"
+  ],
+  "receiver": {
+    "address": "acct:carol@vectors.test",
+    "inbox": "https://carol.vectors.test/darep/v2/inbox",
+    "signingKeys": [
+      "https://carol.vectors.test/.well-known/darep/carol#sig-1",
+      "https://carol.vectors.test/.well-known/darep/carol#rcpt-1"
+    ],
+    "pinned": [
+      "acct:bob@vectors.test",
+      "acct:dave@vectors.test"
+    ],
+    "extensions": [
+      "https://darep.org/ext/core/v2"
+    ]
+  },
+  "records": {
+    "r": {
+      "envelope": {
+        "darep": "2",
+        "id": "9669be9f-c26b-47fc-90d7-bfa0171a7b2e",
+        "type": "https://darep.org/ext/core/v2#message",
+        "source": "acct:bob@vectors.test",
+        "to": [
+          "acct:dave@vectors.test"
+        ],
+        "thread": "9669be9f-c26b-47fc-90d7-bfa0171a7b2e",
+        "inReplyTo": null,
+        "time": "2026-11-20T10:00:00Z",
+        "expires": "2026-11-27T10:00:00Z",
+        "ext": {},
+        "required": [],
+        "grant": {
+          "id": "grant-vectors-bob",
+          "actor": "agent"
+        },
+        "data": {
+          "text": "Check the label."
+        }
+      },
+      "payloadUtf8": "{\"darep\":\"2\",\"id\":\"9669be9f-c26b-47fc-90d7-bfa0171a7b2e\",\"type\":\"https://darep.org/ext/core/v2#message\",\"source\":\"acct:bob@vectors.test\",\"to\":[\"acct:dave@vectors.test\"],\"thread\":\"9669be9f-c26b-47fc-90d7-bfa0171a7b2e\",\"inReplyTo\":null,\"time\":\"2026-11-20T10:00:00Z\",\"expires\":\"2026-11-27T10:00:00Z\",\"ext\":{},\"required\":[],\"grant\":{\"id\":\"grant-vectors-bob\",\"actor\":\"agent\"},\"data\":{\"text\":\"Check the label.\"}}",
+      "payloadSha256": "9140c6954c6c2ecf4c32c99d855bf8f4800d224e5366082c7aa34288d6e93cf4",
+      "recordBytes": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.eyJkYXJlcCI6IjIiLCJpZCI6Ijk2NjliZTlmLWMyNmItNDdmYy05MGQ3LWJmYTAxNzFhN2IyZSIsInR5cGUiOiJodHRwczovL2RhcmVwLm9yZy9leHQvY29yZS92MiNtZXNzYWdlIiwic291cmNlIjoiYWNjdDpib2JAdmVjdG9ycy50ZXN0IiwidG8iOlsiYWNjdDpkYXZlQHZlY3RvcnMudGVzdCJdLCJ0aHJlYWQiOiI5NjY5YmU5Zi1jMjZiLTQ3ZmMtOTBkNy1iZmEwMTcxYTdiMmUiLCJpblJlcGx5VG8iOm51bGwsInRpbWUiOiIyMDI2LTExLTIwVDEwOjAwOjAwWiIsImV4cGlyZXMiOiIyMDI2LTExLTI3VDEwOjAwOjAwWiIsImV4dCI6e30sInJlcXVpcmVkIjpbXSwiZ3JhbnQiOnsiaWQiOiJncmFudC12ZWN0b3JzLWJvYiIsImFjdG9yIjoiYWdlbnQifSwiZGF0YSI6eyJ0ZXh0IjoiQ2hlY2sgdGhlIGxhYmVsLiJ9fQ.i4fqcq-GturrmLVejwtNLLH-99BAOX3_worT2g5AiWLCeK8-oIg8MDRuNg3CM0PjZx9lrQsWZaKPEZPlh9NDYQ"
+    },
+    "ok": {
+      "envelope": {
+        "darep": "2",
+        "id": "57170a40-c182-44a0-b2b8-338e74fae4b0",
+        "type": "https://darep.org/ext/core/v2#message",
+        "source": "acct:bob@vectors.test",
+        "to": [
+          "acct:carol@vectors.test"
+        ],
+        "thread": "57170a40-c182-44a0-b2b8-338e74fae4b0",
+        "inReplyTo": null,
+        "time": "2026-11-20T10:00:00Z",
+        "expires": "2026-11-27T10:00:00Z",
+        "ext": {},
+        "required": [],
+        "grant": {
+          "id": "grant-vectors-bob",
+          "actor": "agent"
+        },
+        "data": {
+          "text": "Check the label."
+        }
+      },
+      "payloadUtf8": "{\"darep\":\"2\",\"id\":\"57170a40-c182-44a0-b2b8-338e74fae4b0\",\"type\":\"https://darep.org/ext/core/v2#message\",\"source\":\"acct:bob@vectors.test\",\"to\":[\"acct:carol@vectors.test\"],\"thread\":\"57170a40-c182-44a0-b2b8-338e74fae4b0\",\"inReplyTo\":null,\"time\":\"2026-11-20T10:00:00Z\",\"expires\":\"2026-11-27T10:00:00Z\",\"ext\":{},\"required\":[],\"grant\":{\"id\":\"grant-vectors-bob\",\"actor\":\"agent\"},\"data\":{\"text\":\"Check the label.\"}}",
+      "payloadSha256": "fbb165f9a5efd9e74ee12e95274b92bfff170a824fc887766b1902bee1b58fe2",
+      "recordBytes": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.eyJkYXJlcCI6IjIiLCJpZCI6IjU3MTcwYTQwLWMxODItNDRhMC1iMmI4LTMzOGU3NGZhZTRiMCIsInR5cGUiOiJodHRwczovL2RhcmVwLm9yZy9leHQvY29yZS92MiNtZXNzYWdlIiwic291cmNlIjoiYWNjdDpib2JAdmVjdG9ycy50ZXN0IiwidG8iOlsiYWNjdDpjYXJvbEB2ZWN0b3JzLnRlc3QiXSwidGhyZWFkIjoiNTcxNzBhNDAtYzE4Mi00NGEwLWIyYjgtMzM4ZTc0ZmFlNGIwIiwiaW5SZXBseVRvIjpudWxsLCJ0aW1lIjoiMjAyNi0xMS0yMFQxMDowMDowMFoiLCJleHBpcmVzIjoiMjAyNi0xMS0yN1QxMDowMDowMFoiLCJleHQiOnt9LCJyZXF1aXJlZCI6W10sImdyYW50Ijp7ImlkIjoiZ3JhbnQtdmVjdG9ycy1ib2IiLCJhY3RvciI6ImFnZW50In0sImRhdGEiOnsidGV4dCI6IkNoZWNrIHRoZSBsYWJlbC4ifX0.UNJuiC6a9mreZWlOloC5bCCMCb9p3XXTfTgy7YVJdkAl7jLv8i4zWaotco519HOiST1XHt8aVvNweuPWbWHS7w"
+    }
+  },
+  "steps": [
+    {
+      "at": "2026-11-20T10:00:30Z",
+      "request": {
+        "method": "POST",
+        "url": "https://carol.vectors.test/darep/v2/inbox",
+        "headers": {
+          "content-type": "application/jose",
+          "darep-recipient": "acct:carol@vectors.test"
+        },
+        "body": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.eyJkYXJlcCI6IjIiLCJpZCI6Ijk2NjliZTlmLWMyNmItNDdmYy05MGQ3LWJmYTAxNzFhN2IyZSIsInR5cGUiOiJodHRwczovL2RhcmVwLm9yZy9leHQvY29yZS92MiNtZXNzYWdlIiwic291cmNlIjoiYWNjdDpib2JAdmVjdG9ycy50ZXN0IiwidG8iOlsiYWNjdDpkYXZlQHZlY3RvcnMudGVzdCJdLCJ0aHJlYWQiOiI5NjY5YmU5Zi1jMjZiLTQ3ZmMtOTBkNy1iZmEwMTcxYTdiMmUiLCJpblJlcGx5VG8iOm51bGwsInRpbWUiOiIyMDI2LTExLTIwVDEwOjAwOjAwWiIsImV4cGlyZXMiOiIyMDI2LTExLTI3VDEwOjAwOjAwWiIsImV4dCI6e30sInJlcXVpcmVkIjpbXSwiZ3JhbnQiOnsiaWQiOiJncmFudC12ZWN0b3JzLWJvYiIsImFjdG9yIjoiYWdlbnQifSwiZGF0YSI6eyJ0ZXh0IjoiQ2hlY2sgdGhlIGxhYmVsLiJ9fQ.i4fqcq-GturrmLVejwtNLLH-99BAOX3_worT2g5AiWLCeK8-oIg8MDRuNg3CM0PjZx9lrQsWZaKPEZPlh9NDYQ"
+      },
+      "expect": {
+        "status": 403,
+        "contentType": "application/problem+json",
+        "problem": {
+          "type": "https://darep.org/problems/wrong-recipient",
+          "status": 403,
+          "code": "wrong-recipient"
+        },
+        "stored": false,
+        "receipt": null
+      }
+    },
+    {
+      "at": "2026-11-20T10:00:31Z",
+      "request": {
+        "method": "POST",
+        "url": "https://carol.vectors.test/darep/v2/inbox",
+        "headers": {
+          "content-type": "application/jose"
+        },
+        "body": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.eyJkYXJlcCI6IjIiLCJpZCI6IjU3MTcwYTQwLWMxODItNDRhMC1iMmI4LTMzOGU3NGZhZTRiMCIsInR5cGUiOiJodHRwczovL2RhcmVwLm9yZy9leHQvY29yZS92MiNtZXNzYWdlIiwic291cmNlIjoiYWNjdDpib2JAdmVjdG9ycy50ZXN0IiwidG8iOlsiYWNjdDpjYXJvbEB2ZWN0b3JzLnRlc3QiXSwidGhyZWFkIjoiNTcxNzBhNDAtYzE4Mi00NGEwLWIyYjgtMzM4ZTc0ZmFlNGIwIiwiaW5SZXBseVRvIjpudWxsLCJ0aW1lIjoiMjAyNi0xMS0yMFQxMDowMDowMFoiLCJleHBpcmVzIjoiMjAyNi0xMS0yN1QxMDowMDowMFoiLCJleHQiOnt9LCJyZXF1aXJlZCI6W10sImdyYW50Ijp7ImlkIjoiZ3JhbnQtdmVjdG9ycy1ib2IiLCJhY3RvciI6ImFnZW50In0sImRhdGEiOnsidGV4dCI6IkNoZWNrIHRoZSBsYWJlbC4ifX0.UNJuiC6a9mreZWlOloC5bCCMCb9p3XXTfTgy7YVJdkAl7jLv8i4zWaotco519HOiST1XHt8aVvNweuPWbWHS7w"
+      },
+      "expect": {
+        "status": 403,
+        "contentType": "application/problem+json",
+        "problem": {
+          "type": "https://darep.org/problems/wrong-recipient",
+          "status": 403,
+          "code": "wrong-recipient"
+        },
+        "stored": false,
+        "receipt": null
+      }
+    },
+    {
+      "at": "2026-11-20T10:00:32Z",
+      "request": {
+        "method": "POST",
+        "url": "https://carol.vectors.test/darep/v2/inbox",
+        "headers": {
+          "content-type": "application/jose",
+          "darep-recipient": "acct:dave@vectors.test"
+        },
+        "body": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.eyJkYXJlcCI6IjIiLCJpZCI6Ijk2NjliZTlmLWMyNmItNDdmYy05MGQ3LWJmYTAxNzFhN2IyZSIsInR5cGUiOiJodHRwczovL2RhcmVwLm9yZy9leHQvY29yZS92MiNtZXNzYWdlIiwic291cmNlIjoiYWNjdDpib2JAdmVjdG9ycy50ZXN0IiwidG8iOlsiYWNjdDpkYXZlQHZlY3RvcnMudGVzdCJdLCJ0aHJlYWQiOiI5NjY5YmU5Zi1jMjZiLTQ3ZmMtOTBkNy1iZmEwMTcxYTdiMmUiLCJpblJlcGx5VG8iOm51bGwsInRpbWUiOiIyMDI2LTExLTIwVDEwOjAwOjAwWiIsImV4cGlyZXMiOiIyMDI2LTExLTI3VDEwOjAwOjAwWiIsImV4dCI6e30sInJlcXVpcmVkIjpbXSwiZ3JhbnQiOnsiaWQiOiJncmFudC12ZWN0b3JzLWJvYiIsImFjdG9yIjoiYWdlbnQifSwiZGF0YSI6eyJ0ZXh0IjoiQ2hlY2sgdGhlIGxhYmVsLiJ9fQ.i4fqcq-GturrmLVejwtNLLH-99BAOX3_worT2g5AiWLCeK8-oIg8MDRuNg3CM0PjZx9lrQsWZaKPEZPlh9NDYQ"
+      },
+      "expect": {
+        "status": 403,
+        "contentType": "application/problem+json",
+        "problem": {
+          "type": "https://darep.org/problems/wrong-recipient",
+          "status": 403,
+          "code": "wrong-recipient"
+        },
+        "stored": false,
+        "receipt": null
+      },
+      "note": "acct:dave@vectors.test is in to[] but not hosted by this receiver. A receiver MAY return wrong-recipient at C1 (before signature verification, e.g. a multi-tenant provider with per-address pins) or at R12."
+    }
+  ]
+}

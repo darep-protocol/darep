@@ -1,0 +1,24 @@
+{
+  "name": "negative/type-trailing-hyphen-host",
+  "description": "type URI host has a label ending with a hyphen, which K-1 forbids.",
+  "spec": "§3.2 K-1, §6.1 U-2",
+  "context": {
+    "mode": "admission",
+    "now": "2026-11-20T12:00:00Z",
+    "receiver": "acct:carol@vectors.test",
+    "typ": "darep-event+jws",
+    "understood": [
+      "https://darep.org/ext/core/v2",
+      "https://darep.org/ext/work/v2",
+      "https://darep.org/ext/reschedule/v2"
+    ]
+  },
+  "jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTIwMjYtMTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.ewogImRhcmVwIjogIjIiLAogImlkIjogIjkwYTljODg5LTgzNGMtNDZlYS1hMzhhLTg3ZDk5MTM5ZDIxNyIsCiAic291cmNlIjogImFjY3Q6Ym9iQHZlY3RvcnMudGVzdCIsCiAidHlwZSI6ICJodHRwczovL2V4YW1wbGUtLnRlc3QvZXh0L3BvbGwvdjEjdm90ZSIsCiAidGltZSI6ICIyMDI2LTExLTIwVDExOjU4OjAwWiIsCiAidG8iOiBbCiAgImFjY3Q6Y2Fyb2xAdmVjdG9ycy50ZXN0IgogXSwKICJ0aHJlYWQiOiAiOTBhOWM4ODktODM0Yy00NmVhLWEzOGEtODdkOTkxMzlkMjE3IiwKICJpblJlcGx5VG8iOiBudWxsLAogImV4cGlyZXMiOiAiMjAyNi0xMS0yN1QxMTo1ODowMFoiLAogImV4dCI6IHt9LAogInJlcXVpcmVkIjogW10sCiAiZ3JhbnQiOiB7CiAgImlkIjogImdyYW50LTdmM2EiLAogICJhY3RvciI6ICJhZ2VudCIKIH0sCiAiZGF0YSI6IHsKICAic3VtbWFyeSI6ICLlkIjmiJDpoJDopr0g8J-XkyIsCiAgIm5leHRTdGVwIjogIuaguOWwjeiNt-iYreaWh-aomeexpOOAjMOpw6lu44CN44CCIiwKICAiZXhwZWN0ZWRSZXN1bHQiOiAi5Zue6KaG5LiA5YCL5piO56K657WQ5p6c44CCIgogfQp9Cg.OPioN6fmVNFlm69kKnwKWDA_VIMN-jk64YmsmMrhiqKo57E5e_Bv7u_weofW3s3bJOaS3YhbL5Cc6RLcIBY-DQ",
+  "headerUtf8": "{\"alg\":\"ES256\",\"kid\":\"https://bob.vectors.test/.well-known/darep/bob#sig-2026-11\",\"typ\":\"darep-event+jws\"}",
+  "payloadUtf8": "{\n \"darep\": \"2\",\n \"id\": \"90a9c889-834c-46ea-a38a-87d99139d217\",\n \"source\": \"acct:bob@vectors.test\",\n \"type\": \"https://example-.test/ext/poll/v1#vote\",\n \"time\": \"2026-11-20T11:58:00Z\",\n \"to\": [\n  \"acct:carol@vectors.test\"\n ],\n \"thread\": \"90a9c889-834c-46ea-a38a-87d99139d217\",\n \"inReplyTo\": null,\n \"expires\": \"2026-11-27T11:58:00Z\",\n \"ext\": {},\n \"required\": [],\n \"grant\": {\n  \"id\": \"grant-7f3a\",\n  \"actor\": \"agent\"\n },\n \"data\": {\n  \"summary\": \"合成預覽 🗓\",\n  \"nextStep\": \"核對荷蘭文標籤「één」。\",\n  \"expectedResult\": \"回覆一個明確結果。\"\n }\n}\n",
+  "payloadSha256": "0dd948243f58aca6ff008f12ac9e090362139c0e00a72a6ce9abb62673f7a15e",
+  "expected": {
+    "verdict": "reject",
+    "code": "malformed"
+  }
+}

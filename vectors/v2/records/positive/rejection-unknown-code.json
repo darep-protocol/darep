@@ -1,0 +1,46 @@
+{
+  "name": "positive/rejection-unknown-code",
+  "description": "Signed rejection with a syntactically valid bare code not in the registry. Verifiers must accept it as an unknown refusal for forward compatibility (§4.5).",
+  "spec": "§4.5",
+  "context": {
+    "mode": "admission",
+    "now": "2026-11-20T12:00:00Z",
+    "receiver": "acct:bob@vectors.test",
+    "typ": [
+      "darep-event+jws",
+      "darep-rejection+jws"
+    ],
+    "understood": [
+      "https://darep.org/ext/core/v2",
+      "https://darep.org/ext/work/v2",
+      "https://darep.org/ext/reschedule/v2"
+    ],
+    "answered": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTIwMjYtMTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.ewogImRhcmVwIjogIjIiLAogImlkIjogIjMzYWIxMDc3LTk1YTgtNDE4My1hNzk4LTgwNWRhM2MxZjFjMSIsCiAic291cmNlIjogImFjY3Q6Ym9iQHZlY3RvcnMudGVzdCIsCiAidHlwZSI6ICJodHRwczovL2RhcmVwLm9yZy9leHQvd29yay92MiNoYW5kb2ZmIiwKICJ0aW1lIjogIjIwMjYtMTEtMjBUMTE6NTg6MDBaIiwKICJ0byI6IFsKICAiYWNjdDpjYXJvbEB2ZWN0b3JzLnRlc3QiCiBdLAogInRocmVhZCI6ICIzM2FiMTA3Ny05NWE4LTQxODMtYTc5OC04MDVkYTNjMWYxYzEiLAogImluUmVwbHlUbyI6IG51bGwsCiAiZXhwaXJlcyI6ICIyMDI2LTExLTI3VDExOjU4OjAwWiIsCiAiZXh0Ijoge30sCiAicmVxdWlyZWQiOiBbCiAgImh0dHBzOi8vZGFyZXAub3JnL2V4dC93b3JrL3YyIgogXSwKICJncmFudCI6IHsKICAiaWQiOiAiZ3JhbnQtN2YzYSIsCiAgImFjdG9yIjogImFnZW50IgogfSwKICJkYXRhIjogewogICJzdW1tYXJ5IjogIuWQiOaIkOmgkOimvSDwn5eTIiwKICAibmV4dFN0ZXAiOiAi5qC45bCN6I236Jit5paH5qiZ57Gk44CMw6nDqW7jgI3jgIIiLAogICJleHBlY3RlZFJlc3VsdCI6ICLlm57opobkuIDlgIvmmI7norrntZDmnpzjgIIiCiB9Cn0K.DmG4Vke_tf90kQFFWZ6-Q1pESNfAVxq55OaVaKA6nZ0fynVBIc4dC-LeIP8WmePmewCUZnaRe2_RiHu876j5Mg"
+  },
+  "jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vY2Fyb2wudmVjdG9ycy50ZXN0Ly53ZWxsLWtub3duL2RhcmVwL2Nhcm9sI2tleS0yMDI2LTExIiwidHlwIjoiZGFyZXAtcmVqZWN0aW9uK2p3cyJ9.eyJkYXJlcCI6IjIiLCJpZCI6ImYzODcyZGQyLTU5MjMtNDMxNy04YjVmLTE4NjdjZTEyMDVhNyIsInNvdXJjZSI6ImFjY3Q6Y2Fyb2xAdmVjdG9ycy50ZXN0IiwidHlwZSI6Imh0dHBzOi8vZGFyZXAub3JnL2V4dC9jb3JlL3YyI3JlamVjdGlvbiIsInRpbWUiOiIyMDI2LTExLTIwVDExOjU5OjAwWiIsInRvIjpbImFjY3Q6Ym9iQHZlY3RvcnMudGVzdCJdLCJ0aHJlYWQiOiIzM2FiMTA3Ny05NWE4LTQxODMtYTc5OC04MDVkYTNjMWYxYzEiLCJpblJlcGx5VG8iOiIzM2FiMTA3Ny05NWE4LTQxODMtYTc5OC04MDVkYTNjMWYxYzEiLCJleHBpcmVzIjoiMjAyNi0xMS0yN1QxMTo1OTowMFoiLCJleHQiOnt9LCJyZXF1aXJlZCI6W10sImRhdGEiOnsiY29kZSI6ImZ1dHVyZS1yZWZ1c2FsIn19.7_ewGgSlD0Me1r64wKpYz-WxJyz95N0dhRsb8KY33s62YFTD_1s7_L_Fn1Iptpcpnjg1YSeCHOv8uR2M1BZetw",
+  "headerUtf8": "{\"alg\":\"ES256\",\"kid\":\"https://carol.vectors.test/.well-known/darep/carol#key-2026-11\",\"typ\":\"darep-rejection+jws\"}",
+  "payloadUtf8": "{\"darep\":\"2\",\"id\":\"f3872dd2-5923-4317-8b5f-1867ce1205a7\",\"source\":\"acct:carol@vectors.test\",\"type\":\"https://darep.org/ext/core/v2#rejection\",\"time\":\"2026-11-20T11:59:00Z\",\"to\":[\"acct:bob@vectors.test\"],\"thread\":\"33ab1077-95a8-4183-a798-805da3c1f1c1\",\"inReplyTo\":\"33ab1077-95a8-4183-a798-805da3c1f1c1\",\"expires\":\"2026-11-27T11:59:00Z\",\"ext\":{},\"required\":[],\"data\":{\"code\":\"future-refusal\"}}",
+  "payloadSha256": "b27d9b65d7011ce65ae5aa72249071a280dc246be5e38ee16ae1da634b246bae",
+  "expected": {
+    "verdict": "accept",
+    "kid": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+    "record": {
+      "darep": "2",
+      "id": "f3872dd2-5923-4317-8b5f-1867ce1205a7",
+      "source": "acct:carol@vectors.test",
+      "type": "https://darep.org/ext/core/v2#rejection",
+      "time": "2026-11-20T11:59:00Z",
+      "to": [
+        "acct:bob@vectors.test"
+      ],
+      "thread": "33ab1077-95a8-4183-a798-805da3c1f1c1",
+      "inReplyTo": "33ab1077-95a8-4183-a798-805da3c1f1c1",
+      "expires": "2026-11-27T11:59:00Z",
+      "ext": {},
+      "required": [],
+      "data": {
+        "code": "future-refusal"
+      }
+    }
+  }
+}

@@ -1,0 +1,2910 @@
+{
+  "usage": "Invalid identity documents that MUST fail pin validation (records.md §5.1, §5.3 P-0).",
+  "cases": [
+    {
+      "name": "id-with-query",
+      "description": "Identity document id carries a query string, which §5.1 forbids.",
+      "spec": "§5.1, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol?v=1",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol?v=1#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "id-with-empty-query",
+      "description": "Identity document id ends with a trailing ?, which §5.1 forbids even though WHATWG .search is empty.",
+      "spec": "§3.2 K-1, §5.1, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol?",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol?#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "id-with-empty-fragment",
+      "description": "Identity document id ends with a trailing #, which §5.1 forbids even though WHATWG .hash is empty.",
+      "spec": "§3.2 K-1, §5.1, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol#",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol##key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "id-uppercase-host",
+      "description": "Identity document id host has an uppercase letter, which K-1 forbids.",
+      "spec": "§3.2 K-1, §5.1, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://Carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://Carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "id-default-port",
+      "description": "Identity document id writes out default port :443, which K-1 forbids.",
+      "spec": "§3.2 K-1, §5.1, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test:443/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test:443/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "darep-missing",
+      "description": "Missing required document member darep.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "darep-wrong-type",
+      "description": "Wrong type for document member darep.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": 42,
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "id-missing",
+      "description": "Missing required document member id.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "id-wrong-type",
+      "description": "Wrong type for document member id.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": 42,
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "addresses-missing",
+      "description": "Missing required document member addresses.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "addresses-wrong-type",
+      "description": "Wrong type for document member addresses.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": 42,
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "updated-missing",
+      "description": "Missing required document member updated.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "updated-wrong-type",
+      "description": "Wrong type for document member updated.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": 42,
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "keys-missing",
+      "description": "Missing required document member keys.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z"
+      }
+    },
+    {
+      "name": "keys-wrong-type",
+      "description": "Wrong type for document member keys.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": 42
+      }
+    },
+    {
+      "name": "wrong-version",
+      "description": "Identity document version must be \"2\".",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "3",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "keys-empty",
+      "description": "A pin must contain at least one key.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": []
+      }
+    },
+    {
+      "name": "key-not-object",
+      "description": "Each key must be an object.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          null
+        ]
+      }
+    },
+    {
+      "name": "key-id-duplicate",
+      "description": "Key ids must be distinct.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          },
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "addresses-empty",
+      "description": "A pin must contain at least one address.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "addresses-duplicate",
+      "description": "Addresses must be distinct.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test",
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "address-wrong-type",
+      "description": "Every address must be a string.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          42
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "address-invalid",
+      "description": "An address must satisfy E-4.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "bob@example.com"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "address-newline",
+      "description": "An address cannot end in a line break.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test\n"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "key-id-missing",
+      "description": "Missing required key member id.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "key-id-wrong-type",
+      "description": "Wrong type for key member id.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": 42,
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "key-purpose-missing",
+      "description": "Missing required key member purpose.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "key-purpose-wrong-type",
+      "description": "Wrong type for key member purpose.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": 42,
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "key-publicKeyJwk-missing",
+      "description": "Missing required key member publicKeyJwk.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "key-publicKeyJwk-wrong-type",
+      "description": "Wrong type for key member publicKeyJwk.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": 42,
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "key-validFrom-missing",
+      "description": "Missing required key member validFrom.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "key-validFrom-wrong-type",
+      "description": "Wrong type for key member validFrom.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": 42
+          }
+        ]
+      }
+    },
+    {
+      "name": "key-id-other-document",
+      "description": "A key id must belong to its document.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://bob.vectors.test/.well-known/darep/bob#key",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "key-id-empty-fragment",
+      "description": "Key fragments must not be empty.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "key-id-long-fragment",
+      "description": "Key fragments are at most 64 characters.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "key-id-newline",
+      "description": "Key fragments cannot end in a line break.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11\n",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "purpose-empty",
+      "description": "Invalid key purpose: empty.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "purpose-duplicate",
+      "description": "Invalid key purpose: duplicate.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "record"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "purpose-unknown",
+      "description": "Invalid key purpose: unknown.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "unknown"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "purpose-nonstring",
+      "description": "Invalid key purpose: nonstring.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              {}
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "purpose-reserved-mixed",
+      "description": "Invalid key purpose: reserved-mixed.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "root"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "updated-not-rfc3339",
+      "description": "Invalid instant for updated: not-rfc3339.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "November 1, 2026",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "updated-invalid-date",
+      "description": "Invalid instant for updated: invalid-date.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-02-30T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "updated-invalid-hour",
+      "description": "Invalid instant for updated: invalid-hour.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T24:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "updated-offset",
+      "description": "Invalid instant for updated: offset.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00+00:00",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "updated-too-precise",
+      "description": "Invalid instant for updated: too-precise.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00.0001Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "updated-newline",
+      "description": "Invalid instant for updated: newline.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z\n",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "updated-null",
+      "description": "Invalid instant for updated: null.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": null,
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "validFrom-not-rfc3339",
+      "description": "Invalid instant for validFrom: not-rfc3339.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "November 1, 2026"
+          }
+        ]
+      }
+    },
+    {
+      "name": "validFrom-invalid-date",
+      "description": "Invalid instant for validFrom: invalid-date.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-02-30T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "validFrom-invalid-hour",
+      "description": "Invalid instant for validFrom: invalid-hour.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T24:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "validFrom-offset",
+      "description": "Invalid instant for validFrom: offset.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00+00:00"
+          }
+        ]
+      }
+    },
+    {
+      "name": "validFrom-too-precise",
+      "description": "Invalid instant for validFrom: too-precise.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00.0001Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "validFrom-newline",
+      "description": "Invalid instant for validFrom: newline.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z\n"
+          }
+        ]
+      }
+    },
+    {
+      "name": "validFrom-null",
+      "description": "Invalid instant for validFrom: null.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "validUntil-not-rfc3339",
+      "description": "Invalid instant for validUntil: not-rfc3339.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z",
+            "validUntil": "November 1, 2026"
+          }
+        ]
+      }
+    },
+    {
+      "name": "validUntil-invalid-date",
+      "description": "Invalid instant for validUntil: invalid-date.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z",
+            "validUntil": "2026-02-30T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "validUntil-invalid-hour",
+      "description": "Invalid instant for validUntil: invalid-hour.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z",
+            "validUntil": "2026-11-01T24:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "validUntil-offset",
+      "description": "Invalid instant for validUntil: offset.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z",
+            "validUntil": "2026-11-01T00:00:00+00:00"
+          }
+        ]
+      }
+    },
+    {
+      "name": "validUntil-too-precise",
+      "description": "Invalid instant for validUntil: too-precise.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z",
+            "validUntil": "2026-11-01T00:00:00.0001Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "validUntil-newline",
+      "description": "Invalid instant for validUntil: newline.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z",
+            "validUntil": "2026-11-01T00:00:00Z\n"
+          }
+        ]
+      }
+    },
+    {
+      "name": "validUntil-null",
+      "description": "Invalid instant for validUntil: null.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z",
+            "validUntil": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "revoked-not-rfc3339",
+      "description": "Invalid instant for revoked: not-rfc3339.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z",
+            "revoked": "November 1, 2026"
+          }
+        ]
+      }
+    },
+    {
+      "name": "revoked-invalid-date",
+      "description": "Invalid instant for revoked: invalid-date.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z",
+            "revoked": "2026-02-30T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "revoked-invalid-hour",
+      "description": "Invalid instant for revoked: invalid-hour.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z",
+            "revoked": "2026-11-01T24:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "revoked-offset",
+      "description": "Invalid instant for revoked: offset.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z",
+            "revoked": "2026-11-01T00:00:00+00:00"
+          }
+        ]
+      }
+    },
+    {
+      "name": "revoked-too-precise",
+      "description": "Invalid instant for revoked: too-precise.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z",
+            "revoked": "2026-11-01T00:00:00.0001Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "revoked-newline",
+      "description": "Invalid instant for revoked: newline.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z",
+            "revoked": "2026-11-01T00:00:00Z\n"
+          }
+        ]
+      }
+    },
+    {
+      "name": "revoked-null",
+      "description": "Invalid instant for revoked: null.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z",
+            "revoked": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "validUntil-equal",
+      "description": "validUntil must be later than validFrom.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z",
+            "validUntil": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "validUntil-before",
+      "description": "validUntil must be later than validFrom.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z",
+            "validUntil": "2026-10-31T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "validUntil-invalid-before-epoch",
+      "description": "Invalid validUntil is invalid even for a pre-epoch key.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "1960-01-01T00:00:00Z",
+            "validUntil": "invalid"
+          }
+        ]
+      }
+    },
+    {
+      "name": "jwk-kty-missing",
+      "description": "Missing JWK member kty.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "jwk-kty-wrong-type",
+      "description": "Wrong JWK member type kty.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": 42,
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "jwk-crv-missing",
+      "description": "Missing JWK member crv.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "jwk-crv-wrong-type",
+      "description": "Wrong JWK member type crv.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": 42,
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "jwk-x-missing",
+      "description": "Missing JWK member x.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "jwk-x-wrong-type",
+      "description": "Wrong JWK member type x.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": 42,
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "jwk-y-missing",
+      "description": "Missing JWK member y.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "jwk-y-wrong-type",
+      "description": "Wrong JWK member type y.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": 42
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "jwk-private",
+      "description": "A public JWK must not contain d.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk",
+              "d": "test-only"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "jwk-wrong-curve",
+      "description": "Only P-256 is allowed.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-384",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "jwk-wrong-kty",
+      "description": "Only EC is allowed.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "RSA",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "jwk-off-curve",
+      "description": "Coordinates must lie on P-256.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "y": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "jwk-x-padded",
+      "description": "JWK coordinates use unpadded base64url.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0=",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "jwk-x-short",
+      "description": "P-256 coordinates encode exactly 32 octets.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "AA",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "jwk-x-noncanonical",
+      "description": "JWK coordinate pad bits must be zero.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX1",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "jwk-y-padded",
+      "description": "JWK coordinates use unpadded base64url.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk="
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "jwk-y-short",
+      "description": "P-256 coordinates encode exactly 32 octets.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "AA"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "name": "jwk-y-noncanonical",
+      "description": "JWK coordinate pad bits must be zero.",
+      "spec": "§5.1, §5.2, §5.3 P-0",
+      "expected": {
+        "verdict": "reject",
+        "rule": "P-0"
+      },
+      "document": {
+        "darep": "2",
+        "id": "https://carol.vectors.test/.well-known/darep/carol",
+        "addresses": [
+          "acct:carol@vectors.test"
+        ],
+        "updated": "2026-11-01T00:00:00Z",
+        "keys": [
+          {
+            "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+            "purpose": [
+              "record",
+              "provider"
+            ],
+            "publicKeyJwk": {
+              "kty": "EC",
+              "crv": "P-256",
+              "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+              "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWql"
+            },
+            "validFrom": "2026-11-01T00:00:00Z"
+          }
+        ]
+      }
+    }
+  ]
+}

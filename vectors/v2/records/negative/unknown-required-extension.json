@@ -1,0 +1,24 @@
+{
+  "name": "negative/unknown-required-extension",
+  "description": "required lists an extension the receiver does not implement.",
+  "spec": "§6.2",
+  "context": {
+    "mode": "admission",
+    "now": "2026-11-20T12:00:00Z",
+    "receiver": "acct:carol@vectors.test",
+    "typ": "darep-event+jws",
+    "understood": [
+      "https://darep.org/ext/core/v2",
+      "https://darep.org/ext/work/v2",
+      "https://darep.org/ext/reschedule/v2"
+    ]
+  },
+  "jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTIwMjYtMTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.ewogImRhcmVwIjogIjIiLAogImlkIjogIjMzYWIxMDc3LTk1YTgtNDE4My1hNzk4LTgwNWRhM2MxZjFjMSIsCiAic291cmNlIjogImFjY3Q6Ym9iQHZlY3RvcnMudGVzdCIsCiAidHlwZSI6ICJodHRwczovL2RhcmVwLm9yZy9leHQvd29yay92MiNoYW5kb2ZmIiwKICJ0aW1lIjogIjIwMjYtMTEtMjBUMTE6NTg6MDBaIiwKICJ0byI6IFsKICAiYWNjdDpjYXJvbEB2ZWN0b3JzLnRlc3QiCiBdLAogInRocmVhZCI6ICIzM2FiMTA3Ny05NWE4LTQxODMtYTc5OC04MDVkYTNjMWYxYzEiLAogImluUmVwbHlUbyI6IG51bGwsCiAiZXhwaXJlcyI6ICIyMDI2LTExLTI3VDExOjU4OjAwWiIsCiAiZXh0Ijoge30sCiAicmVxdWlyZWQiOiBbCiAgImh0dHBzOi8vZGFyZXAub3JnL2V4dC93b3JrL3YyIiwKICAiaHR0cHM6Ly9leGFtcGxlLnRlc3QvZXh0L2VzY3Jvdy92MSIKIF0sCiAiZ3JhbnQiOiB7CiAgImlkIjogImdyYW50LTdmM2EiLAogICJhY3RvciI6ICJhZ2VudCIKIH0sCiAiZGF0YSI6IHsKICAic3VtbWFyeSI6ICLlkIjmiJDpoJDopr0g8J-XkyIsCiAgIm5leHRTdGVwIjogIuaguOWwjeiNt-iYreaWh-aomeexpOOAjMOpw6lu44CN44CCIiwKICAiZXhwZWN0ZWRSZXN1bHQiOiAi5Zue6KaG5LiA5YCL5piO56K657WQ5p6c44CCIgogfQp9Cg.hrhKlMQhfUVM7h4Hj_V6813PPVhTpHWCbvkqyI2KXnf7KGQlTdT1VlooNI3a2JrlYxqFb1N17z_mFLxwNq2TJQ",
+  "headerUtf8": "{\"alg\":\"ES256\",\"kid\":\"https://bob.vectors.test/.well-known/darep/bob#sig-2026-11\",\"typ\":\"darep-event+jws\"}",
+  "payloadUtf8": "{\n \"darep\": \"2\",\n \"id\": \"33ab1077-95a8-4183-a798-805da3c1f1c1\",\n \"source\": \"acct:bob@vectors.test\",\n \"type\": \"https://darep.org/ext/work/v2#handoff\",\n \"time\": \"2026-11-20T11:58:00Z\",\n \"to\": [\n  \"acct:carol@vectors.test\"\n ],\n \"thread\": \"33ab1077-95a8-4183-a798-805da3c1f1c1\",\n \"inReplyTo\": null,\n \"expires\": \"2026-11-27T11:58:00Z\",\n \"ext\": {},\n \"required\": [\n  \"https://darep.org/ext/work/v2\",\n  \"https://example.test/ext/escrow/v1\"\n ],\n \"grant\": {\n  \"id\": \"grant-7f3a\",\n  \"actor\": \"agent\"\n },\n \"data\": {\n  \"summary\": \"合成預覽 🗓\",\n  \"nextStep\": \"核對荷蘭文標籤「één」。\",\n  \"expectedResult\": \"回覆一個明確結果。\"\n }\n}\n",
+  "payloadSha256": "a5da1f3b03730b0b0b36ccbd994e86e436cc4089f344476de1354d2277211a1b",
+  "expected": {
+    "verdict": "reject",
+    "code": "unsupported-extension"
+  }
+}

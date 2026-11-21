@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>DAREP reference provider · Personal workspace</title>
+  <link rel="stylesheet" href="/app.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="mast"><div class="mast-inner">
+    <div class="brand" lang="en"><span class="brand-mark" aria-hidden="true">◈</span> DAREP reference provider</div>
+    <button type="button" id="refresh" class="light-button">Refresh</button>
+  </div></header>
+  <main>
+    <div class="heading"><div><h1>Personal workspace</h1><p id="identity">Loading your identity…</p></div>
+      <div class="owner-options"><details class="owner-key"><summary>Show my fingerprint</summary>
+        <p>Compare fingerprints with your contact using a channel you already trust.</p><code id="fingerprint"></code>
+      </details>
+      <details class="owner-key" id="zone-box"><summary id="zone-summary">Time zone · UTC</summary>
+        <form id="zone-setting">
+          <label for="owner-zone">Time zone</label><input id="owner-zone" value="UTC" list="zone-names" autocomplete="off" required>
+          <datalist id="zone-names"></datalist>
+          <div class="actions"><button type="button" class="text-button" id="device-zone">Use device time zone</button>
+            <button type="submit">Save time zone</button></div>
+        </form>
+      </details></div>
+    </div>
+    <nav aria-label="Workspace navigation" role="tablist">
+      <button role="tab" id="tab-threads" aria-controls="panel-threads" aria-selected="true">Rescheduling</button>
+      <button role="tab" id="tab-contacts" aria-controls="panel-contacts" aria-selected="false" tabindex="-1">Contacts</button>
+      <button role="tab" id="tab-grants" aria-controls="panel-grants" aria-selected="false" tabindex="-1">Agent access</button>
+    </nav>
+    <p id="notice" role="status" aria-live="polite"></p>
+    <noscript><p>Enable JavaScript to use your local workspace.</p></noscript>
+
+    <section id="panel-threads" role="tabpanel" aria-labelledby="tab-threads">
+      <div class="grid">
+        <section class="card"><h2 id="threads-heading">Rescheduling requests</h2>
+          <p class="hint" id="timezone"></p><div id="threads" class="stack"></div>
+          <div class="actions">
+            <button type="button" class="subtle" data-load-workflow="reschedule" hidden>Load earlier requests</button>
+            <button type="button" class="subtle" data-load-workflow="handoff" hidden>Load earlier handoffs</button>
+          </div>
+          <p class="hint" id="pages-note" hidden>Refresh to return to the most recent page.</p>
+        </section>
+        <section class="card" id="sharing-card"><h2>Availability to share</h2>
+          <p class="hint">Choose the times this contact may see for this activity.</p>
+          <form id="sharing">
+            <label for="peer">Contact</label><select id="peer" required></select>
+            <label for="activity">Activity name</label><input id="activity" maxlength="120" required placeholder="Weekend tennis">
+            <div class="split">
+              <div><label for="original">Original start</label><input type="datetime-local" id="original" step="1" required></div>
+              <div><label for="duration">Duration (minutes)</label><input type="number" id="duration" min="1" max="1440" value="60" required></div>
+            </div>
+            <fieldset><legend>Candidate times</legend>
+              <div id="suggested"></div><div id="slots"></div>
+              <button class="text-button" type="button" id="add-slot">Add a candidate time</button>
+            </fieldset>
+            <p class="hint fine">Saving replaces the times approved for this activity. You can still choose to confirm the final time yourself.</p>
+            <div class="actions"><button id="save-times" type="submit">Save availability</button>
+              <button id="clear-times" type="button" class="subtle">Withdraw availability</button></div>
+          </form>
+        </section>
+      </div>
+    </section>
+
+    <section id="panel-contacts" role="tabpanel" aria-labelledby="tab-contacts" hidden>
+      <div class="grid">
+        <section class="card"><h2>Pair with a contact</h2>
+          <p class="hint">Create an invitation, or paste the code your contact sent you.</p>
+          <button type="button" id="invite">Create one-time invitation</button>
+          <form id="inspect" class="divider"><label for="incoming">Invitation or reply code</label>
+            <textarea id="incoming" required spellcheck="false" autocapitalize="off" rows="3"></textarea>
+            <button type="submit" class="subtle">Inspect code</button>
+          </form>
+          <form id="verify" class="well" hidden><h3 id="verify-title">Verify contact identity</h3>
+            <p class="account" id="pair-peer"></p><label>Contact’s public key fingerprint</label><code id="pair-fingerprint"></code>
+            <p id="pair-expiry" class="hint"></p>
+            <label class="check" id="verify-check"><input type="checkbox" id="verified" required>I checked this identity and fingerprint with my contact through a trusted channel.</label>
+            <button type="submit" id="approve">Verify and continue</button>
+          </form>
+          <section id="outgoing-box" class="well" hidden><h3 id="outgoing-title"></h3>
+            <p class="hint" id="outgoing-hint"></p><label for="outgoing">Code for your contact</label>
+            <textarea id="outgoing" rows="3" readonly spellcheck="false"></textarea>
+            <button type="button" class="subtle" id="copy">Copy code</button>
+          </section>
+        </section>
+        <section class="card"><h2>Paired contacts</h2><div id="contacts" class="stack"></div>
+          <section id="pending-box" class="divider" hidden><h3>My pending invitations</h3>
+            <div id="pending-invites" class="stack"></div>
+          </section>
+        </section>
+      </div>
+    </section>
+
+    <section id="panel-grants" role="tabpanel" aria-labelledby="tab-grants" hidden>
+      <div class="grid">
+        <section class="card"><h2>Connect my agent</h2><p class="hint">Each grant has its own permissions. Revoke an earlier grant to remove the access it provides.</p>
+          <form id="grant">
+            <fieldset><legend>Who can confirm the final time?</legend>
+              <label class="check"><input type="radio" name="authority" value="person" checked>I will confirm it myself</label>
+              <label class="check"><input type="radio" name="authority" value="agent">My agent may confirm a time I approved</label>
+            </fieldset>
+            <label id="grant-handoff-label" class="check" hidden><input type="checkbox" id="grant-handoff">My agent may also submit project handoffs I approve</label>
+            <button type="submit">Create agent grant</button>
+          </form>
+          <section id="grant-result" class="well" hidden><h3>Connection instructions</h3><pre id="instructions"></pre><button class="subtle" id="copy-command" type="button">Copy connection settings</button></section>
+          <details id="handoff-box" class="divider" hidden><summary>Approve handoff content</summary>
+            <form id="handoff">
+              <label for="handoff-kind">Action to authorize</label><select id="handoff-kind"><option value="handoff">Start a project handoff</option><option value="complete">Return a result</option></select>
+              <div id="handoff-open">
+                <label for="handoff-peer">Contact</label><select id="handoff-peer"></select>
+                <label for="handoff-summary">Progress summary</label><textarea id="handoff-summary" rows="2"></textarea>
+                <label for="handoff-next">Next step</label><textarea id="handoff-next" rows="2"></textarea>
+                <label for="handoff-expected">Expected result</label><textarea id="handoff-expected" rows="2"></textarea>
+              </div>
+              <div id="handoff-reply" hidden>
+                <label for="handoff-thread">Handoff to reply to</label><select id="handoff-thread"></select>
+                <button type="button" class="text-button" data-load-workflow="handoff" hidden>Load earlier handoffs</button>
+                <label for="handoff-result">Result to share</label><textarea id="handoff-result" rows="2"></textarea>
+              </div>
+              <button type="submit">Approve this content</button>
+            </form>
+            <section class="divider"><h3>Unused handoff approvals</h3>
+              <div id="handoff-approvals" class="stack"></div>
+              <button type="button" class="subtle" id="older-approvals" hidden>Load earlier approvals</button>
+            </section>
+          </details>
+        </section>
+        <section class="card"><h2>Active agent grants</h2><div id="grants" class="stack"></div></section>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

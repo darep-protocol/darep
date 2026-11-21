@@ -1,0 +1,86 @@
+{
+  "vector": "delivery/receiver/reject-not-yet-valid",
+  "generatedBy": "vectors/v2/delivery/generate.mjs",
+  "testOnly": true,
+  "role": "receiver",
+  "clock": "Each step has \"at\": the receiver clock at that moment. Runners inject it. A receiver with a real clock checks storedAt format only.",
+  "description": "time is 10 minutes ahead of the receiver clock (skew allowance is 5 minutes). Transient.",
+  "spec": [
+    "delivery.md §3.1",
+    "delivery.md §5.1",
+    "https-binding.md §2.3",
+    "https-binding.md §3"
+  ],
+  "decisions": [
+    "D6"
+  ],
+  "receiver": {
+    "address": "acct:carol@vectors.test",
+    "inbox": "https://carol.vectors.test/darep/v2/inbox",
+    "signingKeys": [
+      "https://carol.vectors.test/.well-known/darep/carol#sig-1",
+      "https://carol.vectors.test/.well-known/darep/carol#rcpt-1"
+    ],
+    "pinned": [
+      "acct:bob@vectors.test",
+      "acct:dave@vectors.test"
+    ],
+    "extensions": [
+      "https://darep.org/ext/core/v2"
+    ]
+  },
+  "records": {
+    "r": {
+      "envelope": {
+        "darep": "2",
+        "id": "b91d976a-bc90-4ab6-bc42-d01f55951006",
+        "type": "https://darep.org/ext/core/v2#message",
+        "source": "acct:bob@vectors.test",
+        "to": [
+          "acct:carol@vectors.test"
+        ],
+        "thread": "b91d976a-bc90-4ab6-bc42-d01f55951006",
+        "inReplyTo": null,
+        "time": "2026-11-20T10:10:00Z",
+        "expires": "2026-11-27T10:10:00Z",
+        "ext": {},
+        "required": [],
+        "grant": {
+          "id": "grant-vectors-bob",
+          "actor": "agent"
+        },
+        "data": {
+          "text": "Check the label."
+        }
+      },
+      "payloadUtf8": "{\"darep\":\"2\",\"id\":\"b91d976a-bc90-4ab6-bc42-d01f55951006\",\"type\":\"https://darep.org/ext/core/v2#message\",\"source\":\"acct:bob@vectors.test\",\"to\":[\"acct:carol@vectors.test\"],\"thread\":\"b91d976a-bc90-4ab6-bc42-d01f55951006\",\"inReplyTo\":null,\"time\":\"2026-11-20T10:10:00Z\",\"expires\":\"2026-11-27T10:10:00Z\",\"ext\":{},\"required\":[],\"grant\":{\"id\":\"grant-vectors-bob\",\"actor\":\"agent\"},\"data\":{\"text\":\"Check the label.\"}}",
+      "payloadSha256": "0655992fb755213a3ddb20c2f2d8d89b578b98bcf59240e8cfbd099a31b7e8e7",
+      "recordBytes": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.eyJkYXJlcCI6IjIiLCJpZCI6ImI5MWQ5NzZhLWJjOTAtNGFiNi1iYzQyLWQwMWY1NTk1MTAwNiIsInR5cGUiOiJodHRwczovL2RhcmVwLm9yZy9leHQvY29yZS92MiNtZXNzYWdlIiwic291cmNlIjoiYWNjdDpib2JAdmVjdG9ycy50ZXN0IiwidG8iOlsiYWNjdDpjYXJvbEB2ZWN0b3JzLnRlc3QiXSwidGhyZWFkIjoiYjkxZDk3NmEtYmM5MC00YWI2LWJjNDItZDAxZjU1OTUxMDA2IiwiaW5SZXBseVRvIjpudWxsLCJ0aW1lIjoiMjAyNi0xMS0yMFQxMDoxMDowMFoiLCJleHBpcmVzIjoiMjAyNi0xMS0yN1QxMDoxMDowMFoiLCJleHQiOnt9LCJyZXF1aXJlZCI6W10sImdyYW50Ijp7ImlkIjoiZ3JhbnQtdmVjdG9ycy1ib2IiLCJhY3RvciI6ImFnZW50In0sImRhdGEiOnsidGV4dCI6IkNoZWNrIHRoZSBsYWJlbC4ifX0.61NuKYZGQeBmsonpuhvBjV-DflQCDEaMWnMqOSgO5ictw6RIyrKMUGPi-oDS8MuOKICzarQjHjT3vElDBDPimg"
+    }
+  },
+  "steps": [
+    {
+      "at": "2026-11-20T10:00:30Z",
+      "request": {
+        "method": "POST",
+        "url": "https://carol.vectors.test/darep/v2/inbox",
+        "headers": {
+          "content-type": "application/jose",
+          "darep-recipient": "acct:carol@vectors.test"
+        },
+        "body": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.eyJkYXJlcCI6IjIiLCJpZCI6ImI5MWQ5NzZhLWJjOTAtNGFiNi1iYzQyLWQwMWY1NTk1MTAwNiIsInR5cGUiOiJodHRwczovL2RhcmVwLm9yZy9leHQvY29yZS92MiNtZXNzYWdlIiwic291cmNlIjoiYWNjdDpib2JAdmVjdG9ycy50ZXN0IiwidG8iOlsiYWNjdDpjYXJvbEB2ZWN0b3JzLnRlc3QiXSwidGhyZWFkIjoiYjkxZDk3NmEtYmM5MC00YWI2LWJjNDItZDAxZjU1OTUxMDA2IiwiaW5SZXBseVRvIjpudWxsLCJ0aW1lIjoiMjAyNi0xMS0yMFQxMDoxMDowMFoiLCJleHBpcmVzIjoiMjAyNi0xMS0yN1QxMDoxMDowMFoiLCJleHQiOnt9LCJyZXF1aXJlZCI6W10sImdyYW50Ijp7ImlkIjoiZ3JhbnQtdmVjdG9ycy1ib2IiLCJhY3RvciI6ImFnZW50In0sImRhdGEiOnsidGV4dCI6IkNoZWNrIHRoZSBsYWJlbC4ifX0.61NuKYZGQeBmsonpuhvBjV-DflQCDEaMWnMqOSgO5ictw6RIyrKMUGPi-oDS8MuOKICzarQjHjT3vElDBDPimg"
+      },
+      "expect": {
+        "status": 425,
+        "contentType": "application/problem+json",
+        "problem": {
+          "type": "https://darep.org/problems/not-yet-valid",
+          "status": 425,
+          "code": "not-yet-valid"
+        },
+        "stored": false,
+        "receipt": null
+      }
+    }
+  ]
+}

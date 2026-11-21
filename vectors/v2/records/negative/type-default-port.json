@@ -1,0 +1,24 @@
+{
+  "name": "negative/type-default-port",
+  "description": "type URI writes out the default port :443, which K-1 forbids.",
+  "spec": "§3.2 K-1, §6.1 U-2",
+  "context": {
+    "mode": "admission",
+    "now": "2026-11-20T12:00:00Z",
+    "receiver": "acct:carol@vectors.test",
+    "typ": "darep-event+jws",
+    "understood": [
+      "https://darep.org/ext/core/v2",
+      "https://darep.org/ext/work/v2",
+      "https://darep.org/ext/reschedule/v2"
+    ]
+  },
+  "jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTIwMjYtMTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.ewogImRhcmVwIjogIjIiLAogImlkIjogIjk4ZmIzODhjLTdjMDYtNDNmOS05MTY0LWM3ZTU3OGMwZTEyMiIsCiAic291cmNlIjogImFjY3Q6Ym9iQHZlY3RvcnMudGVzdCIsCiAidHlwZSI6ICJodHRwczovL2V4YW1wbGUudGVzdDo0NDMvZXh0L3BvbGwvdjEjdm90ZSIsCiAidGltZSI6ICIyMDI2LTExLTIwVDExOjU4OjAwWiIsCiAidG8iOiBbCiAgImFjY3Q6Y2Fyb2xAdmVjdG9ycy50ZXN0IgogXSwKICJ0aHJlYWQiOiAiOThmYjM4OGMtN2MwNi00M2Y5LTkxNjQtYzdlNTc4YzBlMTIyIiwKICJpblJlcGx5VG8iOiBudWxsLAogImV4cGlyZXMiOiAiMjAyNi0xMS0yN1QxMTo1ODowMFoiLAogImV4dCI6IHt9LAogInJlcXVpcmVkIjogW10sCiAiZ3JhbnQiOiB7CiAgImlkIjogImdyYW50LTdmM2EiLAogICJhY3RvciI6ICJhZ2VudCIKIH0sCiAiZGF0YSI6IHsKICAic3VtbWFyeSI6ICLlkIjmiJDpoJDopr0g8J-XkyIsCiAgIm5leHRTdGVwIjogIuaguOWwjeiNt-iYreaWh-aomeexpOOAjMOpw6lu44CN44CCIiwKICAiZXhwZWN0ZWRSZXN1bHQiOiAi5Zue6KaG5LiA5YCL5piO56K657WQ5p6c44CCIgogfQp9Cg.NiKwA-XRAx1HMJ1MNRDyMFAyYiw8XNNY8ZNRg78Yk6TECDgpnWbO7ZOlVaYUcEYoyo-Ru7M-y1ZvCgIlZ5kF3w",
+  "headerUtf8": "{\"alg\":\"ES256\",\"kid\":\"https://bob.vectors.test/.well-known/darep/bob#sig-2026-11\",\"typ\":\"darep-event+jws\"}",
+  "payloadUtf8": "{\n \"darep\": \"2\",\n \"id\": \"98fb388c-7c06-43f9-9164-c7e578c0e122\",\n \"source\": \"acct:bob@vectors.test\",\n \"type\": \"https://example.test:443/ext/poll/v1#vote\",\n \"time\": \"2026-11-20T11:58:00Z\",\n \"to\": [\n  \"acct:carol@vectors.test\"\n ],\n \"thread\": \"98fb388c-7c06-43f9-9164-c7e578c0e122\",\n \"inReplyTo\": null,\n \"expires\": \"2026-11-27T11:58:00Z\",\n \"ext\": {},\n \"required\": [],\n \"grant\": {\n  \"id\": \"grant-7f3a\",\n  \"actor\": \"agent\"\n },\n \"data\": {\n  \"summary\": \"合成預覽 🗓\",\n  \"nextStep\": \"核對荷蘭文標籤「één」。\",\n  \"expectedResult\": \"回覆一個明確結果。\"\n }\n}\n",
+  "payloadSha256": "9fe10488437a0f150b89b33117071ca58b99a519baa254b68dab7f391d88b198",
+  "expected": {
+    "verdict": "reject",
+    "code": "malformed"
+  }
+}

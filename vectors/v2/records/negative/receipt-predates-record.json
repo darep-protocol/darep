@@ -1,0 +1,25 @@
+{
+  "name": "negative/receipt-predates-record",
+  "description": "A receipt for positive/handoff dated more than 300 seconds before that record's own time. Receipts have no expires, so RC-1 bounds their time by the answered record (TM-4a).",
+  "spec": "§4.4 RC-1, §7.2 TM-4a",
+  "context": {
+    "mode": "admission",
+    "now": "2026-11-20T12:00:00Z",
+    "receiver": "acct:bob@vectors.test",
+    "typ": "darep-receipt+jws",
+    "understood": [
+      "https://darep.org/ext/core/v2",
+      "https://darep.org/ext/work/v2",
+      "https://darep.org/ext/reschedule/v2"
+    ],
+    "answered": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTIwMjYtMTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.ewogImRhcmVwIjogIjIiLAogImlkIjogIjMzYWIxMDc3LTk1YTgtNDE4My1hNzk4LTgwNWRhM2MxZjFjMSIsCiAic291cmNlIjogImFjY3Q6Ym9iQHZlY3RvcnMudGVzdCIsCiAidHlwZSI6ICJodHRwczovL2RhcmVwLm9yZy9leHQvd29yay92MiNoYW5kb2ZmIiwKICJ0aW1lIjogIjIwMjYtMTEtMjBUMTE6NTg6MDBaIiwKICJ0byI6IFsKICAiYWNjdDpjYXJvbEB2ZWN0b3JzLnRlc3QiCiBdLAogInRocmVhZCI6ICIzM2FiMTA3Ny05NWE4LTQxODMtYTc5OC04MDVkYTNjMWYxYzEiLAogImluUmVwbHlUbyI6IG51bGwsCiAiZXhwaXJlcyI6ICIyMDI2LTExLTI3VDExOjU4OjAwWiIsCiAiZXh0Ijoge30sCiAicmVxdWlyZWQiOiBbCiAgImh0dHBzOi8vZGFyZXAub3JnL2V4dC93b3JrL3YyIgogXSwKICJncmFudCI6IHsKICAiaWQiOiAiZ3JhbnQtN2YzYSIsCiAgImFjdG9yIjogImFnZW50IgogfSwKICJkYXRhIjogewogICJzdW1tYXJ5IjogIuWQiOaIkOmgkOimvSDwn5eTIiwKICAibmV4dFN0ZXAiOiAi5qC45bCN6I236Jit5paH5qiZ57Gk44CMw6nDqW7jgI3jgIIiLAogICJleHBlY3RlZFJlc3VsdCI6ICLlm57opobkuIDlgIvmmI7norrntZDmnpzjgIIiCiB9Cn0K.DmG4Vke_tf90kQFFWZ6-Q1pESNfAVxq55OaVaKA6nZ0fynVBIc4dC-LeIP8WmePmewCUZnaRe2_RiHu876j5Mg"
+  },
+  "jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vY2Fyb2wudmVjdG9ycy50ZXN0Ly53ZWxsLWtub3duL2RhcmVwL2Nhcm9sI2tleS0yMDI2LTExIiwidHlwIjoiZGFyZXAtcmVjZWlwdCtqd3MifQ.eyJkYXJlcCI6IjIiLCJpZCI6ImY2OTk5OTM1LTg5NjYtNDU4ZC04MWNkLWYyYWFkMmJkYTk4OCIsInNvdXJjZSI6ImFjY3Q6Y2Fyb2xAdmVjdG9ycy50ZXN0IiwidHlwZSI6Imh0dHBzOi8vZGFyZXAub3JnL2V4dC9jb3JlL3YyI3JlY2VpcHQiLCJ0aW1lIjoiMjAyNi0xMS0yMFQxMTo1MDowMFoiLCJ0byI6WyJhY2N0OmJvYkB2ZWN0b3JzLnRlc3QiXSwidGhyZWFkIjoiMzNhYjEwNzctOTVhOC00MTgzLWE3OTgtODA1ZGEzYzFmMWMxIiwiaW5SZXBseVRvIjoiMzNhYjEwNzctOTVhOC00MTgzLWE3OTgtODA1ZGEzYzFmMWMxIiwiZXh0Ijp7fSwicmVxdWlyZWQiOltdLCJkYXRhIjp7InNoYTI1NiI6Ijc2ZDQwZGY4ZTRlM2I3ZTRmMTM3MGMyM2ZhMzExODZjYWY1NGJlZjVhOGNlOWJkMTZmMGM1MTNiNjljNDc2N2QiLCJzdG9yZWRBdCI6IjIwMjYtMTEtMjBUMTE6NTA6MDBaIn19.fnlPJGKCUEOJaFRq9GlnMgH3jx-r4NPsrbs33ZqO6H_H2ZvelPvo9okmoiF-vk2C-YTiwgjymxCCj_A4rs764Q",
+  "headerUtf8": "{\"alg\":\"ES256\",\"kid\":\"https://carol.vectors.test/.well-known/darep/carol#key-2026-11\",\"typ\":\"darep-receipt+jws\"}",
+  "payloadUtf8": "{\"darep\":\"2\",\"id\":\"f6999935-8966-458d-81cd-f2aad2bda988\",\"source\":\"acct:carol@vectors.test\",\"type\":\"https://darep.org/ext/core/v2#receipt\",\"time\":\"2026-11-20T11:50:00Z\",\"to\":[\"acct:bob@vectors.test\"],\"thread\":\"33ab1077-95a8-4183-a798-805da3c1f1c1\",\"inReplyTo\":\"33ab1077-95a8-4183-a798-805da3c1f1c1\",\"ext\":{},\"required\":[],\"data\":{\"sha256\":\"76d40df8e4e3b7e4f1370c23fa31186caf54bef5a8ce9bd16f0c513b69c4767d\",\"storedAt\":\"2026-11-20T11:50:00Z\"}}",
+  "payloadSha256": "f6daa54f94523c8ac21045696d92e852b19f38f61c8108f0ccea1660c0fa177b",
+  "expected": {
+    "verdict": "reject",
+    "code": "receipt-mismatch"
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "vector": "delivery/receiver/reject-bad-header",
+  "generatedBy": "vectors/v2/delivery/generate.mjs",
+  "testOnly": true,
+  "role": "receiver",
+  "clock": "Each step has \"at\": the receiver clock at that moment. Runners inject it. A receiver with a real clock checks storedAt format only.",
+  "description": "A v1-style kid (an acct: address, not an HTTPS key URL) is refused.",
+  "spec": [
+    "delivery.md §3.1",
+    "delivery.md §5.1",
+    "https-binding.md §2.3",
+    "https-binding.md §3"
+  ],
+  "decisions": [
+    "D6"
+  ],
+  "receiver": {
+    "address": "acct:carol@vectors.test",
+    "inbox": "https://carol.vectors.test/darep/v2/inbox",
+    "signingKeys": [
+      "https://carol.vectors.test/.well-known/darep/carol#sig-1",
+      "https://carol.vectors.test/.well-known/darep/carol#rcpt-1"
+    ],
+    "pinned": [
+      "acct:bob@vectors.test",
+      "acct:dave@vectors.test"
+    ],
+    "extensions": [
+      "https://darep.org/ext/core/v2"
+    ]
+  },
+  "records": {
+    "r": {
+      "envelope": {
+        "darep": "2",
+        "id": "646f53d2-74e1-4355-8522-4438768f3b2c",
+        "type": "https://darep.org/ext/core/v2#message",
+        "source": "acct:bob@vectors.test",
+        "to": [
+          "acct:carol@vectors.test"
+        ],
+        "thread": "646f53d2-74e1-4355-8522-4438768f3b2c",
+        "inReplyTo": null,
+        "time": "2026-11-20T10:00:00Z",
+        "expires": "2026-11-27T10:00:00Z",
+        "ext": {},
+        "required": [],
+        "grant": {
+          "id": "grant-vectors-bob",
+          "actor": "agent"
+        },
+        "data": {
+          "text": "Check the label."
+        }
+      },
+      "payloadUtf8": "{\"darep\":\"2\",\"id\":\"646f53d2-74e1-4355-8522-4438768f3b2c\",\"type\":\"https://darep.org/ext/core/v2#message\",\"source\":\"acct:bob@vectors.test\",\"to\":[\"acct:carol@vectors.test\"],\"thread\":\"646f53d2-74e1-4355-8522-4438768f3b2c\",\"inReplyTo\":null,\"time\":\"2026-11-20T10:00:00Z\",\"expires\":\"2026-11-27T10:00:00Z\",\"ext\":{},\"required\":[],\"grant\":{\"id\":\"grant-vectors-bob\",\"actor\":\"agent\"},\"data\":{\"text\":\"Check the label.\"}}",
+      "payloadSha256": "35d63e2436c68e7297dd57f83161ef5b51e930e2884eb38ca1c874e6a253746e",
+      "recordBytes": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImFjY3Q6Ym9iQHZlY3RvcnMudGVzdCIsInR5cCI6ImRhcmVwLWV2ZW50K2p3cyJ9.eyJkYXJlcCI6IjIiLCJpZCI6IjY0NmY1M2QyLTc0ZTEtNDM1NS04NTIyLTQ0Mzg3NjhmM2IyYyIsInR5cGUiOiJodHRwczovL2RhcmVwLm9yZy9leHQvY29yZS92MiNtZXNzYWdlIiwic291cmNlIjoiYWNjdDpib2JAdmVjdG9ycy50ZXN0IiwidG8iOlsiYWNjdDpjYXJvbEB2ZWN0b3JzLnRlc3QiXSwidGhyZWFkIjoiNjQ2ZjUzZDItNzRlMS00MzU1LTg1MjItNDQzODc2OGYzYjJjIiwiaW5SZXBseVRvIjpudWxsLCJ0aW1lIjoiMjAyNi0xMS0yMFQxMDowMDowMFoiLCJleHBpcmVzIjoiMjAyNi0xMS0yN1QxMDowMDowMFoiLCJleHQiOnt9LCJyZXF1aXJlZCI6W10sImdyYW50Ijp7ImlkIjoiZ3JhbnQtdmVjdG9ycy1ib2IiLCJhY3RvciI6ImFnZW50In0sImRhdGEiOnsidGV4dCI6IkNoZWNrIHRoZSBsYWJlbC4ifX0.6QycozK6UNMuAynUihTUXHUxE9vk1AHxTQFNuVjK6znzwPAOFGUPrvHI0-GoqRA-it9XKApxnEq5cmD6WGxyDQ"
+    }
+  },
+  "steps": [
+    {
+      "at": "2026-11-20T10:00:30Z",
+      "request": {
+        "method": "POST",
+        "url": "https://carol.vectors.test/darep/v2/inbox",
+        "headers": {
+          "content-type": "application/jose",
+          "darep-recipient": "acct:carol@vectors.test"
+        },
+        "body": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImFjY3Q6Ym9iQHZlY3RvcnMudGVzdCIsInR5cCI6ImRhcmVwLWV2ZW50K2p3cyJ9.eyJkYXJlcCI6IjIiLCJpZCI6IjY0NmY1M2QyLTc0ZTEtNDM1NS04NTIyLTQ0Mzg3NjhmM2IyYyIsInR5cGUiOiJodHRwczovL2RhcmVwLm9yZy9leHQvY29yZS92MiNtZXNzYWdlIiwic291cmNlIjoiYWNjdDpib2JAdmVjdG9ycy50ZXN0IiwidG8iOlsiYWNjdDpjYXJvbEB2ZWN0b3JzLnRlc3QiXSwidGhyZWFkIjoiNjQ2ZjUzZDItNzRlMS00MzU1LTg1MjItNDQzODc2OGYzYjJjIiwiaW5SZXBseVRvIjpudWxsLCJ0aW1lIjoiMjAyNi0xMS0yMFQxMDowMDowMFoiLCJleHBpcmVzIjoiMjAyNi0xMS0yN1QxMDowMDowMFoiLCJleHQiOnt9LCJyZXF1aXJlZCI6W10sImdyYW50Ijp7ImlkIjoiZ3JhbnQtdmVjdG9ycy1ib2IiLCJhY3RvciI6ImFnZW50In0sImRhdGEiOnsidGV4dCI6IkNoZWNrIHRoZSBsYWJlbC4ifX0.6QycozK6UNMuAynUihTUXHUxE9vk1AHxTQFNuVjK6znzwPAOFGUPrvHI0-GoqRA-it9XKApxnEq5cmD6WGxyDQ"
+      },
+      "expect": {
+        "status": 400,
+        "contentType": "application/problem+json",
+        "problem": {
+          "type": "https://darep.org/problems/bad-header",
+          "status": 400,
+          "code": "bad-header"
+        },
+        "stored": false,
+        "receipt": null
+      }
+    }
+  ]
+}

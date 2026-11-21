@@ -1,0 +1,115 @@
+{
+  "vector": "delivery/sender/status-fallback",
+  "generatedBy": "vectors/v2/delivery/generate.mjs",
+  "testOnly": true,
+  "role": "sender",
+  "clock": "Each step has \"at\": the sender clock when the attempt is made. Runners inject it and act as the receiving endpoint.",
+  "description": "Without a recognized code the sender classifies by status: other 4xx permanent; 408, 425, 429, 5xx transient. A recognized code wins over its status.",
+  "spec": [
+    "https-binding.md §3"
+  ],
+  "decisions": [
+    "D6"
+  ],
+  "sender": {
+    "address": "acct:bob@vectors.test",
+    "signingKeys": [
+      "https://bob.vectors.test/.well-known/darep/bob#sig-1"
+    ],
+    "pinned": [
+      "acct:carol@vectors.test"
+    ]
+  },
+  "records": {
+    "out": {
+      "envelope": {
+        "darep": "2",
+        "id": "6dd75f8e-dd37-4861-8758-237e89f68b57",
+        "type": "https://darep.org/ext/core/v2#message",
+        "source": "acct:bob@vectors.test",
+        "to": [
+          "acct:carol@vectors.test"
+        ],
+        "thread": "6dd75f8e-dd37-4861-8758-237e89f68b57",
+        "inReplyTo": null,
+        "time": "2026-11-20T10:00:00Z",
+        "expires": "2026-11-27T10:00:00Z",
+        "ext": {},
+        "required": [],
+        "grant": {
+          "id": "grant-vectors-bob",
+          "actor": "agent"
+        },
+        "data": {
+          "text": "Check the label."
+        }
+      },
+      "payloadUtf8": "{\"darep\":\"2\",\"id\":\"6dd75f8e-dd37-4861-8758-237e89f68b57\",\"type\":\"https://darep.org/ext/core/v2#message\",\"source\":\"acct:bob@vectors.test\",\"to\":[\"acct:carol@vectors.test\"],\"thread\":\"6dd75f8e-dd37-4861-8758-237e89f68b57\",\"inReplyTo\":null,\"time\":\"2026-11-20T10:00:00Z\",\"expires\":\"2026-11-27T10:00:00Z\",\"ext\":{},\"required\":[],\"grant\":{\"id\":\"grant-vectors-bob\",\"actor\":\"agent\"},\"data\":{\"text\":\"Check the label.\"}}",
+      "payloadSha256": "8e7ef02c318a7e7d14b3a9360c663402a526b112eefc04abcc3b974528491383",
+      "recordBytes": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.eyJkYXJlcCI6IjIiLCJpZCI6IjZkZDc1ZjhlLWRkMzctNDg2MS04NzU4LTIzN2U4OWY2OGI1NyIsInR5cGUiOiJodHRwczovL2RhcmVwLm9yZy9leHQvY29yZS92MiNtZXNzYWdlIiwic291cmNlIjoiYWNjdDpib2JAdmVjdG9ycy50ZXN0IiwidG8iOlsiYWNjdDpjYXJvbEB2ZWN0b3JzLnRlc3QiXSwidGhyZWFkIjoiNmRkNzVmOGUtZGQzNy00ODYxLTg3NTgtMjM3ZTg5ZjY4YjU3IiwiaW5SZXBseVRvIjpudWxsLCJ0aW1lIjoiMjAyNi0xMS0yMFQxMDowMDowMFoiLCJleHBpcmVzIjoiMjAyNi0xMS0yN1QxMDowMDowMFoiLCJleHQiOnt9LCJyZXF1aXJlZCI6W10sImdyYW50Ijp7ImlkIjoiZ3JhbnQtdmVjdG9ycy1ib2IiLCJhY3RvciI6ImFnZW50In0sImRhdGEiOnsidGV4dCI6IkNoZWNrIHRoZSBsYWJlbC4ifX0.s4MOWtFHT9RyninGzKGv3YMq7zNtL255GCq0dqc1TAVPJhnWqmGBgB_nYJOqYezK8dvEYHvha2OSnpM_eGmfWQ"
+    }
+  },
+  "cases": [
+    {
+      "respond": {
+        "status": 400,
+        "headers": {
+          "content-type": "application/problem+json"
+        },
+        "body": "{\"type\":\"https://darep.org/problems/brand-new-code\",\"title\":\"Future\",\"status\":400,\"code\":\"brand-new-code\"}"
+      },
+      "expect": {
+        "attemptResult": "permanent"
+      }
+    },
+    {
+      "respond": {
+        "status": 404
+      },
+      "expect": {
+        "attemptResult": "permanent"
+      }
+    },
+    {
+      "respond": {
+        "status": 500
+      },
+      "expect": {
+        "attemptResult": "transient"
+      }
+    },
+    {
+      "respond": {
+        "status": 408
+      },
+      "expect": {
+        "attemptResult": "transient"
+      }
+    },
+    {
+      "respond": {
+        "status": 425,
+        "headers": {
+          "content-type": "application/problem+json"
+        },
+        "body": "{\"type\":\"https://darep.org/problems/not-yet-valid\",\"title\":\"Not yet valid\",\"status\":425,\"code\":\"not-yet-valid\"}"
+      },
+      "expect": {
+        "attemptResult": "transient"
+      }
+    },
+    {
+      "respond": {
+        "status": 201,
+        "headers": {
+          "content-type": "application/jose"
+        },
+        "body": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vY2Fyb2wudmVjdG9ycy50ZXN0Ly53ZWxsLWtub3duL2RhcmVwL2Nhcm9sI3JjcHQtMSIsInR5cCI6ImRhcmVwLXJlY2VpcHQrandzIn0.eyJkYXJlcCI6IjIiLCJpZCI6IjQxMjQyZWM3LTJkOWUtNDM0OC04NTQ0LWJkYjQ1MDlkY2UzYyIsInNvdXJjZSI6ImFjY3Q6Y2Fyb2xAdmVjdG9ycy50ZXN0IiwidHlwZSI6Imh0dHBzOi8vZGFyZXAub3JnL2V4dC9jb3JlL3YyI3JlY2VpcHQiLCJ0aW1lIjoiMjAyNi0xMS0yMFQxMDowMDo0MFoiLCJ0byI6WyJhY2N0OmJvYkB2ZWN0b3JzLnRlc3QiXSwidGhyZWFkIjoiNmRkNzVmOGUtZGQzNy00ODYxLTg3NTgtMjM3ZTg5ZjY4YjU3IiwiaW5SZXBseVRvIjoiNmRkNzVmOGUtZGQzNy00ODYxLTg3NTgtMjM3ZTg5ZjY4YjU3IiwiZXh0Ijp7fSwicmVxdWlyZWQiOltdLCJkYXRhIjp7InNoYTI1NiI6IjhlN2VmMDJjMzE4YTdlN2QxNGIzYTkzNjBjNjYzNDAyYTUyNmIxMTJlZWZjMDRhYmNjM2I5NzQ1Mjg0OTEzODMiLCJzdG9yZWRBdCI6IjIwMjYtMTEtMjBUMTA6MDA6NDBaIn19.ZEn9lVgtEOdSLE6AlL41vOC8STGxXun6vp6qUdDUbOGUa8hCsvpGEn53vktt_GBijAuTjf4_OctgaSBj2LcPWA"
+      },
+      "expect": {
+        "attemptResult": "receipt-mismatch",
+        "note": "200 is the only success status."
+      }
+    }
+  ]
+}

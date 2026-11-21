@@ -1,0 +1,81 @@
+{
+  "vector": "delivery/sender/give-up-at-expiry",
+  "generatedBy": "vectors/v2/delivery/generate.mjs",
+  "testOnly": true,
+  "role": "sender",
+  "clock": "Each step has \"at\": the sender clock when the attempt is made. Runners inject it and act as the receiving endpoint.",
+  "description": "A delivery that only ever meets transient failures is marked failed at its expires plus the skew allowance (here time + 7 days + 300 s). After that the sender accepts no receipt for it (records.md TM-4a).",
+  "spec": [
+    "delivery.md §7.3"
+  ],
+  "decisions": [
+    "D4"
+  ],
+  "sender": {
+    "address": "acct:bob@vectors.test",
+    "signingKeys": [
+      "https://bob.vectors.test/.well-known/darep/bob#sig-1"
+    ],
+    "pinned": [
+      "acct:carol@vectors.test"
+    ]
+  },
+  "records": {
+    "out": {
+      "envelope": {
+        "darep": "2",
+        "id": "6dd75f8e-dd37-4861-8758-237e89f68b57",
+        "type": "https://darep.org/ext/core/v2#message",
+        "source": "acct:bob@vectors.test",
+        "to": [
+          "acct:carol@vectors.test"
+        ],
+        "thread": "6dd75f8e-dd37-4861-8758-237e89f68b57",
+        "inReplyTo": null,
+        "time": "2026-11-20T10:00:00Z",
+        "expires": "2026-11-27T10:00:00Z",
+        "ext": {},
+        "required": [],
+        "grant": {
+          "id": "grant-vectors-bob",
+          "actor": "agent"
+        },
+        "data": {
+          "text": "Check the label."
+        }
+      },
+      "payloadUtf8": "{\"darep\":\"2\",\"id\":\"6dd75f8e-dd37-4861-8758-237e89f68b57\",\"type\":\"https://darep.org/ext/core/v2#message\",\"source\":\"acct:bob@vectors.test\",\"to\":[\"acct:carol@vectors.test\"],\"thread\":\"6dd75f8e-dd37-4861-8758-237e89f68b57\",\"inReplyTo\":null,\"time\":\"2026-11-20T10:00:00Z\",\"expires\":\"2026-11-27T10:00:00Z\",\"ext\":{},\"required\":[],\"grant\":{\"id\":\"grant-vectors-bob\",\"actor\":\"agent\"},\"data\":{\"text\":\"Check the label.\"}}",
+      "payloadSha256": "8e7ef02c318a7e7d14b3a9360c663402a526b112eefc04abcc3b974528491383",
+      "recordBytes": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.eyJkYXJlcCI6IjIiLCJpZCI6IjZkZDc1ZjhlLWRkMzctNDg2MS04NzU4LTIzN2U4OWY2OGI1NyIsInR5cGUiOiJodHRwczovL2RhcmVwLm9yZy9leHQvY29yZS92MiNtZXNzYWdlIiwic291cmNlIjoiYWNjdDpib2JAdmVjdG9ycy50ZXN0IiwidG8iOlsiYWNjdDpjYXJvbEB2ZWN0b3JzLnRlc3QiXSwidGhyZWFkIjoiNmRkNzVmOGUtZGQzNy00ODYxLTg3NTgtMjM3ZTg5ZjY4YjU3IiwiaW5SZXBseVRvIjpudWxsLCJ0aW1lIjoiMjAyNi0xMS0yMFQxMDowMDowMFoiLCJleHBpcmVzIjoiMjAyNi0xMS0yN1QxMDowMDowMFoiLCJleHQiOnt9LCJyZXF1aXJlZCI6W10sImdyYW50Ijp7ImlkIjoiZ3JhbnQtdmVjdG9ycy1ib2IiLCJhY3RvciI6ImFnZW50In0sImRhdGEiOnsidGV4dCI6IkNoZWNrIHRoZSBsYWJlbC4ifX0.s4MOWtFHT9RyninGzKGv3YMq7zNtL255GCq0dqc1TAVPJhnWqmGBgB_nYJOqYezK8dvEYHvha2OSnpM_eGmfWQ"
+    }
+  },
+  "steps": [
+    {
+      "at": "2026-11-27T10:04:00Z",
+      "request": {
+        "method": "POST",
+        "url": "https://carol.vectors.test/darep/v2/inbox",
+        "headers": {
+          "content-type": "application/jose",
+          "darep-recipient": "acct:carol@vectors.test"
+        },
+        "bodyEqualsRecord": "out"
+      },
+      "respond": {
+        "status": 503
+      },
+      "expect": {
+        "delivery": "queued",
+        "attemptResult": "transient"
+      }
+    },
+    {
+      "at": "2026-11-27T10:05:01Z",
+      "event": "expires plus skew allowance has passed",
+      "expect": {
+        "delivery": "failed",
+        "furtherAttempts": 0
+      }
+    }
+  ]
+}

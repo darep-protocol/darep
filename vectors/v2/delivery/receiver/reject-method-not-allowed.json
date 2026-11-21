@@ -1,0 +1,57 @@
+{
+  "vector": "delivery/receiver/reject-method-not-allowed",
+  "generatedBy": "vectors/v2/delivery/generate.mjs",
+  "testOnly": true,
+  "role": "receiver",
+  "clock": "Each step has \"at\": the receiver clock at that moment. Runners inject it. A receiver with a real clock checks storedAt format only.",
+  "description": "GET on an inbox is refused.",
+  "spec": [
+    "delivery.md §3.1",
+    "delivery.md §5.1",
+    "https-binding.md §2.3",
+    "https-binding.md §3"
+  ],
+  "decisions": [
+    "D6"
+  ],
+  "receiver": {
+    "address": "acct:carol@vectors.test",
+    "inbox": "https://carol.vectors.test/darep/v2/inbox",
+    "signingKeys": [
+      "https://carol.vectors.test/.well-known/darep/carol#sig-1",
+      "https://carol.vectors.test/.well-known/darep/carol#rcpt-1"
+    ],
+    "pinned": [
+      "acct:bob@vectors.test",
+      "acct:dave@vectors.test"
+    ],
+    "extensions": [
+      "https://darep.org/ext/core/v2"
+    ]
+  },
+  "records": {},
+  "steps": [
+    {
+      "at": "2026-11-20T10:00:30Z",
+      "request": {
+        "method": "GET",
+        "url": "https://carol.vectors.test/darep/v2/inbox",
+        "headers": {}
+      },
+      "expect": {
+        "status": 405,
+        "contentType": "application/problem+json",
+        "headers": {
+          "allow": "POST"
+        },
+        "problem": {
+          "type": "https://darep.org/problems/method-not-allowed",
+          "status": 405,
+          "code": "method-not-allowed"
+        },
+        "stored": false,
+        "receipt": null
+      }
+    }
+  ]
+}

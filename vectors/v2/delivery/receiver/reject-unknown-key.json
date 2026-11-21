@@ -1,0 +1,86 @@
+{
+  "vector": "delivery/receiver/reject-unknown-key",
+  "generatedBy": "vectors/v2/delivery/generate.mjs",
+  "testOnly": true,
+  "role": "receiver",
+  "clock": "Each step has \"at\": the receiver clock at that moment. Runners inject it. A receiver with a real clock checks storedAt format only.",
+  "description": "A record signed by a key in an identity document carol has not pinned is refused. The receiver does not fetch the document (D2).",
+  "spec": [
+    "delivery.md §3.1",
+    "delivery.md §5.1",
+    "https-binding.md §2.3",
+    "https-binding.md §3"
+  ],
+  "decisions": [
+    "D6"
+  ],
+  "receiver": {
+    "address": "acct:carol@vectors.test",
+    "inbox": "https://carol.vectors.test/darep/v2/inbox",
+    "signingKeys": [
+      "https://carol.vectors.test/.well-known/darep/carol#sig-1",
+      "https://carol.vectors.test/.well-known/darep/carol#rcpt-1"
+    ],
+    "pinned": [
+      "acct:bob@vectors.test",
+      "acct:dave@vectors.test"
+    ],
+    "extensions": [
+      "https://darep.org/ext/core/v2"
+    ]
+  },
+  "records": {
+    "r": {
+      "envelope": {
+        "darep": "2",
+        "id": "6dbeec9b-b0c6-46f6-a32b-bef189f2ae6b",
+        "type": "https://darep.org/ext/core/v2#message",
+        "source": "acct:mallory@vectors.test",
+        "to": [
+          "acct:carol@vectors.test"
+        ],
+        "thread": "6dbeec9b-b0c6-46f6-a32b-bef189f2ae6b",
+        "inReplyTo": null,
+        "time": "2026-11-20T10:00:00Z",
+        "expires": "2026-11-27T10:00:00Z",
+        "ext": {},
+        "required": [],
+        "grant": {
+          "id": "grant-vectors-mallory",
+          "actor": "agent"
+        },
+        "data": {
+          "text": "Check the label."
+        }
+      },
+      "payloadUtf8": "{\"darep\":\"2\",\"id\":\"6dbeec9b-b0c6-46f6-a32b-bef189f2ae6b\",\"type\":\"https://darep.org/ext/core/v2#message\",\"source\":\"acct:mallory@vectors.test\",\"to\":[\"acct:carol@vectors.test\"],\"thread\":\"6dbeec9b-b0c6-46f6-a32b-bef189f2ae6b\",\"inReplyTo\":null,\"time\":\"2026-11-20T10:00:00Z\",\"expires\":\"2026-11-27T10:00:00Z\",\"ext\":{},\"required\":[],\"grant\":{\"id\":\"grant-vectors-mallory\",\"actor\":\"agent\"},\"data\":{\"text\":\"Check the label.\"}}",
+      "payloadSha256": "87fa42bf801750549c04fc344ad913d455f53108501ae2bc703f1f5dd57c47f9",
+      "recordBytes": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vbWFsbG9yeS52ZWN0b3JzLnRlc3QvLndlbGwta25vd24vZGFyZXAvbWFsbG9yeSNzaWctMSIsInR5cCI6ImRhcmVwLWV2ZW50K2p3cyJ9.eyJkYXJlcCI6IjIiLCJpZCI6IjZkYmVlYzliLWIwYzYtNDZmNi1hMzJiLWJlZjE4OWYyYWU2YiIsInR5cGUiOiJodHRwczovL2RhcmVwLm9yZy9leHQvY29yZS92MiNtZXNzYWdlIiwic291cmNlIjoiYWNjdDptYWxsb3J5QHZlY3RvcnMudGVzdCIsInRvIjpbImFjY3Q6Y2Fyb2xAdmVjdG9ycy50ZXN0Il0sInRocmVhZCI6IjZkYmVlYzliLWIwYzYtNDZmNi1hMzJiLWJlZjE4OWYyYWU2YiIsImluUmVwbHlUbyI6bnVsbCwidGltZSI6IjIwMjYtMTEtMjBUMTA6MDA6MDBaIiwiZXhwaXJlcyI6IjIwMjYtMTEtMjdUMTA6MDA6MDBaIiwiZXh0Ijp7fSwicmVxdWlyZWQiOltdLCJncmFudCI6eyJpZCI6ImdyYW50LXZlY3RvcnMtbWFsbG9yeSIsImFjdG9yIjoiYWdlbnQifSwiZGF0YSI6eyJ0ZXh0IjoiQ2hlY2sgdGhlIGxhYmVsLiJ9fQ.R8beCIZIGt1H7apZvG6uhnNLxf2YnP5q5DXfZ0oZbnZfB7AaYy9b5FCk70t7cfPD3dOPZ1rcbP-66NoG3djl3A"
+    }
+  },
+  "steps": [
+    {
+      "at": "2026-11-20T10:00:30Z",
+      "request": {
+        "method": "POST",
+        "url": "https://carol.vectors.test/darep/v2/inbox",
+        "headers": {
+          "content-type": "application/jose",
+          "darep-recipient": "acct:carol@vectors.test"
+        },
+        "body": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vbWFsbG9yeS52ZWN0b3JzLnRlc3QvLndlbGwta25vd24vZGFyZXAvbWFsbG9yeSNzaWctMSIsInR5cCI6ImRhcmVwLWV2ZW50K2p3cyJ9.eyJkYXJlcCI6IjIiLCJpZCI6IjZkYmVlYzliLWIwYzYtNDZmNi1hMzJiLWJlZjE4OWYyYWU2YiIsInR5cGUiOiJodHRwczovL2RhcmVwLm9yZy9leHQvY29yZS92MiNtZXNzYWdlIiwic291cmNlIjoiYWNjdDptYWxsb3J5QHZlY3RvcnMudGVzdCIsInRvIjpbImFjY3Q6Y2Fyb2xAdmVjdG9ycy50ZXN0Il0sInRocmVhZCI6IjZkYmVlYzliLWIwYzYtNDZmNi1hMzJiLWJlZjE4OWYyYWU2YiIsImluUmVwbHlUbyI6bnVsbCwidGltZSI6IjIwMjYtMTEtMjBUMTA6MDA6MDBaIiwiZXhwaXJlcyI6IjIwMjYtMTEtMjdUMTA6MDA6MDBaIiwiZXh0Ijp7fSwicmVxdWlyZWQiOltdLCJncmFudCI6eyJpZCI6ImdyYW50LXZlY3RvcnMtbWFsbG9yeSIsImFjdG9yIjoiYWdlbnQifSwiZGF0YSI6eyJ0ZXh0IjoiQ2hlY2sgdGhlIGxhYmVsLiJ9fQ.R8beCIZIGt1H7apZvG6uhnNLxf2YnP5q5DXfZ0oZbnZfB7AaYy9b5FCk70t7cfPD3dOPZ1rcbP-66NoG3djl3A"
+      },
+      "expect": {
+        "status": 403,
+        "contentType": "application/problem+json",
+        "problem": {
+          "type": "https://darep.org/problems/unknown-key",
+          "status": 403,
+          "code": "unknown-key"
+        },
+        "stored": false,
+        "receipt": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,254 @@
+{
+  "vector": "delivery/receiver/out-of-order",
+  "generatedBy": "vectors/v2/delivery/generate.mjs",
+  "testOnly": true,
+  "role": "receiver",
+  "clock": "Each step has \"at\": the receiver clock at that moment. Runners inject it. A receiver with a real clock checks storedAt format only.",
+  "description": "A record whose predecessor has not arrived is stored and acknowledged, held as pending, and applied after the predecessor is applied.",
+  "spec": [
+    "delivery.md §3.2",
+    "delivery.md §8.2",
+    "delivery.md §8.4"
+  ],
+  "decisions": [
+    "D4",
+    "D6"
+  ],
+  "receiver": {
+    "address": "acct:bob@vectors.test",
+    "inbox": "https://bob.vectors.test/darep/v2/inbox",
+    "signingKeys": [
+      "https://bob.vectors.test/.well-known/darep/bob#sig-1",
+      "https://bob.vectors.test/.well-known/darep/bob#rcpt-1"
+    ],
+    "pinned": [
+      "acct:carol@vectors.test",
+      "acct:dave@vectors.test"
+    ],
+    "extensions": [
+      "https://darep.org/ext/core/v2",
+      "https://darep.org/ext/work/v2"
+    ]
+  },
+  "priorState": [
+    {
+      "direction": "outgoing",
+      "record": "r1",
+      "applyOutcome": "applied",
+      "note": "Bob opened the thread; r1 is his own stored outgoing record."
+    }
+  ],
+  "records": {
+    "r1": {
+      "envelope": {
+        "darep": "2",
+        "id": "5dd60087-ef55-497b-ba01-18795eb6d728",
+        "type": "https://darep.org/ext/work/v2#handoff",
+        "source": "acct:bob@vectors.test",
+        "to": [
+          "acct:carol@vectors.test"
+        ],
+        "thread": "5dd60087-ef55-497b-ba01-18795eb6d728",
+        "inReplyTo": null,
+        "time": "2026-11-20T10:00:00Z",
+        "expires": "2026-11-27T10:00:00Z",
+        "ext": {},
+        "required": [
+          "https://darep.org/ext/work/v2"
+        ],
+        "grant": {
+          "id": "grant-vectors-bob",
+          "actor": "agent"
+        },
+        "data": {
+          "summary": "Vector handoff 測試 🗓",
+          "nextStep": "Check the attached label.",
+          "expectedResult": "One clear answer."
+        }
+      },
+      "payloadUtf8": "{\"darep\":\"2\",\"id\":\"5dd60087-ef55-497b-ba01-18795eb6d728\",\"type\":\"https://darep.org/ext/work/v2#handoff\",\"source\":\"acct:bob@vectors.test\",\"to\":[\"acct:carol@vectors.test\"],\"thread\":\"5dd60087-ef55-497b-ba01-18795eb6d728\",\"inReplyTo\":null,\"time\":\"2026-11-20T10:00:00Z\",\"expires\":\"2026-11-27T10:00:00Z\",\"ext\":{},\"required\":[\"https://darep.org/ext/work/v2\"],\"grant\":{\"id\":\"grant-vectors-bob\",\"actor\":\"agent\"},\"data\":{\"summary\":\"Vector handoff 測試 🗓\",\"nextStep\":\"Check the attached label.\",\"expectedResult\":\"One clear answer.\"}}",
+      "payloadSha256": "192a282f08957f590bd723bef1aef2b6917e07c780756ce18930b488ace0968f",
+      "recordBytes": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.eyJkYXJlcCI6IjIiLCJpZCI6IjVkZDYwMDg3LWVmNTUtNDk3Yi1iYTAxLTE4Nzk1ZWI2ZDcyOCIsInR5cGUiOiJodHRwczovL2RhcmVwLm9yZy9leHQvd29yay92MiNoYW5kb2ZmIiwic291cmNlIjoiYWNjdDpib2JAdmVjdG9ycy50ZXN0IiwidG8iOlsiYWNjdDpjYXJvbEB2ZWN0b3JzLnRlc3QiXSwidGhyZWFkIjoiNWRkNjAwODctZWY1NS00OTdiLWJhMDEtMTg3OTVlYjZkNzI4IiwiaW5SZXBseVRvIjpudWxsLCJ0aW1lIjoiMjAyNi0xMS0yMFQxMDowMDowMFoiLCJleHBpcmVzIjoiMjAyNi0xMS0yN1QxMDowMDowMFoiLCJleHQiOnt9LCJyZXF1aXJlZCI6WyJodHRwczovL2RhcmVwLm9yZy9leHQvd29yay92MiJdLCJncmFudCI6eyJpZCI6ImdyYW50LXZlY3RvcnMtYm9iIiwiYWN0b3IiOiJhZ2VudCJ9LCJkYXRhIjp7InN1bW1hcnkiOiJWZWN0b3IgaGFuZG9mZiDmuKzoqaYg8J-XkyIsIm5leHRTdGVwIjoiQ2hlY2sgdGhlIGF0dGFjaGVkIGxhYmVsLiIsImV4cGVjdGVkUmVzdWx0IjoiT25lIGNsZWFyIGFuc3dlci4ifX0._u1aiYdawK8tYnwTUKrLbaVXQx4rkGuOtRHbVJc1EVAkHS_1NkY5cdW8xKMsAqk6iasmdZZMSnzUMhEedM7CBA"
+    },
+    "r2": {
+      "envelope": {
+        "darep": "2",
+        "id": "94e18701-8e23-493b-81f3-823ed82a92b2",
+        "type": "https://darep.org/ext/work/v2#accept",
+        "source": "acct:carol@vectors.test",
+        "to": [
+          "acct:bob@vectors.test"
+        ],
+        "thread": "5dd60087-ef55-497b-ba01-18795eb6d728",
+        "inReplyTo": "5dd60087-ef55-497b-ba01-18795eb6d728",
+        "time": "2026-11-20T10:01:00Z",
+        "expires": "2026-11-27T10:01:00Z",
+        "ext": {},
+        "required": [
+          "https://darep.org/ext/work/v2"
+        ],
+        "grant": {
+          "id": "grant-vectors-carol",
+          "actor": "agent"
+        },
+        "data": {}
+      },
+      "payloadUtf8": "{\"darep\":\"2\",\"id\":\"94e18701-8e23-493b-81f3-823ed82a92b2\",\"type\":\"https://darep.org/ext/work/v2#accept\",\"source\":\"acct:carol@vectors.test\",\"to\":[\"acct:bob@vectors.test\"],\"thread\":\"5dd60087-ef55-497b-ba01-18795eb6d728\",\"inReplyTo\":\"5dd60087-ef55-497b-ba01-18795eb6d728\",\"time\":\"2026-11-20T10:01:00Z\",\"expires\":\"2026-11-27T10:01:00Z\",\"ext\":{},\"required\":[\"https://darep.org/ext/work/v2\"],\"grant\":{\"id\":\"grant-vectors-carol\",\"actor\":\"agent\"},\"data\":{}}",
+      "payloadSha256": "9f32ee893aef5d456df136bf152138d547987c80b0bd0b7161375b9460ed2938",
+      "recordBytes": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vY2Fyb2wudmVjdG9ycy50ZXN0Ly53ZWxsLWtub3duL2RhcmVwL2Nhcm9sI3NpZy0xIiwidHlwIjoiZGFyZXAtZXZlbnQrandzIn0.eyJkYXJlcCI6IjIiLCJpZCI6Ijk0ZTE4NzAxLThlMjMtNDkzYi04MWYzLTgyM2VkODJhOTJiMiIsInR5cGUiOiJodHRwczovL2RhcmVwLm9yZy9leHQvd29yay92MiNhY2NlcHQiLCJzb3VyY2UiOiJhY2N0OmNhcm9sQHZlY3RvcnMudGVzdCIsInRvIjpbImFjY3Q6Ym9iQHZlY3RvcnMudGVzdCJdLCJ0aHJlYWQiOiI1ZGQ2MDA4Ny1lZjU1LTQ5N2ItYmEwMS0xODc5NWViNmQ3MjgiLCJpblJlcGx5VG8iOiI1ZGQ2MDA4Ny1lZjU1LTQ5N2ItYmEwMS0xODc5NWViNmQ3MjgiLCJ0aW1lIjoiMjAyNi0xMS0yMFQxMDowMTowMFoiLCJleHBpcmVzIjoiMjAyNi0xMS0yN1QxMDowMTowMFoiLCJleHQiOnt9LCJyZXF1aXJlZCI6WyJodHRwczovL2RhcmVwLm9yZy9leHQvd29yay92MiJdLCJncmFudCI6eyJpZCI6ImdyYW50LXZlY3RvcnMtY2Fyb2wiLCJhY3RvciI6ImFnZW50In0sImRhdGEiOnt9fQ.qSkakzo2sLqMY84Iv4zARlZGCGPYfQVsLKDIqD5pjivkAVBSmUP2KN8QMPhl9ifFzmVndwTIOgumqAMOBvUFbw"
+    },
+    "r3": {
+      "envelope": {
+        "darep": "2",
+        "id": "e2c705c1-f459-481e-ae79-21477500af47",
+        "type": "https://darep.org/ext/work/v2#complete",
+        "source": "acct:carol@vectors.test",
+        "to": [
+          "acct:bob@vectors.test"
+        ],
+        "thread": "5dd60087-ef55-497b-ba01-18795eb6d728",
+        "inReplyTo": "94e18701-8e23-493b-81f3-823ed82a92b2",
+        "time": "2026-11-20T10:02:00Z",
+        "expires": "2026-11-27T10:02:00Z",
+        "ext": {},
+        "required": [
+          "https://darep.org/ext/work/v2"
+        ],
+        "grant": {
+          "id": "grant-vectors-carol",
+          "actor": "agent"
+        },
+        "data": {
+          "result": "Label checked."
+        }
+      },
+      "payloadUtf8": "{\"darep\":\"2\",\"id\":\"e2c705c1-f459-481e-ae79-21477500af47\",\"type\":\"https://darep.org/ext/work/v2#complete\",\"source\":\"acct:carol@vectors.test\",\"to\":[\"acct:bob@vectors.test\"],\"thread\":\"5dd60087-ef55-497b-ba01-18795eb6d728\",\"inReplyTo\":\"94e18701-8e23-493b-81f3-823ed82a92b2\",\"time\":\"2026-11-20T10:02:00Z\",\"expires\":\"2026-11-27T10:02:00Z\",\"ext\":{},\"required\":[\"https://darep.org/ext/work/v2\"],\"grant\":{\"id\":\"grant-vectors-carol\",\"actor\":\"agent\"},\"data\":{\"result\":\"Label checked.\"}}",
+      "payloadSha256": "7972b2236b43bb065e1aff730d0b99d1593511823f0fd5d97bec8ce2c8b95881",
+      "recordBytes": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vY2Fyb2wudmVjdG9ycy50ZXN0Ly53ZWxsLWtub3duL2RhcmVwL2Nhcm9sI3NpZy0xIiwidHlwIjoiZGFyZXAtZXZlbnQrandzIn0.eyJkYXJlcCI6IjIiLCJpZCI6ImUyYzcwNWMxLWY0NTktNDgxZS1hZTc5LTIxNDc3NTAwYWY0NyIsInR5cGUiOiJodHRwczovL2RhcmVwLm9yZy9leHQvd29yay92MiNjb21wbGV0ZSIsInNvdXJjZSI6ImFjY3Q6Y2Fyb2xAdmVjdG9ycy50ZXN0IiwidG8iOlsiYWNjdDpib2JAdmVjdG9ycy50ZXN0Il0sInRocmVhZCI6IjVkZDYwMDg3LWVmNTUtNDk3Yi1iYTAxLTE4Nzk1ZWI2ZDcyOCIsImluUmVwbHlUbyI6Ijk0ZTE4NzAxLThlMjMtNDkzYi04MWYzLTgyM2VkODJhOTJiMiIsInRpbWUiOiIyMDI2LTExLTIwVDEwOjAyOjAwWiIsImV4cGlyZXMiOiIyMDI2LTExLTI3VDEwOjAyOjAwWiIsImV4dCI6e30sInJlcXVpcmVkIjpbImh0dHBzOi8vZGFyZXAub3JnL2V4dC93b3JrL3YyIl0sImdyYW50Ijp7ImlkIjoiZ3JhbnQtdmVjdG9ycy1jYXJvbCIsImFjdG9yIjoiYWdlbnQifSwiZGF0YSI6eyJyZXN1bHQiOiJMYWJlbCBjaGVja2VkLiJ9fQ.mvGFm140AgRQq_T00Mbu4e3r2Ru6lSfkG-eHXe0WUzeL0LbMQNS3XeXIPPTd_ZHyiEl8ooiRFzY0Kg0F4Tfdig"
+    }
+  },
+  "steps": [
+    {
+      "at": "2026-11-20T10:03:00Z",
+      "request": {
+        "method": "POST",
+        "url": "https://bob.vectors.test/darep/v2/inbox",
+        "headers": {
+          "content-type": "application/jose",
+          "darep-recipient": "acct:bob@vectors.test"
+        },
+        "body": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vY2Fyb2wudmVjdG9ycy50ZXN0Ly53ZWxsLWtub3duL2RhcmVwL2Nhcm9sI3NpZy0xIiwidHlwIjoiZGFyZXAtZXZlbnQrandzIn0.eyJkYXJlcCI6IjIiLCJpZCI6ImUyYzcwNWMxLWY0NTktNDgxZS1hZTc5LTIxNDc3NTAwYWY0NyIsInR5cGUiOiJodHRwczovL2RhcmVwLm9yZy9leHQvd29yay92MiNjb21wbGV0ZSIsInNvdXJjZSI6ImFjY3Q6Y2Fyb2xAdmVjdG9ycy50ZXN0IiwidG8iOlsiYWNjdDpib2JAdmVjdG9ycy50ZXN0Il0sInRocmVhZCI6IjVkZDYwMDg3LWVmNTUtNDk3Yi1iYTAxLTE4Nzk1ZWI2ZDcyOCIsImluUmVwbHlUbyI6Ijk0ZTE4NzAxLThlMjMtNDkzYi04MWYzLTgyM2VkODJhOTJiMiIsInRpbWUiOiIyMDI2LTExLTIwVDEwOjAyOjAwWiIsImV4cGlyZXMiOiIyMDI2LTExLTI3VDEwOjAyOjAwWiIsImV4dCI6e30sInJlcXVpcmVkIjpbImh0dHBzOi8vZGFyZXAub3JnL2V4dC93b3JrL3YyIl0sImdyYW50Ijp7ImlkIjoiZ3JhbnQtdmVjdG9ycy1jYXJvbCIsImFjdG9yIjoiYWdlbnQifSwiZGF0YSI6eyJyZXN1bHQiOiJMYWJlbCBjaGVja2VkLiJ9fQ.mvGFm140AgRQq_T00Mbu4e3r2Ru6lSfkG-eHXe0WUzeL0LbMQNS3XeXIPPTd_ZHyiEl8ooiRFzY0Kg0F4Tfdig"
+      },
+      "expect": {
+        "status": 200,
+        "contentType": "application/jose",
+        "stored": true,
+        "receipt": {
+          "typ": "darep-receipt+jws",
+          "signedBy": "a key of acct:bob@vectors.test with purpose provider",
+          "members": [
+            "darep",
+            "id",
+            "source",
+            "type",
+            "time",
+            "to",
+            "thread",
+            "inReplyTo",
+            "ext",
+            "required",
+            "data"
+          ],
+          "equals": {
+            "darep": "2",
+            "source": "acct:bob@vectors.test",
+            "type": "https://darep.org/ext/core/v2#receipt",
+            "to": [
+              "acct:carol@vectors.test"
+            ],
+            "thread": "5dd60087-ef55-497b-ba01-18795eb6d728",
+            "inReplyTo": "e2c705c1-f459-481e-ae79-21477500af47",
+            "ext": {},
+            "required": [],
+            "data": {
+              "sha256": "7972b2236b43bb065e1aff730d0b99d1593511823f0fd5d97bec8ce2c8b95881",
+              "storedAt": "2026-11-20T10:03:00Z"
+            }
+          },
+          "timeAtOrAfter": "2026-11-20T10:03:00Z",
+          "retainedAtLeastUntil": "2026-12-20T10:03:00Z"
+        },
+        "applyOutcome": "pending"
+      }
+    },
+    {
+      "at": "2026-11-20T10:04:00Z",
+      "request": {
+        "method": "POST",
+        "url": "https://bob.vectors.test/darep/v2/inbox",
+        "headers": {
+          "content-type": "application/jose",
+          "darep-recipient": "acct:bob@vectors.test"
+        },
+        "body": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vY2Fyb2wudmVjdG9ycy50ZXN0Ly53ZWxsLWtub3duL2RhcmVwL2Nhcm9sI3NpZy0xIiwidHlwIjoiZGFyZXAtZXZlbnQrandzIn0.eyJkYXJlcCI6IjIiLCJpZCI6Ijk0ZTE4NzAxLThlMjMtNDkzYi04MWYzLTgyM2VkODJhOTJiMiIsInR5cGUiOiJodHRwczovL2RhcmVwLm9yZy9leHQvd29yay92MiNhY2NlcHQiLCJzb3VyY2UiOiJhY2N0OmNhcm9sQHZlY3RvcnMudGVzdCIsInRvIjpbImFjY3Q6Ym9iQHZlY3RvcnMudGVzdCJdLCJ0aHJlYWQiOiI1ZGQ2MDA4Ny1lZjU1LTQ5N2ItYmEwMS0xODc5NWViNmQ3MjgiLCJpblJlcGx5VG8iOiI1ZGQ2MDA4Ny1lZjU1LTQ5N2ItYmEwMS0xODc5NWViNmQ3MjgiLCJ0aW1lIjoiMjAyNi0xMS0yMFQxMDowMTowMFoiLCJleHBpcmVzIjoiMjAyNi0xMS0yN1QxMDowMTowMFoiLCJleHQiOnt9LCJyZXF1aXJlZCI6WyJodHRwczovL2RhcmVwLm9yZy9leHQvd29yay92MiJdLCJncmFudCI6eyJpZCI6ImdyYW50LXZlY3RvcnMtY2Fyb2wiLCJhY3RvciI6ImFnZW50In0sImRhdGEiOnt9fQ.qSkakzo2sLqMY84Iv4zARlZGCGPYfQVsLKDIqD5pjivkAVBSmUP2KN8QMPhl9ifFzmVndwTIOgumqAMOBvUFbw"
+      },
+      "expect": {
+        "status": 200,
+        "contentType": "application/jose",
+        "stored": true,
+        "receipt": {
+          "typ": "darep-receipt+jws",
+          "signedBy": "a key of acct:bob@vectors.test with purpose provider",
+          "members": [
+            "darep",
+            "id",
+            "source",
+            "type",
+            "time",
+            "to",
+            "thread",
+            "inReplyTo",
+            "ext",
+            "required",
+            "data"
+          ],
+          "equals": {
+            "darep": "2",
+            "source": "acct:bob@vectors.test",
+            "type": "https://darep.org/ext/core/v2#receipt",
+            "to": [
+              "acct:carol@vectors.test"
+            ],
+            "thread": "5dd60087-ef55-497b-ba01-18795eb6d728",
+            "inReplyTo": "94e18701-8e23-493b-81f3-823ed82a92b2",
+            "ext": {},
+            "required": [],
+            "data": {
+              "sha256": "9f32ee893aef5d456df136bf152138d547987c80b0bd0b7161375b9460ed2938",
+              "storedAt": "2026-11-20T10:04:00Z"
+            }
+          },
+          "timeAtOrAfter": "2026-11-20T10:04:00Z",
+          "retainedAtLeastUntil": "2026-12-20T10:04:00Z"
+        },
+        "applyOutcome": "applied",
+        "afterApply": [
+          {
+            "record": "e2c705c1-f459-481e-ae79-21477500af47",
+            "applyOutcome": "applied"
+          }
+        ]
+      }
+    }
+  ],
+  "finalState": {
+    "threadHead": "e2c705c1-f459-481e-ae79-21477500af47",
+    "applyOrder": [
+      "5dd60087-ef55-497b-ba01-18795eb6d728",
+      "94e18701-8e23-493b-81f3-823ed82a92b2",
+      "e2c705c1-f459-481e-ae79-21477500af47"
+    ],
+    "rejectionRecords": 0
+  },
+  "conformance": "depends on the experimental work/v2 extension"
+}

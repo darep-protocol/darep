@@ -1,0 +1,163 @@
+{
+  "warning": "TEST ONLY. Public halves of the keys in test-keys.json. Identity documents in the shape of spec/records.md §5.1.",
+  "pinnedBy": {
+    "acct:carol@vectors.test": [
+      "acct:bob@vectors.test",
+      "acct:dave@vectors.test"
+    ],
+    "acct:bob@vectors.test": [
+      "acct:carol@vectors.test",
+      "acct:dave@vectors.test"
+    ]
+  },
+  "unpinned": [
+    "acct:mallory@vectors.test"
+  ],
+  "documents": [
+    {
+      "darep": "2",
+      "id": "https://bob.vectors.test/.well-known/darep/bob",
+      "addresses": [
+        "acct:bob@vectors.test"
+      ],
+      "updated": "2026-01-01T00:00:00Z",
+      "keys": [
+        {
+          "id": "https://bob.vectors.test/.well-known/darep/bob#sig-1",
+          "purpose": [
+            "record"
+          ],
+          "publicKeyJwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "erm7Vg5tALYd5eZZGt2EJEXsjcK93n6q6tK8uPNrL28",
+            "y": "3eRsmXk0A_qTj2xu0qO6dcUanZCyvFRtuExyz3ADQCY"
+          },
+          "validFrom": "2026-01-01T00:00:00Z",
+          "validUntil": "2027-12-31T23:59:59Z"
+        },
+        {
+          "id": "https://bob.vectors.test/.well-known/darep/bob#sig-old",
+          "purpose": [
+            "record"
+          ],
+          "publicKeyJwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "qkwbU4qux05hE5IRWq0pYGnNXfyLa_5IGRsSf8IdHq0",
+            "y": "_KRMUS0YuMlNDkqdDyqxqgKlaSvusbuEFe4PntvZwQs"
+          },
+          "validFrom": "2025-01-01T00:00:00Z",
+          "validUntil": "2026-06-01T00:00:00Z"
+        },
+        {
+          "id": "https://bob.vectors.test/.well-known/darep/bob#rcpt-1",
+          "purpose": [
+            "provider"
+          ],
+          "publicKeyJwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "L5x6rTndpUjFZ50nnkyJqWC6bMo5Un0Pfkc0SlreLIA",
+            "y": "9rSND2ybuXR6iwTcoi1dwz7s_w-ZGOnGBc8ya02XdAE"
+          },
+          "validFrom": "2026-01-01T00:00:00Z",
+          "validUntil": "2027-12-31T23:59:59Z"
+        }
+      ]
+    },
+    {
+      "darep": "2",
+      "id": "https://carol.vectors.test/.well-known/darep/carol",
+      "addresses": [
+        "acct:carol@vectors.test"
+      ],
+      "updated": "2026-01-01T00:00:00Z",
+      "keys": [
+        {
+          "id": "https://carol.vectors.test/.well-known/darep/carol#sig-1",
+          "purpose": [
+            "record"
+          ],
+          "publicKeyJwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "_CLDTVIBD2bHz4Gri6U8dCgN4huoyTpuT58J846irvc",
+            "y": "qGNra0A3oXYySlXT1Uxb-ZObXdp8zrMGJ2G7m_ewwa8"
+          },
+          "validFrom": "2026-01-01T00:00:00Z",
+          "validUntil": "2027-12-31T23:59:59Z"
+        },
+        {
+          "id": "https://carol.vectors.test/.well-known/darep/carol#rcpt-1",
+          "purpose": [
+            "provider"
+          ],
+          "publicKeyJwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "MOEaKfWjgc-UGqrltyNP3qyCTQMaQQnaOpAmjY4vX0I",
+            "y": "j9aEP_25E-qlvS7cyZyWLHzmKtBMtcRICuQdIclGAb8"
+          },
+          "validFrom": "2026-01-01T00:00:00Z",
+          "validUntil": "2027-12-31T23:59:59Z"
+        }
+      ]
+    },
+    {
+      "darep": "2",
+      "id": "https://dave.vectors.test/.well-known/darep/dave",
+      "addresses": [
+        "acct:dave@vectors.test"
+      ],
+      "updated": "2026-01-01T00:00:00Z",
+      "keys": [
+        {
+          "id": "https://dave.vectors.test/.well-known/darep/dave#sig-1",
+          "purpose": [
+            "record"
+          ],
+          "publicKeyJwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "Sgxe0GdYAloVbXapK_ssxUtpokYaKLwwlLaBQLs9JyQ",
+            "y": "MSwXkazFYrCzzxOWTcPKtfSEXQ5JWBtjoNQcuXzk65I"
+          },
+          "validFrom": "2026-01-01T00:00:00Z",
+          "validUntil": "2027-12-31T23:59:59Z"
+        }
+      ]
+    },
+    {
+      "darep": "2",
+      "id": "https://mallory.vectors.test/.well-known/darep/mallory",
+      "addresses": [
+        "acct:mallory@vectors.test"
+      ],
+      "updated": "2026-01-01T00:00:00Z",
+      "keys": [
+        {
+          "id": "https://mallory.vectors.test/.well-known/darep/mallory#sig-1",
+          "purpose": [
+            "record"
+          ],
+          "publicKeyJwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "W5l90k76xNmshwI0Ch5c_WzT6gl-GvEntj5ls2VXdqg",
+            "y": "cbDwN9tIkkO_vVqB7rshrVlFKzewcDdAwVDT0HefGXo"
+          },
+          "validFrom": "2026-01-01T00:00:00Z",
+          "validUntil": "2027-12-31T23:59:59Z"
+        }
+      ]
+    }
+  ],
+  "inboxes": {
+    "acct:bob@vectors.test": "https://bob.vectors.test/darep/v2/inbox",
+    "acct:carol@vectors.test": "https://carol.vectors.test/darep/v2/inbox",
+    "acct:dave@vectors.test": "https://dave.vectors.test/darep/v2/inbox",
+    "acct:mallory@vectors.test": "https://mallory.vectors.test/darep/v2/inbox"
+  },
+  "inboxesNote": "Binding configuration (https-binding.md §1.1), exchanged out of band with the pin. Not part of any identity document."
+}

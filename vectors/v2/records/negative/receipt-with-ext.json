@@ -1,0 +1,25 @@
+{
+  "name": "negative/receipt-with-ext",
+  "description": "A receipt that carries an ext entry. Receipts are evidence with an exact shape: ext must be {} and required must be [] (§4.4).",
+  "spec": "§4.4",
+  "context": {
+    "mode": "admission",
+    "now": "2026-11-20T12:00:00Z",
+    "receiver": "acct:bob@vectors.test",
+    "typ": "darep-receipt+jws",
+    "understood": [
+      "https://darep.org/ext/core/v2",
+      "https://darep.org/ext/work/v2",
+      "https://darep.org/ext/reschedule/v2"
+    ],
+    "answered": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTIwMjYtMTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.ewogImRhcmVwIjogIjIiLAogImlkIjogIjMzYWIxMDc3LTk1YTgtNDE4My1hNzk4LTgwNWRhM2MxZjFjMSIsCiAic291cmNlIjogImFjY3Q6Ym9iQHZlY3RvcnMudGVzdCIsCiAidHlwZSI6ICJodHRwczovL2RhcmVwLm9yZy9leHQvd29yay92MiNoYW5kb2ZmIiwKICJ0aW1lIjogIjIwMjYtMTEtMjBUMTE6NTg6MDBaIiwKICJ0byI6IFsKICAiYWNjdDpjYXJvbEB2ZWN0b3JzLnRlc3QiCiBdLAogInRocmVhZCI6ICIzM2FiMTA3Ny05NWE4LTQxODMtYTc5OC04MDVkYTNjMWYxYzEiLAogImluUmVwbHlUbyI6IG51bGwsCiAiZXhwaXJlcyI6ICIyMDI2LTExLTI3VDExOjU4OjAwWiIsCiAiZXh0Ijoge30sCiAicmVxdWlyZWQiOiBbCiAgImh0dHBzOi8vZGFyZXAub3JnL2V4dC93b3JrL3YyIgogXSwKICJncmFudCI6IHsKICAiaWQiOiAiZ3JhbnQtN2YzYSIsCiAgImFjdG9yIjogImFnZW50IgogfSwKICJkYXRhIjogewogICJzdW1tYXJ5IjogIuWQiOaIkOmgkOimvSDwn5eTIiwKICAibmV4dFN0ZXAiOiAi5qC45bCN6I236Jit5paH5qiZ57Gk44CMw6nDqW7jgI3jgIIiLAogICJleHBlY3RlZFJlc3VsdCI6ICLlm57opobkuIDlgIvmmI7norrntZDmnpzjgIIiCiB9Cn0K.DmG4Vke_tf90kQFFWZ6-Q1pESNfAVxq55OaVaKA6nZ0fynVBIc4dC-LeIP8WmePmewCUZnaRe2_RiHu876j5Mg"
+  },
+  "jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vY2Fyb2wudmVjdG9ycy50ZXN0Ly53ZWxsLWtub3duL2RhcmVwL2Nhcm9sI2tleS0yMDI2LTExIiwidHlwIjoiZGFyZXAtcmVjZWlwdCtqd3MifQ.eyJkYXJlcCI6IjIiLCJpZCI6IjQyZmJjY2Y1LWI5ZjAtNDE4NC04NjVkLTIxNmU5ZmY2YjZmNiIsInNvdXJjZSI6ImFjY3Q6Y2Fyb2xAdmVjdG9ycy50ZXN0IiwidHlwZSI6Imh0dHBzOi8vZGFyZXAub3JnL2V4dC9jb3JlL3YyI3JlY2VpcHQiLCJ0aW1lIjoiMjAyNi0xMS0yMFQxMTo1ODowMVoiLCJ0byI6WyJhY2N0OmJvYkB2ZWN0b3JzLnRlc3QiXSwidGhyZWFkIjoiMzNhYjEwNzctOTVhOC00MTgzLWE3OTgtODA1ZGEzYzFmMWMxIiwiaW5SZXBseVRvIjoiMzNhYjEwNzctOTVhOC00MTgzLWE3OTgtODA1ZGEzYzFmMWMxIiwiZXh0Ijp7Imh0dHBzOi8vZXhhbXBsZS50ZXN0L2V4dC90cmFjZS92MSI6eyJzcGFuIjoiMDBmMDY3YWEwYmE5MDJiNyJ9fSwicmVxdWlyZWQiOltdLCJkYXRhIjp7InNoYTI1NiI6Ijc2ZDQwZGY4ZTRlM2I3ZTRmMTM3MGMyM2ZhMzExODZjYWY1NGJlZjVhOGNlOWJkMTZmMGM1MTNiNjljNDc2N2QiLCJzdG9yZWRBdCI6IjIwMjYtMTEtMjBUMTE6NTg6MDFaIn19.xoOWk1rcTQ787GVVomB8SXdcv_AeKGSMyvXm5mAA_4eMvfIhGlBRkNISvdaWWS24blpBKnX0qnvd2LX1pwa1sQ",
+  "headerUtf8": "{\"alg\":\"ES256\",\"kid\":\"https://carol.vectors.test/.well-known/darep/carol#key-2026-11\",\"typ\":\"darep-receipt+jws\"}",
+  "payloadUtf8": "{\"darep\":\"2\",\"id\":\"42fbccf5-b9f0-4184-865d-216e9ff6b6f6\",\"source\":\"acct:carol@vectors.test\",\"type\":\"https://darep.org/ext/core/v2#receipt\",\"time\":\"2026-11-20T11:58:01Z\",\"to\":[\"acct:bob@vectors.test\"],\"thread\":\"33ab1077-95a8-4183-a798-805da3c1f1c1\",\"inReplyTo\":\"33ab1077-95a8-4183-a798-805da3c1f1c1\",\"ext\":{\"https://example.test/ext/trace/v1\":{\"span\":\"00f067aa0ba902b7\"}},\"required\":[],\"data\":{\"sha256\":\"76d40df8e4e3b7e4f1370c23fa31186caf54bef5a8ce9bd16f0c513b69c4767d\",\"storedAt\":\"2026-11-20T11:58:01Z\"}}",
+  "payloadSha256": "e9a8e80349d28901c79498f9e48acca96899637f92b549eaf9fc29736cf6c714",
+  "expected": {
+    "verdict": "reject",
+    "code": "malformed"
+  }
+}

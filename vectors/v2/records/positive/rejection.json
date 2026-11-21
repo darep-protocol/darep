@@ -1,0 +1,43 @@
+{
+  "name": "positive/rejection",
+  "description": "Post-store signed rejection (D6 tier 2) from Carol's provider back into the thread.",
+  "spec": "§4.5, §8",
+  "context": {
+    "mode": "admission",
+    "now": "2026-11-20T12:00:00Z",
+    "receiver": "acct:bob@vectors.test",
+    "typ": "darep-rejection+jws",
+    "understood": [
+      "https://darep.org/ext/core/v2",
+      "https://darep.org/ext/work/v2",
+      "https://darep.org/ext/reschedule/v2"
+    ]
+  },
+  "jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vY2Fyb2wudmVjdG9ycy50ZXN0Ly53ZWxsLWtub3duL2RhcmVwL2Nhcm9sI2tleS0yMDI2LTExIiwidHlwIjoiZGFyZXAtcmVqZWN0aW9uK2p3cyJ9.ewogImRhcmVwIjogIjIiLAogImlkIjogIjE4YzE1NmNjLTk5NWMtNGFkYS04ZjliLTAzZDcwYzU4MGQxMyIsCiAic291cmNlIjogImFjY3Q6Y2Fyb2xAdmVjdG9ycy50ZXN0IiwKICJ0eXBlIjogImh0dHBzOi8vZGFyZXAub3JnL2V4dC9jb3JlL3YyI3JlamVjdGlvbiIsCiAidGltZSI6ICIyMDI2LTExLTIwVDExOjU5OjAwWiIsCiAidG8iOiBbCiAgImFjY3Q6Ym9iQHZlY3RvcnMudGVzdCIKIF0sCiAidGhyZWFkIjogIjMzYWIxMDc3LTk1YTgtNDE4My1hNzk4LTgwNWRhM2MxZjFjMSIsCiAiaW5SZXBseVRvIjogIjliNzdjNTg5LWU4OWYtNDgwMi04MjFkLTkwZjVkMDI3YTQxNCIsCiAiZXhwaXJlcyI6ICIyMDI2LTExLTI3VDExOjU5OjAwWiIsCiAiZXh0Ijoge30sCiAicmVxdWlyZWQiOiBbXSwKICJkYXRhIjogewogICJjb2RlIjogInN0YWxlLWhlYWQiLAogICJkZXRhaWwiOiAiVGhlIHRocmVhZCBoZWFkIG1vdmVkOyByZWFkIHRoZSB0aHJlYWQgYWdhaW4uIgogfQp9Cg._1ol8QJl1AeiEfQCDg8DK_-mEp9JTU2SuMrWQyTjI0-4TY3EP8iK3klEd2FRP0joZgY1wvXZBFTHqcrLdXkjyQ",
+  "headerUtf8": "{\"alg\":\"ES256\",\"kid\":\"https://carol.vectors.test/.well-known/darep/carol#key-2026-11\",\"typ\":\"darep-rejection+jws\"}",
+  "payloadUtf8": "{\n \"darep\": \"2\",\n \"id\": \"18c156cc-995c-4ada-8f9b-03d70c580d13\",\n \"source\": \"acct:carol@vectors.test\",\n \"type\": \"https://darep.org/ext/core/v2#rejection\",\n \"time\": \"2026-11-20T11:59:00Z\",\n \"to\": [\n  \"acct:bob@vectors.test\"\n ],\n \"thread\": \"33ab1077-95a8-4183-a798-805da3c1f1c1\",\n \"inReplyTo\": \"9b77c589-e89f-4802-821d-90f5d027a414\",\n \"expires\": \"2026-11-27T11:59:00Z\",\n \"ext\": {},\n \"required\": [],\n \"data\": {\n  \"code\": \"stale-head\",\n  \"detail\": \"The thread head moved; read the thread again.\"\n }\n}\n",
+  "payloadSha256": "ecc72a6048bbf066ace5c68b08588d01772a66d0a7de4ab8d2a49cff90f10d23",
+  "expected": {
+    "verdict": "accept",
+    "kid": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+    "record": {
+      "darep": "2",
+      "id": "18c156cc-995c-4ada-8f9b-03d70c580d13",
+      "source": "acct:carol@vectors.test",
+      "type": "https://darep.org/ext/core/v2#rejection",
+      "time": "2026-11-20T11:59:00Z",
+      "to": [
+        "acct:bob@vectors.test"
+      ],
+      "thread": "33ab1077-95a8-4183-a798-805da3c1f1c1",
+      "inReplyTo": "9b77c589-e89f-4802-821d-90f5d027a414",
+      "expires": "2026-11-27T11:59:00Z",
+      "ext": {},
+      "required": [],
+      "data": {
+        "code": "stale-head",
+        "detail": "The thread head moved; read the thread again."
+      }
+    }
+  }
+}

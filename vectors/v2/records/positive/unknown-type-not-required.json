@@ -1,0 +1,46 @@
+{
+  "name": "positive/unknown-type-not-required",
+  "description": "A type the receiver does not implement, with no required extension, still verifies and can be stored and acked (§6.3).",
+  "spec": "§6.3",
+  "context": {
+    "mode": "admission",
+    "now": "2026-11-20T12:00:00Z",
+    "receiver": "acct:carol@vectors.test",
+    "typ": "darep-event+jws",
+    "understood": [
+      "https://darep.org/ext/core/v2",
+      "https://darep.org/ext/work/v2",
+      "https://darep.org/ext/reschedule/v2"
+    ]
+  },
+  "jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTIwMjYtMTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.ewogImRhcmVwIjogIjIiLAogImlkIjogIjU4NmY4NjNlLTk5MDEtNDZhYy1iMzRlLTlmZjlmMGViZTg1MyIsCiAic291cmNlIjogImFjY3Q6Ym9iQHZlY3RvcnMudGVzdCIsCiAidHlwZSI6ICJodHRwczovL2V4YW1wbGUudGVzdC9leHQvcG9sbC92MSN2b3RlIiwKICJ0aW1lIjogIjIwMjYtMTEtMjBUMTE6NTg6MDBaIiwKICJ0byI6IFsKICAiYWNjdDpjYXJvbEB2ZWN0b3JzLnRlc3QiCiBdLAogInRocmVhZCI6ICI1ODZmODYzZS05OTAxLTQ2YWMtYjM0ZS05ZmY5ZjBlYmU4NTMiLAogImluUmVwbHlUbyI6IG51bGwsCiAiZXhwaXJlcyI6ICIyMDI2LTExLTI3VDExOjU4OjAwWiIsCiAiZXh0Ijoge30sCiAicmVxdWlyZWQiOiBbXSwKICJncmFudCI6IHsKICAiaWQiOiAiZ3JhbnQtN2YzYSIsCiAgImFjdG9yIjogImFnZW50IgogfSwKICJkYXRhIjogewogICJjaG9pY2UiOiAyCiB9Cn0K.clNkNeMYDsbODREkT7WxgknjcO7fECiuKxrv3h6drwakV8SmNdVdykI1mnZokd_z7CvmffQn4DCjmxnTzje4AQ",
+  "headerUtf8": "{\"alg\":\"ES256\",\"kid\":\"https://bob.vectors.test/.well-known/darep/bob#sig-2026-11\",\"typ\":\"darep-event+jws\"}",
+  "payloadUtf8": "{\n \"darep\": \"2\",\n \"id\": \"586f863e-9901-46ac-b34e-9ff9f0ebe853\",\n \"source\": \"acct:bob@vectors.test\",\n \"type\": \"https://example.test/ext/poll/v1#vote\",\n \"time\": \"2026-11-20T11:58:00Z\",\n \"to\": [\n  \"acct:carol@vectors.test\"\n ],\n \"thread\": \"586f863e-9901-46ac-b34e-9ff9f0ebe853\",\n \"inReplyTo\": null,\n \"expires\": \"2026-11-27T11:58:00Z\",\n \"ext\": {},\n \"required\": [],\n \"grant\": {\n  \"id\": \"grant-7f3a\",\n  \"actor\": \"agent\"\n },\n \"data\": {\n  \"choice\": 2\n }\n}\n",
+  "payloadSha256": "cf3746567fe0f248b7b9986be82d3e4b5c5e53fa950d2e326982b755a736e8eb",
+  "expected": {
+    "verdict": "accept",
+    "kid": "https://bob.vectors.test/.well-known/darep/bob#sig-2026-11",
+    "record": {
+      "darep": "2",
+      "id": "586f863e-9901-46ac-b34e-9ff9f0ebe853",
+      "source": "acct:bob@vectors.test",
+      "type": "https://example.test/ext/poll/v1#vote",
+      "time": "2026-11-20T11:58:00Z",
+      "to": [
+        "acct:carol@vectors.test"
+      ],
+      "thread": "586f863e-9901-46ac-b34e-9ff9f0ebe853",
+      "inReplyTo": null,
+      "expires": "2026-11-27T11:58:00Z",
+      "ext": {},
+      "required": [],
+      "grant": {
+        "id": "grant-7f3a",
+        "actor": "agent"
+      },
+      "data": {
+        "choice": 2
+      }
+    }
+  }
+}

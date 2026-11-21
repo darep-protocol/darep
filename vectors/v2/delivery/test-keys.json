@@ -1,0 +1,62 @@
+{
+  "warning": "TEST ONLY. These private keys are public on purpose and MUST NOT sign any real record. Never pin them outside tests.",
+  "hmacSecretForUnsupportedAlgorithm": "vectors-only-hs256-secret-not-a-real-key",
+  "keys": {
+    "https://bob.vectors.test/.well-known/darep/bob#sig-1": {
+      "kty": "EC",
+      "x": "erm7Vg5tALYd5eZZGt2EJEXsjcK93n6q6tK8uPNrL28",
+      "y": "3eRsmXk0A_qTj2xu0qO6dcUanZCyvFRtuExyz3ADQCY",
+      "crv": "P-256",
+      "d": "uqqUx_i0CIzNu0M2Ae1Wa4xrdO_QgUDogASFVmMljOI",
+      "alg": "ES256"
+    },
+    "https://bob.vectors.test/.well-known/darep/bob#sig-old": {
+      "kty": "EC",
+      "x": "qkwbU4qux05hE5IRWq0pYGnNXfyLa_5IGRsSf8IdHq0",
+      "y": "_KRMUS0YuMlNDkqdDyqxqgKlaSvusbuEFe4PntvZwQs",
+      "crv": "P-256",
+      "d": "EeBQWypgpoNcHooVIbIIN3UsYUx1Palx7Q-5FLuJBck",
+      "alg": "ES256"
+    },
+    "https://bob.vectors.test/.well-known/darep/bob#rcpt-1": {
+      "kty": "EC",
+      "x": "L5x6rTndpUjFZ50nnkyJqWC6bMo5Un0Pfkc0SlreLIA",
+      "y": "9rSND2ybuXR6iwTcoi1dwz7s_w-ZGOnGBc8ya02XdAE",
+      "crv": "P-256",
+      "d": "NC6RuULD0P6oZK8wOL7Z7A4kZoZE7tKkp4xikcrXIaw",
+      "alg": "ES256"
+    },
+    "https://carol.vectors.test/.well-known/darep/carol#sig-1": {
+      "kty": "EC",
+      "x": "_CLDTVIBD2bHz4Gri6U8dCgN4huoyTpuT58J846irvc",
+      "y": "qGNra0A3oXYySlXT1Uxb-ZObXdp8zrMGJ2G7m_ewwa8",
+      "crv": "P-256",
+      "d": "xJ8h-JaB7_6aQterzcKR4QGmHowzgtiDDdoattP4sUM",
+      "alg": "ES256"
+    },
+    "https://carol.vectors.test/.well-known/darep/carol#rcpt-1": {
+      "kty": "EC",
+      "x": "MOEaKfWjgc-UGqrltyNP3qyCTQMaQQnaOpAmjY4vX0I",
+      "y": "j9aEP_25E-qlvS7cyZyWLHzmKtBMtcRICuQdIclGAb8",
+      "crv": "P-256",
+      "d": "QZhP14rjuQhMX9r4QTfz7EdVi1QDs0CGaVpmgI1znHM",
+      "alg": "ES256"
+    },
+    "https://dave.vectors.test/.well-known/darep/dave#sig-1": {
+      "kty": "EC",
+      "x": "Sgxe0GdYAloVbXapK_ssxUtpokYaKLwwlLaBQLs9JyQ",
+      "y": "MSwXkazFYrCzzxOWTcPKtfSEXQ5JWBtjoNQcuXzk65I",
+      "crv": "P-256",
+      "d": "1uKbjOQCsKtAHXJE6IqxnDppEVS8xNsLZsnlVq5T0kE",
+      "alg": "ES256"
+    },
+    "https://mallory.vectors.test/.well-known/darep/mallory#sig-1": {
+      "kty": "EC",
+      "x": "W5l90k76xNmshwI0Ch5c_WzT6gl-GvEntj5ls2VXdqg",
+      "y": "cbDwN9tIkkO_vVqB7rshrVlFKzewcDdAwVDT0HefGXo",
+      "crv": "P-256",
+      "d": "_4z0rA42-L0pfdmFC4MaTjTCwFR8Me2HXV4elcHdBec",
+      "alg": "ES256"
+    }
+  }
+}

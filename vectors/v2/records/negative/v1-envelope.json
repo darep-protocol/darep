@@ -1,0 +1,24 @@
+{
+  "name": "negative/v1-envelope",
+  "description": "A Wire v1 CloudEvents envelope signed with a valid v2 header.",
+  "spec": "§4.1",
+  "context": {
+    "mode": "admission",
+    "now": "2026-11-20T12:00:00Z",
+    "receiver": "acct:carol@vectors.test",
+    "typ": "darep-event+jws",
+    "understood": [
+      "https://darep.org/ext/core/v2",
+      "https://darep.org/ext/work/v2",
+      "https://darep.org/ext/reschedule/v2"
+    ]
+  },
+  "jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTIwMjYtMTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.ewogInNwZWN2ZXJzaW9uIjogIjEuMCIsCiAidHlwZSI6ICJuZXQuYWdlbnRuZXR3b3JrLmhhbmRvZmYudjEiLAogImlkIjogIjMzYWIxMDc3LTk1YTgtNDE4My1hNzk4LTgwNWRhM2MxZjFjMSIsCiAic291cmNlIjogImFjY3Q6Ym9iQHZlY3RvcnMudGVzdCIsCiAic3ViamVjdCI6ICIzM2FiMTA3Ny05NWE4LTQxODMtYTc5OC04MDVkYTNjMWYxYzEiLAogInRpbWUiOiAiMjAyNi0xMS0yMFQxMTo1ODowMFoiLAogImRhdGFjb250ZW50dHlwZSI6ICJhcHBsaWNhdGlvbi9qc29uIiwKICJkYXRhIjogewogICJ0byI6ICJhY2N0OmNhcm9sQHZlY3RvcnMudGVzdCIsCiAgInByZXZpb3VzIjogbnVsbCwKICAiYWN0aW9uIjogewogICAia2luZCI6ICJoYW5kb2ZmIgogIH0KIH0KfQo.BV69FgvbzlDuxARtFkFjTxqzjHTCfvShrSDhWXyO7L1Ic0pHHHRLN_fW4acyu8rkLKZYrje-iEF70JZsMdP6Iw",
+  "headerUtf8": "{\"alg\":\"ES256\",\"kid\":\"https://bob.vectors.test/.well-known/darep/bob#sig-2026-11\",\"typ\":\"darep-event+jws\"}",
+  "payloadUtf8": "{\n \"specversion\": \"1.0\",\n \"type\": \"net.agentnetwork.handoff.v1\",\n \"id\": \"33ab1077-95a8-4183-a798-805da3c1f1c1\",\n \"source\": \"acct:bob@vectors.test\",\n \"subject\": \"33ab1077-95a8-4183-a798-805da3c1f1c1\",\n \"time\": \"2026-11-20T11:58:00Z\",\n \"datacontenttype\": \"application/json\",\n \"data\": {\n  \"to\": \"acct:carol@vectors.test\",\n  \"previous\": null,\n  \"action\": {\n   \"kind\": \"handoff\"\n  }\n }\n}\n",
+  "payloadSha256": "c17a6b6623d2b3b10d5ecc5aff46a035825e73c98c1a27bc890976484fab325c",
+  "expected": {
+    "verdict": "reject",
+    "code": "unsupported-version"
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "usage": "Pinned identity-document snapshots (records.md §5). Every vector is checked against all of them.",
+  "documents": [
+    {
+      "darep": "2",
+      "id": "https://bob.vectors.test/.well-known/darep/bob",
+      "addresses": [
+        "acct:bob@vectors.test"
+      ],
+      "updated": "2026-11-01T00:00:00Z",
+      "keys": [
+        {
+          "id": "https://bob.vectors.test/.well-known/darep/bob#sig-2026-01",
+          "purpose": [
+            "record"
+          ],
+          "publicKeyJwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "y_zw9oAHa2b_wUlNKqob1nndOBUS5wlyWWyxVnY4nWI",
+            "y": "IEkwiadyiXHylvtWD3UbvSQvBFEc3dYXjBFnNUylHUE"
+          },
+          "validFrom": "2026-01-01T00:00:00Z",
+          "revoked": "2026-05-01T00:00:00Z"
+        },
+        {
+          "id": "https://bob.vectors.test/.well-known/darep/bob#sig-2026-05",
+          "purpose": [
+            "record"
+          ],
+          "publicKeyJwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "q-H8nx5LUltlrK40vKWUU_dvtQjGeiFOR4-Ilce94Sg",
+            "y": "3RMfRfm5iHp3Gq-n8fzKDd2hLDviVFXMcrOXbKddzFo"
+          },
+          "validFrom": "2026-05-01T00:00:00Z",
+          "validUntil": "2026-11-15T00:00:00Z"
+        },
+        {
+          "id": "https://bob.vectors.test/.well-known/darep/bob#sig-2026-11",
+          "purpose": [
+            "record"
+          ],
+          "publicKeyJwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "jO6LLRc-DwZjwycwFPLrgcHHmitYAMw-dSGo-9pmjjM",
+            "y": "KlXvtXgWq5IaMuATs6vfHj1kKMTdoHqavZwyY-4CfIw"
+          },
+          "validFrom": "2026-11-01T00:00:00Z"
+        },
+        {
+          "id": "https://bob.vectors.test/.well-known/darep/bob#provider-2026-11",
+          "purpose": [
+            "provider"
+          ],
+          "publicKeyJwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "VvHWhTIQZurPXA2kAekCXKA71VQK4-zGwEYluF7ltzQ",
+            "y": "lYGTVvMTz-pEO0doo2M5siif2c_CBD-wimv2nO9C4RY"
+          },
+          "validFrom": "2026-11-01T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "darep": "2",
+      "id": "https://carol.vectors.test/.well-known/darep/carol",
+      "addresses": [
+        "acct:carol@vectors.test"
+      ],
+      "updated": "2026-11-01T00:00:00Z",
+      "keys": [
+        {
+          "id": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+          "purpose": [
+            "record",
+            "provider"
+          ],
+          "publicKeyJwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+            "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk"
+          },
+          "validFrom": "2026-11-01T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "darep": "2",
+      "id": "https://dave.vectors.test/.well-known/darep/dave",
+      "addresses": [
+        "acct:dave@vectors.test"
+      ],
+      "updated": "2026-11-01T00:00:00Z",
+      "keys": [
+        {
+          "id": "https://dave.vectors.test/.well-known/darep/dave#key-2026-11",
+          "purpose": [
+            "record",
+            "provider"
+          ],
+          "publicKeyJwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "BinIWduVv23Haxs94l5eKQLMmfqjWon8T_X4cvsbyRg",
+            "y": "u19Z8ke54s7Cl63hbipGastnD6pDMdrFMKb8Ci4D4NE"
+          },
+          "validFrom": "2026-11-01T00:00:00Z"
+        }
+      ]
+    }
+  ]
+}

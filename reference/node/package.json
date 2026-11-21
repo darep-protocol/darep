@@ -1,0 +1,18 @@
+{
+  "name": "darep-reference-node",
+  "version": "0.1.0",
+  "description": "DAREP Wire v2 reference provider (Node.js)",
+  "private": true,
+  "license": "Apache-2.0",
+  "type": "module",
+  "engines": { "node": ">=22.18.0" },
+  "scripts": {
+    "provider": "node src/cli.js",
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "jose": "6.2.18",
+    "zod": "4.6.7"
+  }
+}

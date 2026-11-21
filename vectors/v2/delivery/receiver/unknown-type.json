@@ -1,0 +1,138 @@
+{
+  "vector": "delivery/receiver/unknown-type",
+  "generatedBy": "vectors/v2/delivery/generate.mjs",
+  "testOnly": true,
+  "role": "receiver",
+  "clock": "Each step has \"at\": the receiver clock at that moment. Runners inject it. A receiver with a real clock checks storedAt format only.",
+  "description": "A record of a type the receiver does not implement, not covered by required[], is stored and acknowledged. Its outcome is unsupported. A rejection record with unsupported-type is allowed but not required.",
+  "spec": [
+    "delivery.md §3.2",
+    "delivery.md §3.3"
+  ],
+  "decisions": [
+    "D4",
+    "D6"
+  ],
+  "receiver": {
+    "address": "acct:carol@vectors.test",
+    "inbox": "https://carol.vectors.test/darep/v2/inbox",
+    "signingKeys": [
+      "https://carol.vectors.test/.well-known/darep/carol#sig-1",
+      "https://carol.vectors.test/.well-known/darep/carol#rcpt-1"
+    ],
+    "pinned": [
+      "acct:bob@vectors.test",
+      "acct:dave@vectors.test"
+    ],
+    "extensions": [
+      "https://darep.org/ext/core/v2"
+    ]
+  },
+  "records": {
+    "unknown": {
+      "envelope": {
+        "darep": "2",
+        "id": "66e79074-9ccf-49d0-8c62-a9b166bef582",
+        "type": "https://vectors.test/ext/survey/v1#question",
+        "source": "acct:bob@vectors.test",
+        "to": [
+          "acct:carol@vectors.test"
+        ],
+        "thread": "66e79074-9ccf-49d0-8c62-a9b166bef582",
+        "inReplyTo": null,
+        "time": "2026-11-20T10:00:00Z",
+        "expires": "2026-11-27T10:00:00Z",
+        "ext": {},
+        "required": [],
+        "grant": {
+          "id": "grant-vectors-bob",
+          "actor": "agent"
+        },
+        "data": {
+          "question": "Which label?"
+        }
+      },
+      "payloadUtf8": "{\"darep\":\"2\",\"id\":\"66e79074-9ccf-49d0-8c62-a9b166bef582\",\"type\":\"https://vectors.test/ext/survey/v1#question\",\"source\":\"acct:bob@vectors.test\",\"to\":[\"acct:carol@vectors.test\"],\"thread\":\"66e79074-9ccf-49d0-8c62-a9b166bef582\",\"inReplyTo\":null,\"time\":\"2026-11-20T10:00:00Z\",\"expires\":\"2026-11-27T10:00:00Z\",\"ext\":{},\"required\":[],\"grant\":{\"id\":\"grant-vectors-bob\",\"actor\":\"agent\"},\"data\":{\"question\":\"Which label?\"}}",
+      "payloadSha256": "453686baf5c205988b49b14c031f820e574fa884126b1acedbb3e0790b502a88",
+      "recordBytes": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.eyJkYXJlcCI6IjIiLCJpZCI6IjY2ZTc5MDc0LTljY2YtNDlkMC04YzYyLWE5YjE2NmJlZjU4MiIsInR5cGUiOiJodHRwczovL3ZlY3RvcnMudGVzdC9leHQvc3VydmV5L3YxI3F1ZXN0aW9uIiwic291cmNlIjoiYWNjdDpib2JAdmVjdG9ycy50ZXN0IiwidG8iOlsiYWNjdDpjYXJvbEB2ZWN0b3JzLnRlc3QiXSwidGhyZWFkIjoiNjZlNzkwNzQtOWNjZi00OWQwLThjNjItYTliMTY2YmVmNTgyIiwiaW5SZXBseVRvIjpudWxsLCJ0aW1lIjoiMjAyNi0xMS0yMFQxMDowMDowMFoiLCJleHBpcmVzIjoiMjAyNi0xMS0yN1QxMDowMDowMFoiLCJleHQiOnt9LCJyZXF1aXJlZCI6W10sImdyYW50Ijp7ImlkIjoiZ3JhbnQtdmVjdG9ycy1ib2IiLCJhY3RvciI6ImFnZW50In0sImRhdGEiOnsicXVlc3Rpb24iOiJXaGljaCBsYWJlbD8ifX0.y4jHvXnhHxenT4U0vKwBIjM7bOWkUC4munQghBOIQlX_XgGD0L04iUgM3BLoenYi_cKDaxOPdARcZPTTSBOvGQ"
+    }
+  },
+  "steps": [
+    {
+      "at": "2026-11-20T10:00:30Z",
+      "request": {
+        "method": "POST",
+        "url": "https://carol.vectors.test/darep/v2/inbox",
+        "headers": {
+          "content-type": "application/jose",
+          "darep-recipient": "acct:carol@vectors.test"
+        },
+        "body": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.eyJkYXJlcCI6IjIiLCJpZCI6IjY2ZTc5MDc0LTljY2YtNDlkMC04YzYyLWE5YjE2NmJlZjU4MiIsInR5cGUiOiJodHRwczovL3ZlY3RvcnMudGVzdC9leHQvc3VydmV5L3YxI3F1ZXN0aW9uIiwic291cmNlIjoiYWNjdDpib2JAdmVjdG9ycy50ZXN0IiwidG8iOlsiYWNjdDpjYXJvbEB2ZWN0b3JzLnRlc3QiXSwidGhyZWFkIjoiNjZlNzkwNzQtOWNjZi00OWQwLThjNjItYTliMTY2YmVmNTgyIiwiaW5SZXBseVRvIjpudWxsLCJ0aW1lIjoiMjAyNi0xMS0yMFQxMDowMDowMFoiLCJleHBpcmVzIjoiMjAyNi0xMS0yN1QxMDowMDowMFoiLCJleHQiOnt9LCJyZXF1aXJlZCI6W10sImdyYW50Ijp7ImlkIjoiZ3JhbnQtdmVjdG9ycy1ib2IiLCJhY3RvciI6ImFnZW50In0sImRhdGEiOnsicXVlc3Rpb24iOiJXaGljaCBsYWJlbD8ifX0.y4jHvXnhHxenT4U0vKwBIjM7bOWkUC4munQghBOIQlX_XgGD0L04iUgM3BLoenYi_cKDaxOPdARcZPTTSBOvGQ"
+      },
+      "expect": {
+        "status": 200,
+        "contentType": "application/jose",
+        "stored": true,
+        "receipt": {
+          "typ": "darep-receipt+jws",
+          "signedBy": "a key of acct:carol@vectors.test with purpose provider",
+          "members": [
+            "darep",
+            "id",
+            "source",
+            "type",
+            "time",
+            "to",
+            "thread",
+            "inReplyTo",
+            "ext",
+            "required",
+            "data"
+          ],
+          "equals": {
+            "darep": "2",
+            "source": "acct:carol@vectors.test",
+            "type": "https://darep.org/ext/core/v2#receipt",
+            "to": [
+              "acct:bob@vectors.test"
+            ],
+            "thread": "66e79074-9ccf-49d0-8c62-a9b166bef582",
+            "inReplyTo": "66e79074-9ccf-49d0-8c62-a9b166bef582",
+            "ext": {},
+            "required": [],
+            "data": {
+              "sha256": "453686baf5c205988b49b14c031f820e574fa884126b1acedbb3e0790b502a88",
+              "storedAt": "2026-11-20T10:00:30Z"
+            }
+          },
+          "timeAtOrAfter": "2026-11-20T10:00:30Z",
+          "retainedAtLeastUntil": "2026-12-20T10:00:30Z"
+        },
+        "applyOutcome": "unsupported",
+        "rejectionRecord": {
+          "optional": true,
+          "typ": "darep-rejection+jws",
+          "signedBy": "a key of acct:carol@vectors.test with purpose provider",
+          "deliveredTo": "acct:bob@vectors.test",
+          "equals": {
+            "darep": "2",
+            "source": "acct:carol@vectors.test",
+            "type": "https://darep.org/ext/core/v2#rejection",
+            "to": [
+              "acct:bob@vectors.test"
+            ],
+            "thread": "66e79074-9ccf-49d0-8c62-a9b166bef582",
+            "inReplyTo": "66e79074-9ccf-49d0-8c62-a9b166bef582",
+            "data.code": "unsupported-type"
+          },
+          "absent": [
+            "grant"
+          ],
+          "present": [
+            "expires"
+          ]
+        }
+      }
+    }
+  ]
+}

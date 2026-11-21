@@ -1,0 +1,54 @@
+{
+  "name": "positive/unknown-optional-extension",
+  "description": "An unknown ext entry that is not listed in required is ignored.",
+  "spec": "§6.2",
+  "context": {
+    "mode": "admission",
+    "now": "2026-11-20T12:00:00Z",
+    "receiver": "acct:carol@vectors.test",
+    "typ": "darep-event+jws",
+    "understood": [
+      "https://darep.org/ext/core/v2",
+      "https://darep.org/ext/work/v2",
+      "https://darep.org/ext/reschedule/v2"
+    ]
+  },
+  "jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTIwMjYtMTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.ewogImRhcmVwIjogIjIiLAogImlkIjogIjMzYWIxMDc3LTk1YTgtNDE4My1hNzk4LTgwNWRhM2MxZjFjMSIsCiAic291cmNlIjogImFjY3Q6Ym9iQHZlY3RvcnMudGVzdCIsCiAidHlwZSI6ICJodHRwczovL2RhcmVwLm9yZy9leHQvd29yay92MiNoYW5kb2ZmIiwKICJ0aW1lIjogIjIwMjYtMTEtMjBUMTE6NTg6MDBaIiwKICJ0byI6IFsKICAiYWNjdDpjYXJvbEB2ZWN0b3JzLnRlc3QiCiBdLAogInRocmVhZCI6ICIzM2FiMTA3Ny05NWE4LTQxODMtYTc5OC04MDVkYTNjMWYxYzEiLAogImluUmVwbHlUbyI6IG51bGwsCiAiZXhwaXJlcyI6ICIyMDI2LTExLTI3VDExOjU4OjAwWiIsCiAiZXh0IjogewogICJodHRwczovL2V4YW1wbGUudGVzdC9leHQvdHJhY2UvdjEiOiB7CiAgICJzcGFuIjogIjAwZjA2N2FhMGJhOTAyYjciCiAgfQogfSwKICJyZXF1aXJlZCI6IFsKICAiaHR0cHM6Ly9kYXJlcC5vcmcvZXh0L3dvcmsvdjIiCiBdLAogImdyYW50IjogewogICJpZCI6ICJncmFudC03ZjNhIiwKICAiYWN0b3IiOiAiYWdlbnQiCiB9LAogImRhdGEiOiB7CiAgInN1bW1hcnkiOiAi5ZCI5oiQ6aCQ6Ka9IPCfl5MiLAogICJuZXh0U3RlcCI6ICLmoLjlsI3ojbfomK3mlofmqJnnsaTjgIzDqcOpbuOAjeOAgiIsCiAgImV4cGVjdGVkUmVzdWx0IjogIuWbnuimhuS4gOWAi-aYjueiuue1kOaenOOAgiIKIH0KfQo.Eqpz3ViL98apog2ye7ch1f_brxXjPKuJm-HTc-yJ8wD0rQIA7o00cZG6tg7_dtwu6oGTez51MyWsu3ICweT0fA",
+  "headerUtf8": "{\"alg\":\"ES256\",\"kid\":\"https://bob.vectors.test/.well-known/darep/bob#sig-2026-11\",\"typ\":\"darep-event+jws\"}",
+  "payloadUtf8": "{\n \"darep\": \"2\",\n \"id\": \"33ab1077-95a8-4183-a798-805da3c1f1c1\",\n \"source\": \"acct:bob@vectors.test\",\n \"type\": \"https://darep.org/ext/work/v2#handoff\",\n \"time\": \"2026-11-20T11:58:00Z\",\n \"to\": [\n  \"acct:carol@vectors.test\"\n ],\n \"thread\": \"33ab1077-95a8-4183-a798-805da3c1f1c1\",\n \"inReplyTo\": null,\n \"expires\": \"2026-11-27T11:58:00Z\",\n \"ext\": {\n  \"https://example.test/ext/trace/v1\": {\n   \"span\": \"00f067aa0ba902b7\"\n  }\n },\n \"required\": [\n  \"https://darep.org/ext/work/v2\"\n ],\n \"grant\": {\n  \"id\": \"grant-7f3a\",\n  \"actor\": \"agent\"\n },\n \"data\": {\n  \"summary\": \"合成預覽 🗓\",\n  \"nextStep\": \"核對荷蘭文標籤「één」。\",\n  \"expectedResult\": \"回覆一個明確結果。\"\n }\n}\n",
+  "payloadSha256": "61eeecd552c1fc9ef9b2f46cac047858924f85c31eb77c82a1820ea5ac5600b7",
+  "expected": {
+    "verdict": "accept",
+    "kid": "https://bob.vectors.test/.well-known/darep/bob#sig-2026-11",
+    "record": {
+      "darep": "2",
+      "id": "33ab1077-95a8-4183-a798-805da3c1f1c1",
+      "source": "acct:bob@vectors.test",
+      "type": "https://darep.org/ext/work/v2#handoff",
+      "time": "2026-11-20T11:58:00Z",
+      "to": [
+        "acct:carol@vectors.test"
+      ],
+      "thread": "33ab1077-95a8-4183-a798-805da3c1f1c1",
+      "inReplyTo": null,
+      "expires": "2026-11-27T11:58:00Z",
+      "ext": {
+        "https://example.test/ext/trace/v1": {
+          "span": "00f067aa0ba902b7"
+        }
+      },
+      "required": [
+        "https://darep.org/ext/work/v2"
+      ],
+      "grant": {
+        "id": "grant-7f3a",
+        "actor": "agent"
+      },
+      "data": {
+        "summary": "合成預覽 🗓",
+        "nextStep": "核對荷蘭文標籤「één」。",
+        "expectedResult": "回覆一個明確結果。"
+      }
+    }
+  }
+}

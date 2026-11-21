@@ -1,0 +1,63 @@
+{
+  "vector": "delivery/receiver/reject-too-large",
+  "generatedBy": "vectors/v2/delivery/generate.mjs",
+  "testOnly": true,
+  "role": "receiver",
+  "clock": "Each step has \"at\": the receiver clock at that moment. Runners inject it. A receiver with a real clock checks storedAt format only.",
+  "description": "A body of 65,537 octets is refused before parsing.",
+  "spec": [
+    "delivery.md §3.1",
+    "delivery.md §5.1",
+    "https-binding.md §2.3",
+    "https-binding.md §3"
+  ],
+  "decisions": [
+    "D6"
+  ],
+  "receiver": {
+    "address": "acct:carol@vectors.test",
+    "inbox": "https://carol.vectors.test/darep/v2/inbox",
+    "signingKeys": [
+      "https://carol.vectors.test/.well-known/darep/carol#sig-1",
+      "https://carol.vectors.test/.well-known/darep/carol#rcpt-1"
+    ],
+    "pinned": [
+      "acct:bob@vectors.test",
+      "acct:dave@vectors.test"
+    ],
+    "extensions": [
+      "https://darep.org/ext/core/v2"
+    ]
+  },
+  "records": {},
+  "steps": [
+    {
+      "at": "2026-11-20T10:00:30Z",
+      "request": {
+        "method": "POST",
+        "url": "https://carol.vectors.test/darep/v2/inbox",
+        "headers": {
+          "content-type": "application/jose",
+          "darep-recipient": "acct:carol@vectors.test"
+        },
+        "body": null,
+        "bodyFill": {
+          "octet": "A",
+          "length": 65537
+        },
+        "note": "Runners build the body: 65,537 copies of \"A\"."
+      },
+      "expect": {
+        "status": 413,
+        "contentType": "application/problem+json",
+        "problem": {
+          "type": "https://darep.org/problems/too-large",
+          "status": 413,
+          "code": "too-large"
+        },
+        "stored": false,
+        "receipt": null
+      }
+    }
+  ]
+}

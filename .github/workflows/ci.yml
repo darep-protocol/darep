@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  dco:
+    name: DCO sign-off
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          # Check the contributor's commits, not GitHub's synthetic merge commit.
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - run: sh .github/scripts/check-dco.sh
+
+  vectors:
+    name: Vectors (check and determinism)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - name: Check every vector against the reference verifier
+        run: npm run vectors:check
+      - name: Regenerate and require byte-identical output
+        run: |
+          npm run vectors:generate
+          git diff --exit-code -- vectors/
+
+  node:
+    name: Node reference provider
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: reference/node
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm test
+
+  python:
+    name: Python peer and live interop
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: astral-sh/setup-uv@v6
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: npm ci
+        working-directory: reference/node
+      - run: uv sync --locked --project reference/python --extra agent
+      - name: Unit tests and every applicable vector
+        run: reference/python/.venv/bin/python reference/python/test_peer.py
+      - name: Vector runner
+        run: reference/python/.venv/bin/python reference/python/run_vectors.py
+      - name: Node reference verifier accepts Python-signed bytes
+        run: node reference/python/check-vector.mjs
+      - name: Live Node-Python interop
+        run: reference/python/.venv/bin/python reference/python/verify_interop.py

@@ -1,0 +1,54 @@
+{
+  "name": "positive/reschedule",
+  "description": "Opening reschedule request, serialized without whitespace.",
+  "spec": "§4, §8",
+  "context": {
+    "mode": "admission",
+    "now": "2026-11-20T12:00:00Z",
+    "receiver": "acct:carol@vectors.test",
+    "typ": "darep-event+jws",
+    "understood": [
+      "https://darep.org/ext/core/v2",
+      "https://darep.org/ext/work/v2",
+      "https://darep.org/ext/reschedule/v2"
+    ]
+  },
+  "jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTIwMjYtMTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.eyJkYXJlcCI6IjIiLCJpZCI6ImQ1M2YzZGZmLTM1ZjItNGI4Yy1iOTMxLTI0NDI2NTkzNmVkMSIsInNvdXJjZSI6ImFjY3Q6Ym9iQHZlY3RvcnMudGVzdCIsInR5cGUiOiJodHRwczovL2RhcmVwLm9yZy9leHQvcmVzY2hlZHVsZS92MiNyZXF1ZXN0IiwidGltZSI6IjIwMjYtMTEtMjBUMTE6NTg6MDBaIiwidG8iOlsiYWNjdDpjYXJvbEB2ZWN0b3JzLnRlc3QiXSwidGhyZWFkIjoiZDUzZjNkZmYtMzVmMi00YjhjLWI5MzEtMjQ0MjY1OTM2ZWQxIiwiaW5SZXBseVRvIjpudWxsLCJleHBpcmVzIjoiMjAyNi0xMS0yN1QxMTo1ODowMFoiLCJleHQiOnt9LCJyZXF1aXJlZCI6WyJodHRwczovL2RhcmVwLm9yZy9leHQvcmVzY2hlZHVsZS92MiJdLCJncmFudCI6eyJpZCI6ImdyYW50LTdmM2EiLCJhY3RvciI6ImFnZW50In0sImRhdGEiOnsiYWN0aXZpdHkiOiJUZW5uaXMgbGVzc29uIiwib3JpZ2luYWxTdGFydCI6IjIwMjYtMTEtMjRUMDk6MDA6MDBaIiwiZHVyYXRpb25NaW51dGVzIjo2MCwic2xvdHMiOlsiMjAyNi0xMS0yNVQwOTowMDowMFoiLCIyMDI2LTExLTI2VDE4OjMwOjAwWiJdfX0.ldFWYvWv-L2AriZV7eOXVAUsLaqluj3utej_diu2uzhXzi_7pwfrLms4cH8N6dG-QC03ZuS7zUM_f4INM6_eww",
+  "headerUtf8": "{\"alg\":\"ES256\",\"kid\":\"https://bob.vectors.test/.well-known/darep/bob#sig-2026-11\",\"typ\":\"darep-event+jws\"}",
+  "payloadUtf8": "{\"darep\":\"2\",\"id\":\"d53f3dff-35f2-4b8c-b931-244265936ed1\",\"source\":\"acct:bob@vectors.test\",\"type\":\"https://darep.org/ext/reschedule/v2#request\",\"time\":\"2026-11-20T11:58:00Z\",\"to\":[\"acct:carol@vectors.test\"],\"thread\":\"d53f3dff-35f2-4b8c-b931-244265936ed1\",\"inReplyTo\":null,\"expires\":\"2026-11-27T11:58:00Z\",\"ext\":{},\"required\":[\"https://darep.org/ext/reschedule/v2\"],\"grant\":{\"id\":\"grant-7f3a\",\"actor\":\"agent\"},\"data\":{\"activity\":\"Tennis lesson\",\"originalStart\":\"2026-11-24T09:00:00Z\",\"durationMinutes\":60,\"slots\":[\"2026-11-25T09:00:00Z\",\"2026-11-26T18:30:00Z\"]}}",
+  "payloadSha256": "07c3d3f88d5ed2d320053f7eb4e24c51ee22363b847041236877f9754e503540",
+  "expected": {
+    "verdict": "accept",
+    "kid": "https://bob.vectors.test/.well-known/darep/bob#sig-2026-11",
+    "record": {
+      "darep": "2",
+      "id": "d53f3dff-35f2-4b8c-b931-244265936ed1",
+      "source": "acct:bob@vectors.test",
+      "type": "https://darep.org/ext/reschedule/v2#request",
+      "time": "2026-11-20T11:58:00Z",
+      "to": [
+        "acct:carol@vectors.test"
+      ],
+      "thread": "d53f3dff-35f2-4b8c-b931-244265936ed1",
+      "inReplyTo": null,
+      "expires": "2026-11-27T11:58:00Z",
+      "ext": {},
+      "required": [
+        "https://darep.org/ext/reschedule/v2"
+      ],
+      "grant": {
+        "id": "grant-7f3a",
+        "actor": "agent"
+      },
+      "data": {
+        "activity": "Tennis lesson",
+        "originalStart": "2026-11-24T09:00:00Z",
+        "durationMinutes": 60,
+        "slots": [
+          "2026-11-25T09:00:00Z",
+          "2026-11-26T18:30:00Z"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "warning": "TEST ONLY. These private keys are published on purpose so anyone can regenerate the vectors. They protect nothing. Never accept them outside a test.",
+  "derivation": "d = (SHA-256(\"DAREP vectors v2 TEST ONLY: \" + seed) mod (n - 1)) + 1 on P-256",
+  "keys": {
+    "bobOld": {
+      "seed": "bob sig-2026-05",
+      "kid": "https://bob.vectors.test/.well-known/darep/bob#sig-2026-05",
+      "privateJwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "x": "q-H8nx5LUltlrK40vKWUU_dvtQjGeiFOR4-Ilce94Sg",
+        "y": "3RMfRfm5iHp3Gq-n8fzKDd2hLDviVFXMcrOXbKddzFo",
+        "d": "fEaczFgskdI2E9aCmB5PTfB3EtIS0PsfEx4Q6GrD7dk"
+      }
+    },
+    "bob": {
+      "seed": "bob sig-2026-11",
+      "kid": "https://bob.vectors.test/.well-known/darep/bob#sig-2026-11",
+      "privateJwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "x": "jO6LLRc-DwZjwycwFPLrgcHHmitYAMw-dSGo-9pmjjM",
+        "y": "KlXvtXgWq5IaMuATs6vfHj1kKMTdoHqavZwyY-4CfIw",
+        "d": "sFia8IUYE1yTbj1FKJIaVVREk-pSIhno15nOdK_ov9c"
+      }
+    },
+    "bobProvider": {
+      "seed": "bob provider-2026-11",
+      "kid": "https://bob.vectors.test/.well-known/darep/bob#provider-2026-11",
+      "privateJwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "x": "VvHWhTIQZurPXA2kAekCXKA71VQK4-zGwEYluF7ltzQ",
+        "y": "lYGTVvMTz-pEO0doo2M5siif2c_CBD-wimv2nO9C4RY",
+        "d": "GMWOMCYfvbN4-fbSSSPh_g0A76xwhMFsUa_J6ROVbsI"
+      }
+    },
+    "bobRevoked": {
+      "seed": "bob sig-2026-01",
+      "kid": "https://bob.vectors.test/.well-known/darep/bob#sig-2026-01",
+      "privateJwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "x": "y_zw9oAHa2b_wUlNKqob1nndOBUS5wlyWWyxVnY4nWI",
+        "y": "IEkwiadyiXHylvtWD3UbvSQvBFEc3dYXjBFnNUylHUE",
+        "d": "84iEAcAZ_8YfQmNm9xhKxeXaORFz4hK6LrR9C6WyKfQ"
+      }
+    },
+    "carol": {
+      "seed": "carol key-2026-11",
+      "kid": "https://carol.vectors.test/.well-known/darep/carol#key-2026-11",
+      "privateJwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "x": "mQDt0ibKPefMPt2CiSrLpCqIxYodp_TGvNpShCxLpX0",
+        "y": "EHuuLAKdgpe37dFC5qdF9olyp0raAV8E2cndNvtbWqk",
+        "d": "n2DgqAU3Y2uNGD2wr2INhHBLiykZWw44qQ9_-iSiGoE"
+      }
+    },
+    "dave": {
+      "seed": "dave key-2026-11",
+      "kid": "https://dave.vectors.test/.well-known/darep/dave#key-2026-11",
+      "privateJwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "x": "BinIWduVv23Haxs94l5eKQLMmfqjWon8T_X4cvsbyRg",
+        "y": "u19Z8ke54s7Cl63hbipGastnD6pDMdrFMKb8Ci4D4NE",
+        "d": "KMMDRtRnODn0KZodVXf4mF3g2dXNKqgWKETvVfAv-FE"
+      }
+    },
+    "attacker": {
+      "seed": "attacker (never pinned)",
+      "kid": null,
+      "privateJwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "x": "TvRfSqw07S_perAX66YBfDtTgKJfrjeWOSMlHfPbXMw",
+        "y": "uhs5CFTTjWdMD8MdOvvPcOjd3WhwdqguIHY4mG7wDUc",
+        "d": "4cWSRyqD7XwEVyLp90ddG4-ipvjSk-1TQ9k11ZpdGg0"
+      }
+    }
+  }
+}

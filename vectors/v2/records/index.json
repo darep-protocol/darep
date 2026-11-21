@@ -1,0 +1,332 @@
+{
+  "spec": "spec/records.md",
+  "wire": "DAREP Wire v2, frozen (spec v0.1)",
+  "generator": "vectors/v2/records/generate.mjs",
+  "vectors": [
+    {
+      "name": "positive/handoff",
+      "verdict": "accept",
+      "code": null
+    },
+    {
+      "name": "positive/reschedule",
+      "verdict": "accept",
+      "code": null
+    },
+    {
+      "name": "positive/receipt",
+      "verdict": "accept",
+      "code": null
+    },
+    {
+      "name": "positive/rejection",
+      "verdict": "accept",
+      "code": null
+    },
+    {
+      "name": "positive/rejection-extension-code",
+      "verdict": "accept",
+      "code": null
+    },
+    {
+      "name": "positive/rejection-unknown-code",
+      "verdict": "accept",
+      "code": null
+    },
+    {
+      "name": "positive/message-multi-recipient",
+      "verdict": "accept",
+      "code": null
+    },
+    {
+      "name": "positive/extra-header-member",
+      "verdict": "accept",
+      "code": null
+    },
+    {
+      "name": "positive/unknown-type-not-required",
+      "verdict": "accept",
+      "code": null
+    },
+    {
+      "name": "positive/unknown-optional-extension",
+      "verdict": "accept",
+      "code": null
+    },
+    {
+      "name": "positive/rotated-key-within-validity",
+      "verdict": "accept",
+      "code": null
+    },
+    {
+      "name": "positive/evidence-mode-expired",
+      "verdict": "accept",
+      "code": null
+    },
+    {
+      "name": "negative/wrong-kid",
+      "verdict": "reject",
+      "code": "unknown-key"
+    },
+    {
+      "name": "negative/kid-not-url",
+      "verdict": "reject",
+      "code": "bad-header"
+    },
+    {
+      "name": "negative/kid-of-other-identity",
+      "verdict": "reject",
+      "code": "signer-mismatch"
+    },
+    {
+      "name": "negative/alg-none",
+      "verdict": "reject",
+      "code": "unsupported-alg"
+    },
+    {
+      "name": "negative/alg-hs256",
+      "verdict": "reject",
+      "code": "unsupported-alg"
+    },
+    {
+      "name": "negative/alg-es384-label",
+      "verdict": "reject",
+      "code": "unsupported-alg"
+    },
+    {
+      "name": "negative/legacy-typ",
+      "verdict": "reject",
+      "code": "bad-header"
+    },
+    {
+      "name": "negative/typ-context-mismatch",
+      "verdict": "reject",
+      "code": "bad-header"
+    },
+    {
+      "name": "negative/crit-header",
+      "verdict": "reject",
+      "code": "bad-header"
+    },
+    {
+      "name": "negative/embedded-jwk-ignored",
+      "verdict": "reject",
+      "code": "bad-signature"
+    },
+    {
+      "name": "negative/duplicate-header-member",
+      "verdict": "reject",
+      "code": "malformed"
+    },
+    {
+      "name": "negative/tampered-payload",
+      "verdict": "reject",
+      "code": "bad-signature"
+    },
+    {
+      "name": "negative/duplicate-payload-member",
+      "verdict": "reject",
+      "code": "malformed"
+    },
+    {
+      "name": "negative/bom",
+      "verdict": "reject",
+      "code": "malformed"
+    },
+    {
+      "name": "negative/invalid-utf8",
+      "verdict": "reject",
+      "code": "malformed"
+    },
+    {
+      "name": "negative/v1-envelope",
+      "verdict": "reject",
+      "code": "unsupported-version"
+    },
+    {
+      "name": "negative/unknown-top-level-member",
+      "verdict": "reject",
+      "code": "malformed"
+    },
+    {
+      "name": "negative/unknown-required-extension",
+      "verdict": "reject",
+      "code": "unsupported-extension"
+    },
+    {
+      "name": "negative/expired",
+      "verdict": "reject",
+      "code": "expired"
+    },
+    {
+      "name": "negative/not-yet-valid",
+      "verdict": "reject",
+      "code": "not-yet-valid"
+    },
+    {
+      "name": "negative/expiry-window-too-long",
+      "verdict": "reject",
+      "code": "malformed"
+    },
+    {
+      "name": "negative/retired-key-after-validity",
+      "verdict": "reject",
+      "code": "key-not-valid"
+    },
+    {
+      "name": "negative/revoked-key",
+      "verdict": "reject",
+      "code": "key-not-valid"
+    },
+    {
+      "name": "negative/wrong-key-purpose",
+      "verdict": "reject",
+      "code": "key-not-valid"
+    },
+    {
+      "name": "negative/b64-header",
+      "verdict": "reject",
+      "code": "bad-header"
+    },
+    {
+      "name": "negative/noncanonical-base64url",
+      "verdict": "reject",
+      "code": "malformed"
+    },
+    {
+      "name": "negative/noncharacter",
+      "verdict": "reject",
+      "code": "malformed"
+    },
+    {
+      "name": "negative/receipt-predates-record",
+      "verdict": "reject",
+      "code": "receipt-mismatch"
+    },
+    {
+      "name": "negative/receipt-with-ext",
+      "verdict": "reject",
+      "code": "malformed"
+    },
+    {
+      "name": "negative/receipt-mismatch",
+      "verdict": "reject",
+      "code": "receipt-mismatch"
+    },
+    {
+      "name": "negative/receipt-after-delivery-window",
+      "verdict": "reject",
+      "code": "expired"
+    },
+    {
+      "name": "negative/wrong-recipient",
+      "verdict": "reject",
+      "code": "wrong-recipient"
+    },
+    {
+      "name": "negative/receipt-mismatch-after-window",
+      "verdict": "reject",
+      "code": "receipt-mismatch"
+    },
+    {
+      "name": "negative/rejection-missing-code",
+      "verdict": "reject",
+      "code": "malformed"
+    },
+    {
+      "name": "negative/rejection-nonstring-code",
+      "verdict": "reject",
+      "code": "malformed"
+    },
+    {
+      "name": "negative/rejection-empty-data",
+      "verdict": "reject",
+      "code": "malformed"
+    },
+    {
+      "name": "negative/ext-empty-fragment",
+      "verdict": "reject",
+      "code": "malformed"
+    },
+    {
+      "name": "negative/required-empty-fragment",
+      "verdict": "reject",
+      "code": "malformed"
+    },
+    {
+      "name": "negative/type-empty-fragment",
+      "verdict": "reject",
+      "code": "malformed"
+    },
+    {
+      "name": "negative/kid-empty-fragment",
+      "verdict": "reject",
+      "code": "bad-header"
+    },
+    {
+      "name": "negative/kid-uppercase-host",
+      "verdict": "reject",
+      "code": "bad-header"
+    },
+    {
+      "name": "negative/type-uppercase-host",
+      "verdict": "reject",
+      "code": "malformed"
+    },
+    {
+      "name": "negative/kid-hyphen-host",
+      "verdict": "reject",
+      "code": "bad-header"
+    },
+    {
+      "name": "negative/type-trailing-hyphen-host",
+      "verdict": "reject",
+      "code": "malformed"
+    },
+    {
+      "name": "negative/kid-single-label-host",
+      "verdict": "reject",
+      "code": "bad-header"
+    },
+    {
+      "name": "negative/kid-default-port",
+      "verdict": "reject",
+      "code": "bad-header"
+    },
+    {
+      "name": "negative/type-default-port",
+      "verdict": "reject",
+      "code": "malformed"
+    },
+    {
+      "name": "negative/kid-dot-segment",
+      "verdict": "reject",
+      "code": "bad-header"
+    },
+    {
+      "name": "negative/type-dot-segment",
+      "verdict": "reject",
+      "code": "malformed"
+    },
+    {
+      "name": "negative/kid-hex-ipv4",
+      "verdict": "reject",
+      "code": "bad-header"
+    },
+    {
+      "name": "negative/kid-octal-ipv4",
+      "verdict": "reject",
+      "code": "bad-header"
+    },
+    {
+      "name": "negative/kid-userinfo",
+      "verdict": "reject",
+      "code": "bad-header"
+    },
+    {
+      "name": "negative/type-userinfo",
+      "verdict": "reject",
+      "code": "malformed"
+    }
+  ]
+}
