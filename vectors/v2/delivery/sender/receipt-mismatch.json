@@ -4,7 +4,7 @@
   "testOnly": true,
   "role": "sender",
   "clock": "Each step has \"at\": the sender clock when the attempt is made. Runners inject it and act as the receiving endpoint.",
-  "description": "Each response is 200 with a receipt that fails delivery.md §7.4. None marks the delivery delivered. Each mismatched receipt is kept as evidence, and every retry sends the identical record bytes with doubling retry spacing. The last attempt gets a valid receipt.",
+  "description": "Each response is 200 with a receipt that fails delivery.md §7.4. None marks the delivery delivered. Each mismatched receipt is kept as evidence, and every retry sends the identical record bytes. Mandatory backoff bounds are separate from SHOULD-level doubling profile expectations. The last attempt gets a valid receipt.",
   "spec": [
     "delivery.md §7.4",
     "delivery.md §7.2",
@@ -53,6 +53,12 @@
       "recordBytes": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.eyJkYXJlcCI6IjIiLCJpZCI6IjZkZDc1ZjhlLWRkMzctNDg2MS04NzU4LTIzN2U4OWY2OGI1NyIsInR5cGUiOiJodHRwczovL2RhcmVwLm9yZy9leHQvY29yZS92MiNtZXNzYWdlIiwic291cmNlIjoiYWNjdDpib2JAdmVjdG9ycy50ZXN0IiwidG8iOlsiYWNjdDpjYXJvbEB2ZWN0b3JzLnRlc3QiXSwidGhyZWFkIjoiNmRkNzVmOGUtZGQzNy00ODYxLTg3NTgtMjM3ZTg5ZjY4YjU3IiwiaW5SZXBseVRvIjpudWxsLCJ0aW1lIjoiMjAyNi0xMS0yMFQxMDowMDowMFoiLCJleHBpcmVzIjoiMjAyNi0xMS0yN1QxMDowMDowMFoiLCJleHQiOnt9LCJyZXF1aXJlZCI6W10sImdyYW50Ijp7ImlkIjoiZ3JhbnQtdmVjdG9ycy1ib2IiLCJhY3RvciI6ImFnZW50In0sImRhdGEiOnsidGV4dCI6IkNoZWNrIHRoZSBsYWJlbC4ifX0.s4MOWtFHT9RyninGzKGv3YMq7zNtL255GCq0dqc1TAVPJhnWqmGBgB_nYJOqYezK8dvEYHvha2OSnpM_eGmfWQ"
     }
   },
+  "retryProfile": {
+    "initialBackoffSeconds": 1,
+    "multiplier": 2,
+    "jitterPercent": 0,
+    "level": "SHOULD"
+  },
   "steps": [
     {
       "at": "2026-11-20T10:00:40Z",
@@ -96,7 +102,15 @@
         "attemptResult": "receipt-mismatch",
         "verifyCode": "receipt-mismatch",
         "evidenceKept": "receipt bytes",
-        "nextAttemptNotBefore": "2026-11-20T10:00:41Z"
+        "nextAttemptNotBefore": "2026-11-20T10:00:41Z",
+        "backoff": {
+          "minimumSeconds": 1,
+          "nonDecreasing": true
+        },
+        "should": {
+          "backoffSeconds": 1,
+          "nextAttemptAt": "2026-11-20T10:00:41Z"
+        }
       }
     },
     {
@@ -141,7 +155,15 @@
         "attemptResult": "receipt-mismatch",
         "verifyCode": "receipt-mismatch",
         "evidenceKept": "receipt bytes",
-        "nextAttemptNotBefore": "2026-11-20T10:00:43Z"
+        "nextAttemptNotBefore": "2026-11-20T10:00:43Z",
+        "backoff": {
+          "minimumSeconds": 1,
+          "nonDecreasing": true
+        },
+        "should": {
+          "backoffSeconds": 2,
+          "nextAttemptAt": "2026-11-20T10:00:44Z"
+        }
       }
     },
     {
@@ -186,7 +208,15 @@
         "attemptResult": "receipt-mismatch",
         "verifyCode": "receipt-mismatch",
         "evidenceKept": "receipt bytes",
-        "nextAttemptNotBefore": "2026-11-20T10:00:47Z"
+        "nextAttemptNotBefore": "2026-11-20T10:00:47Z",
+        "backoff": {
+          "minimumSeconds": 1,
+          "nonDecreasing": true
+        },
+        "should": {
+          "backoffSeconds": 4,
+          "nextAttemptAt": "2026-11-20T10:00:50Z"
+        }
       }
     },
     {
@@ -231,7 +261,15 @@
         "attemptResult": "receipt-mismatch",
         "verifyCode": "signer-mismatch",
         "evidenceKept": "receipt bytes",
-        "nextAttemptNotBefore": "2026-11-20T10:00:55Z"
+        "nextAttemptNotBefore": "2026-11-20T10:00:55Z",
+        "backoff": {
+          "minimumSeconds": 1,
+          "nonDecreasing": true
+        },
+        "should": {
+          "backoffSeconds": 8,
+          "nextAttemptAt": "2026-11-20T10:01:02Z"
+        }
       }
     },
     {
@@ -276,7 +314,15 @@
         "attemptResult": "receipt-mismatch",
         "verifyCode": "wrong-recipient",
         "evidenceKept": "receipt bytes",
-        "nextAttemptNotBefore": "2026-11-20T10:01:11Z"
+        "nextAttemptNotBefore": "2026-11-20T10:01:11Z",
+        "backoff": {
+          "minimumSeconds": 1,
+          "nonDecreasing": true
+        },
+        "should": {
+          "backoffSeconds": 16,
+          "nextAttemptAt": "2026-11-20T10:01:26Z"
+        }
       }
     },
     {
@@ -322,7 +368,15 @@
         "attemptResult": "receipt-mismatch",
         "verifyCode": "malformed",
         "evidenceKept": "receipt bytes",
-        "nextAttemptNotBefore": "2026-11-20T10:01:43Z"
+        "nextAttemptNotBefore": "2026-11-20T10:01:43Z",
+        "backoff": {
+          "minimumSeconds": 1,
+          "nonDecreasing": true
+        },
+        "should": {
+          "backoffSeconds": 32,
+          "nextAttemptAt": "2026-11-20T10:02:14Z"
+        }
       }
     },
     {
@@ -369,7 +423,15 @@
         "attemptResult": "receipt-mismatch",
         "verifyCode": "malformed",
         "evidenceKept": "receipt bytes",
-        "nextAttemptNotBefore": "2026-11-20T10:02:47Z"
+        "nextAttemptNotBefore": "2026-11-20T10:02:47Z",
+        "backoff": {
+          "minimumSeconds": 1,
+          "nonDecreasing": true
+        },
+        "should": {
+          "backoffSeconds": 64,
+          "nextAttemptAt": "2026-11-20T10:03:50Z"
+        }
       }
     },
     {
@@ -414,7 +476,15 @@
         "attemptResult": "receipt-mismatch",
         "verifyCode": "key-not-valid",
         "evidenceKept": "receipt bytes",
-        "nextAttemptNotBefore": "2026-11-20T10:04:55Z"
+        "nextAttemptNotBefore": "2026-11-20T10:04:55Z",
+        "backoff": {
+          "minimumSeconds": 1,
+          "nonDecreasing": true
+        },
+        "should": {
+          "backoffSeconds": 128,
+          "nextAttemptAt": "2026-11-20T10:07:02Z"
+        }
       }
     },
     {

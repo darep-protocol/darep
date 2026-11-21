@@ -17,6 +17,8 @@ Both scripts use only Node built-ins (Node ≥ 22.18, as in `package.json`).
 
 `keys.json` contains **private** keys. They are published on purpose so anyone can regenerate and extend the vectors. They protect nothing, and an implementation MUST NOT accept them outside a test. Each key is derived from a fixed seed string (see `derivation` in the file), and every signature uses deterministic ECDSA ([RFC 6979](https://www.rfc-editor.org/rfc/rfc6979)), so rerunning `generate.mjs` reproduces every file exactly. The generator self-checks its RFC 6979 implementation against the RFC's own P-256 test vector and verifies every signature it writes with OpenSSL.
 
+The file uses `keys.<alias>.{kid,privateJwk,seed}`. Normalize each entry to `{kid, privateJwk, alias?, seed?}`; see the [shared key access model and equivalent loaders](../../README.md#shared-key-access-model-25) for this schema and delivery's `keys.<kid>` schema. Neither is a wire schema, and neither physical format changes in v0.1.1.
+
 The test identities live under the reserved `.test` TLD:
 
 | Identity | Document | Keys |
@@ -25,7 +27,7 @@ The test identities live under the reserved `.test` TLD:
 | `acct:carol@vectors.test` | `https://carol.vectors.test/.well-known/darep/carol` | `#key-2026-11` (`record`, `provider`) |
 | `acct:dave@vectors.test` | `https://dave.vectors.test/.well-known/darep/dave` | `#key-2026-11` (`record`, `provider`) |
 
-An `attacker` key exists in `keys.json` but is deliberately absent from every identity document.
+An `attacker` key exists in `keys.json` with `kid: null` and is deliberately absent from every identity document. Keep it by alias for negative signing tests; exclude it from key-URL lookup.
 
 ## Files
 
@@ -74,14 +76,14 @@ Work and reschedule payloads here illustrate signed envelopes; passing these rec
 |---|---|
 | `handoff` | `wrong-kid` → `unknown-key` |
 | `reschedule` (no whitespace) | `kid-not-url` → `bad-header` |
-| `receipt` (for `handoff`) | `kid-of-other-identity` → `signer-mismatch` |
+| `receipt` (for `handoff`), `receipt-signing-before-stored-at` (verifier acceptance despite issuer inconsistency) | `kid-of-other-identity` → `signer-mismatch` |
 | `rejection` (signed, post-store) | `alg-none`, `alg-hs256`, `alg-es384-label` → `unsupported-alg` |
 | `rejection-extension-code` (code is an extension URI) | `rejection-missing-code`, `rejection-nonstring-code`, `rejection-empty-data` → `malformed` |
 | `rejection-unknown-code` (valid unregistered bare code) | `ext-empty-fragment`, `required-empty-fragment`, `type-empty-fragment` → `malformed`; `kid-empty-fragment` → `bad-header` |
 | `message-multi-recipient` | `legacy-typ`, `typ-context-mismatch`, `crit-header` → `bad-header` |
 | `extra-header-member` | `embedded-jwk-ignored`, `tampered-payload` → `bad-signature` |
 | `unknown-type-not-required` | `duplicate-header-member`, `duplicate-payload-member`, `bom`, `invalid-utf8` → `malformed` |
-| `unknown-optional-extension` | `v1-envelope` → `unsupported-version` |
+| `unknown-optional-extension`, `extension-query`, `extension-empty-query` | `v1-envelope` → `unsupported-version` |
 | `rotated-key-within-validity` | `unknown-top-level-member`, `expiry-window-too-long` → `malformed` |
 | `evidence-mode-expired` | `unknown-required-extension` → `unsupported-extension` |
 | | `expired` → `expired`, `not-yet-valid` → `not-yet-valid` |
@@ -90,6 +92,7 @@ Work and reschedule payloads here illustrate signed envelopes; passing these rec
 | | `b64-header` → `bad-header`; `noncanonical-base64url`, `noncharacter` → `malformed` |
 | | `receipt-predates-record`, `receipt-mismatch`, `receipt-mismatch-after-window` → `receipt-mismatch` |
 | | `receipt-with-ext` → `malformed`; `receipt-after-delivery-window` → `expired` |
+| | `kid-query`, `kid-empty-query`, `kid-broad-fragment` → `unknown-key` (K-1 syntax passes; no valid pin can resolve them) |
 | | `kid-uppercase-host`, `kid-hyphen-host`, `kid-single-label-host`, `kid-default-port`, `kid-dot-segment`, `kid-hex-ipv4`, `kid-octal-ipv4`, `kid-userinfo` → `bad-header` |
 | | `type-uppercase-host`, `type-trailing-hyphen-host`, `type-default-port`, `type-dot-segment`, `type-userinfo` → `malformed` |
 | | Pin validation (`invalid-identities.json`): `id-with-query`, `id-with-empty-query`, `id-with-empty-fragment`, `id-uppercase-host`, `id-default-port`, plus missing/wrong-type fields, empty keys, invalid addresses, key IDs, purposes, instants, validity ordering and JWK coordinates → reject (P-0) |

@@ -673,6 +673,15 @@ class RecordsLayerTests(unittest.TestCase):
         for suffix in ["?", "?v=1"]:
             self.assertFalse(wire.https_uri("https://a.test/x" + suffix, fragment=False, allow_query=False))
 
+    def test_explicit_ipv4_uri_policy(self):
+        for uri, fragment, allow_query in [
+            ("https://127.0.0.1/identity", False, False),
+            ("https://127.0.0.1/identity#key-1", True, True),
+        ]:
+            self.assertFalse(wire.https_uri(uri, fragment=fragment, allow_query=allow_query, test_only=False))
+            self.assertTrue(wire.https_uri(uri, fragment=fragment, allow_query=allow_query, test_only=True))
+            self.assertFalse(wire.https_uri(uri, fragment=fragment, allow_query=allow_query))
+
     def test_bad_kid_precedes_pin_lookup(self):
         for name in ["kid-hyphen-host", "kid-single-label-host", "kid-empty-fragment", "kid-default-port", "kid-userinfo"]:
             v = run_vectors.load(run_vectors.RECORDS / ("negative/" + name + ".json"))

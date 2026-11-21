@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.1.1 (unreleased)
+
+Clarifications and editorial fixes only; Wire v2 conformance is unchanged.
+
+- #18: Clarify URI-slot query/fragment rules and `unknown-key` resolution failures.
+- #19: Explain explicit local test-only IPv4 policy and test enabled/disabled URI parsing.
+- #20: Distinguish receipt signing-time obligations from verifier checks.
+- #21: Separate mandatory retry bounds from SHOULD-level doubling profile expectations.
+- #22: Exercise recognized problem-code precedence over conflicting HTTP statuses.
+- #23: Isolate the multi-recipient receipt source check with a valid receipt from another recipient.
+- #24: Qualify the deterministic failure-order explanation by its existing exceptions.
+- #25: Document both test-key schemas and equivalent loaders into a common normalized view.
+
 ## Spec v0.1 = DAREP Wire v2 (frozen), 2026-11-21
 
 The first public release of the specification, the test vectors and the two reference implementations.

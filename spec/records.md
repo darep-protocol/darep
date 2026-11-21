@@ -146,6 +146,20 @@ A verifier always knows which `typ` values it expects from context. A delivery e
 
 Vectors: `negative/kid-not-url` (the v1 form, `kid` = `acct:` address), `negative/wrong-kid`, `negative/legacy-typ`, `negative/typ-context-mismatch`.
 
+The URI slots use the same normalized syntax with these existing restrictions:
+
+| Slot | Query | Fragment |
+|---|---|---|
+| Identity document `id` (§5.1) | Forbidden, including empty `?` | Forbidden |
+| Header `kid` syntax (K-1, step 4) | Permitted, including empty `?` | Required; K-1's broad printable-ASCII grammar |
+| Pinned `keys[].id` (§5.1, step 5) | Forbidden, because the prefix is the document `id` | Required; 1–64 characters from `[A-Za-z0-9._-]` |
+| Extension URI (U-1) | Permitted, including empty `?` | Forbidden |
+| Type URI (U-2) | Permitted, including empty `?` | Required; K-1's broad grammar, within U-2's total length limit |
+
+For example, `https://bob.vectors.test/.well-known/darep/bob?v=1#sig-2026-11`, `https://bob.vectors.test/.well-known/darep/bob?#sig-2026-11`, and `https://bob.vectors.test/.well-known/darep/bob#key{wide}` satisfy K-1 but cannot match a valid pinned document/key. A syntactically valid `kid` that cannot match a valid pinned document/key fails step 5 with `unknown-key`, not step 4 with `bad-header`. An extension URI such as `https://example.test/ext/poll/v1?` and its type URI `https://example.test/ext/poll/v1?#vote` have a permitted empty query.
+
+Test context is an explicit local deployment or test-harness policy, shared by identity-document validation and record verification. It is not inferred from an untrusted record or request. Outside an explicitly selected test context, the test-only IPv4 alternative is unavailable. No wire field advertises this policy.
+
 ### 3.3 Other header members
 
 Wire v1 required the header to have exactly `alg`, `kid` and `typ`. Wire v2 drops that rule.
@@ -223,6 +237,8 @@ A receipt is returned only in the response to the delivery it answers. It is nev
 - `grant` MUST be absent. The provider issues receipts on its own authority.
 - `ext` MUST be `{}` and `required` MUST be `[]`. `subject` MUST be absent. A receipt is evidence, and its meaning must not drift through extensions.
 - `data` is exactly `{ "sha256": <64 lowercase hex>, "storedAt": <instant> }`. `sha256` is computed over the received record's exact payload bytes (C-4). The receiver retains the record until at least `storedAt` + 30 days (D4); that promise is fixed by the delivery contract, so the receipt does not restate it.
+
+The `time >= data.storedAt` relationship is an issuer obligation under [delivery §4.1](delivery.md#41-what-stored-means). Wire v2 §8 does not add a verifier rejection condition for this relationship. Applications may report inconsistent evidence without changing the protocol verification verdict.
 
 - **RC-1. Correlation.** A receipt or signed rejection counts as an answer to a record `R` only if all of the following hold: its `source` is in `R.to`, its `to` is `[R.source]`, its `inReplyTo` is `R.id`, its `thread` is `R.thread`, and its `time` is not earlier than `R.time` − skew (§7.2). For a receipt, `data.sha256` must also equal the SHA-256 of `R`'s exact stored payload bytes. A verifier that holds `R`, such as the sender matching a delivery response or an evidence checker, MUST run this check as §8 step 15. A failure there is `receipt-mismatch`. A receipt that fails it proves nothing about `R`. The delivery contract adds one sender-side rule on top: a receipt's `source` must equal the recipient address of the delivery it answers.
 
@@ -396,7 +412,7 @@ Vector: `positive/evidence-mode-expired`, `negative/revoked-key` (evidence mode)
 
 A verifier runs these steps in order and stops at the first failure. The order is normative, so that two conformant verifiers return the same code for the same input. Every vector exercises one failure. A receiver runs the delivery contract's carrier checks before step 1 and its deduplication check between steps 12 and 13 ([delivery contract](delivery.md) §3.1). It does not otherwise reorder these steps.
 
-Inputs: the compact JWS string, the expected `typ` values, the pinned snapshots (each already validated by P-0), and in admission mode also `now`, the receiver's own address, and the set of extension URIs it understands. For step 15, the input also includes the answered record's JWS.
+Inputs: the compact JWS string, the expected `typ` values, the pinned snapshots (each already validated by P-0), and in admission mode also `now`, the receiver's own address, and the set of extension URIs it understands. For step 15, the input also includes the answered record's JWS. The local test-context policy (§3.2) is shared with P-0 validation; it is not a wire input.
 
 | Step | Check | On failure |
 |---|---|---|
@@ -493,3 +509,9 @@ Normative publication of the experimental `work/v2` extension remains future wor
 - **Protocol rename.** Renamed the protocol to DAREP, with `darep-*` `typ` strings and `https://darep.org/` URIs, per the D1 amendment dated 2026-11-21; behavior is unchanged.
 - **Envelope version member.** Renamed the record envelope protocol-version member `ack` to `darep`, retaining the value `"2"`, per the D3 amendment dated 2026-11-21.
 - **Remaining protocol identifiers.** Renamed the identity-document version member to `darep` (value `"2"`), the well-known path to `/.well-known/darep/<name>`, the inbox path to `/darep/v2/inbox`, and the recipient header to `Darep-Recipient`, per the amendment dated 2026-11-21; behavior is unchanged.
+
+## Errata 2026-11-21 (v0.1.1)
+
+- #18: Clarified URI-slot query and fragment rules and step-5 key-resolution failures (§3.2).
+- #19: Explained local selection of the shared test-only IPv4 policy (§3.2, §8 inputs).
+- #20: Distinguished the receipt signing-time obligation from verifier rejection conditions (§4.4).

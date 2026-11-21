@@ -9,6 +9,7 @@ peer.attempt() with each scripted response in place of the network. Under D8 a v
 needs a type outside core/v2, work/v2 and message, and the skip is reported with its reason.
 """
 
+from contextlib import nullcontext
 import http.client
 import json
 import sqlite3
@@ -375,6 +376,7 @@ def run_sender(path):
         return "ok (" + str(len(vector["cases"])) + " cases)"
     with tempfile.TemporaryDirectory(prefix="darep-vector-") as root:
         fx = sender_fixture(vector, Path(root) / "peer")
+        previous_backoff = 0
         for i, step in enumerate(vector["steps"]):
             fx.at(step["at"])
             exp = step["expect"]
@@ -383,15 +385,21 @@ def run_sender(path):
                 name = req["bodyEqualsRecord"]
                 recipient = req["headers"]["darep-recipient"]
                 row = delivery_row(fx, vector["records"][name]["envelope"]["id"], recipient)
-                # The runner forces each attempt at the vector's clock. Our own backoff may be longer than the
-                # vector's spacing (1 s doubling reaches 128 s at the 8th retry); the MUST is only "not earlier
-                # than the vector's nextAttemptNotBefore", checked after each step below.
+                # Scripted attempt clocks are stimuli, not assertions about the sender's computed schedule.
+                # Check the mandatory bounds and report the optional profile separately below.
                 check(row["status"] == "queued", f"step {i}: delivery is {row['status']}")
                 if row["next_at"] > fx.clock[0]:
                     notes.append(f"step {i} forced {(row['next_at'] - fx.clock[0]) / 1000:.1f}s before our backoff")
                 check(row["jws"] == vector["records"][name]["recordBytes"], f"step {i}: stored bytes changed")
                 calls = []
-                got = peer.attempt(fx.store, row, fake_send(step["respond"], req, calls))
+                if exp.get("recordsVerdict") == "accept":
+                    with fx.store.connection() as db:
+                        pins = fx.store.pins(db)
+                    wire.verify_record(step["respond"]["body"], (wire.TYP_RECEIPT,), pins,
+                                       now=fx.clock[0], receiver=fx.address, answered=row["jws"])
+                zero_jitter = vector.get("retryProfile", {}).get("jitterPercent") == 0
+                with patch("mailbox_db.secrets.randbelow", return_value=0) if zero_jitter else nullcontext():
+                    got = peer.attempt(fx.store, row, fake_send(step["respond"], req, calls))
                 check(len(calls) == 1 and calls[0][1] == vector["records"][name]["recordBytes"].encode(),
                       f"step {i}: did not send the stored bytes exactly once")
                 check(got == exp.get("attemptResult", got), f"step {i}: attempt {got}, expected {exp.get('attemptResult')}")
@@ -414,6 +422,18 @@ def run_sender(path):
                 check(row["status"] == exp["delivery"], f"step {i}: delivery {row['status']}, expected {exp['delivery']}")
             if "nextAttemptNotBefore" in exp:
                 check(row["next_at"] >= wire.instant_ms(exp["nextAttemptNotBefore"]), f"step {i}: retried too early")
+            if "backoff" in exp:
+                check(row["backoff_ms"] >= exp["backoff"]["minimumSeconds"] * 1000, f"step {i}: backoff below minimum")
+                if exp["backoff"].get("nonDecreasing"):
+                    check(row["backoff_ms"] >= previous_backoff, f"step {i}: backoff decreased")
+                check(row["next_at"] >= fx.clock[0] + row["backoff_ms"], f"step {i}: schedule precedes backoff")
+                previous_backoff = row["backoff_ms"]
+            if "backoffSeconds" in exp.get("should", {}):
+                recommended = exp["should"]
+                met = (row["backoff_ms"] == recommended["backoffSeconds"] * 1000
+                       and row["next_at"] == wire.instant_ms(recommended["nextAttemptAt"]))
+                notes.append(("SHOULD met: " if met else "SHOULD not met: ")
+                             + f"zero-jitter profile backoff {recommended['backoffSeconds']}s")
             if exp.get("furtherAttempts") == 0:
                 fx.clock[0] += 3600_000
                 check(all(d["seq"] != row["seq"] for d in fx.store.due()), f"step {i}: further attempts are due")

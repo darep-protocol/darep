@@ -62,7 +62,7 @@ const PEOPLE = {
     'rcpt-1': { purpose: ['provider'], validFrom: '2026-01-01T00:00:00Z', validUntil: '2027-12-31T23:59:59Z' },
   } },
   dave: { address: 'acct:dave@vectors.test', host: 'dave.vectors.test', keys: {
-    'sig-1': { purpose: ['record'], validFrom: '2026-01-01T00:00:00Z', validUntil: '2027-12-31T23:59:59Z' },
+    'sig-1': { purpose: ['record', 'provider'], validFrom: '2026-01-01T00:00:00Z', validUntil: '2027-12-31T23:59:59Z' },
   } },
   mallory: { address: 'acct:mallory@vectors.test', host: 'mallory.vectors.test', keys: {
     'sig-1': { purpose: ['record'], validFrom: '2026-01-01T00:00:00Z', validUntil: '2027-12-31T23:59:59Z' },
@@ -480,13 +480,31 @@ async function senderVectors() {
   ];
   // Step spacing doubles (gaps 2, 4, 8, 16, 32, 64, 128, 256 s) so a doubling sender with up to 20% jitter is never forced early.
   const mismatchAt = i => 40 + 2 * (2 ** i - 1);
-  v['receipt-mismatch'] = { ...base, description: 'Each response is 200 with a receipt that fails delivery.md §7.4. None marks the delivery delivered. Each mismatched receipt is kept as evidence, and every retry sends the identical record bytes with doubling retry spacing. The last attempt gets a valid receipt.',
+  v['receipt-mismatch'] = { ...base, description: 'Each response is 200 with a receipt that fails delivery.md §7.4. None marks the delivery delivered. Each mismatched receipt is kept as evidence, and every retry sends the identical record bytes. Mandatory backoff bounds are separate from SHOULD-level doubling profile expectations. The last attempt gets a valid receipt.',
     spec: ['delivery.md §7.4', 'delivery.md §7.2', 'delivery.md §9.2', 'https-binding.md §2.2'], decisions: ['D4', 'NC1'], sender, records: { out },
+    retryProfile: { initialBackoffSeconds: 1, multiplier: 2, jitterPercent: 0, level: 'SHOULD' },
     steps: [
       ...mismatches.map((m, i) => step({ at: at(mismatchAt(i)), ...sameBytes, respond: { status: 200, headers: { 'content-type': 'application/jose' }, body: m.receiptBytes, receiptPayload: m.payload, mismatch: m.label },
-        expect: { delivery: 'queued', attemptResult: 'receipt-mismatch', verifyCode: m.verifyCode, evidenceKept: 'receipt bytes', nextAttemptNotBefore: at(mismatchAt(i) + 1) } })),
+        expect: { delivery: 'queued', attemptResult: 'receipt-mismatch', verifyCode: m.verifyCode, evidenceKept: 'receipt bytes', nextAttemptNotBefore: at(mismatchAt(i) + 1),
+          backoff: { minimumSeconds: 1, nonDecreasing: true },
+          should: { backoffSeconds: 2 ** i, nextAttemptAt: at(mismatchAt(i) + 2 ** i) } } })),
       step({ at: at(mismatchAt(mismatches.length)), ...sameBytes, respond: { status: 200, headers: { 'content-type': 'application/jose' }, body: ok.receiptBytes, receiptPayload: ok.payload },
         expect: { delivery: 'delivered', receiptStored: 'byte-identical to respond.body' } }),
+    ] };
+
+  // Dave's receipt passes records RC-1 because Dave is in out.to, but cannot acknowledge delivery to Carol.
+  const multiOut = await record(envelope({ name: 'sender-multi-outgoing', from: 'bob', to: ['carol', 'dave'], data: { text: 'Check both labels.' } }), { who: 'bob' });
+  const daveReceipt = await receipt(receiptPayload({ name: 'sender-other-recipient', rec: multiOut, receiver: 'dave', storedAt: at(40) }), { who: 'dave', key: 'sig-1' });
+  const carolReceipt = await receipt(receiptPayload({ name: 'sender-multi-ok', rec: multiOut, receiver: 'carol', storedAt: at(42) }), { who: 'carol' });
+  v['receipt-other-recipient'] = { ...base,
+    description: 'A record is addressed to Carol and Dave. Dave signs a fully correlated receipt with his provider-purpose test key. Records §8 accepts it, but delivery to Carol fails §7.4 rule 2. Keep the receipt and retry unchanged bytes. The separate receipt-mismatch scenario retains its signer-mismatch case.',
+    spec: ['records.md §8', 'delivery.md §7.4', 'delivery.md §7.1', 'delivery.md §9.2'], decisions: ['D4', 'NC1'],
+    sender: { ...sender, pinned: [addr('carol'), addr('dave')] }, records: { out: multiOut },
+    steps: [
+      step({ at: at(40), ...sameBytes, respond: { status: 200, headers: { 'content-type': 'application/jose' }, body: daveReceipt.receiptBytes, receiptPayload: daveReceipt.payload, mismatch: 'other-recipient' },
+        expect: { recordsVerdict: 'accept', delivery: 'queued', attemptResult: 'receipt-mismatch', verifyCode: 'receipt-mismatch', evidenceKept: 'receipt bytes', nextAttemptNotBefore: at(41) } }),
+      step({ at: at(42), ...sameBytes, respond: { status: 200, headers: { 'content-type': 'application/jose' }, body: carolReceipt.receiptBytes, receiptPayload: carolReceipt.payload },
+        expect: { recordsVerdict: 'accept', delivery: 'delivered', receiptStored: 'byte-identical to respond.body' } }),
     ] };
 
   v['retry-same-bytes'] = { ...base, description: 'Transient failures are retried with backoff, honoring Retry-After as a one-attempt floor without advancing the backoff sequence, and every attempt sends the same record bytes.',
@@ -505,10 +523,12 @@ async function senderVectors() {
     steps: [step({ at: at(30), ...sameBytes, respond: { status: 403, headers: { 'content-type': 'application/problem+json' }, body: JSON.stringify({ type: PROBLEM + 'unknown-key', title: 'Unknown key', status: 403, code: 'unknown-key' }) },
       expect: { delivery: 'failed', attemptResult: 'permanent', evidenceKept: 'status and problem body', furtherAttempts: 0, dependentRecords: { [dependent.envelope.id]: { should: 'failed without an attempt' } } } })] };
 
-  v['status-fallback'] = { ...base, description: 'Without a recognized code the sender classifies by status: other 4xx permanent; 408, 425, 429, 5xx transient. A recognized code wins over its status.',
+  v['status-fallback'] = { ...base, description: 'Without a recognized code the sender classifies by status: other 4xx permanent; 408, 425, 429, 5xx transient. A recognized code wins over its status. Deliberately inconsistent code/status pairs test sender robustness, not conforming receiver output.',
     spec: ['https-binding.md §3'], decisions: ['D6'], sender, records: { out },
     cases: [
       { respond: { status: 400, headers: { 'content-type': 'application/problem+json' }, body: JSON.stringify({ type: PROBLEM + 'brand-new-code', title: 'Future', status: 400, code: 'brand-new-code' }) }, expect: { attemptResult: 'permanent' } },
+      { respond: { status: 500, headers: { 'content-type': 'application/problem+json' }, body: JSON.stringify({ type: PROBLEM + 'malformed', title: 'Malformed', status: 500, code: 'malformed' }) }, expect: { attemptResult: 'permanent' } },
+      { respond: { status: 400, headers: { 'content-type': 'application/problem+json' }, body: JSON.stringify({ type: PROBLEM + 'unavailable', title: 'Unavailable', status: 400, code: 'unavailable' }) }, expect: { attemptResult: 'transient' } },
       { respond: { status: 404 }, expect: { attemptResult: 'permanent' } },
       { respond: { status: 500 }, expect: { attemptResult: 'transient' } },
       { respond: { status: 408 }, expect: { attemptResult: 'transient' } },
@@ -608,10 +628,12 @@ async function check() {
         if (!s.respond?.body || s.respond.headers?.['content-type'] !== 'application/jose') continue;
         const got = recordsVerdict(s.respond.body, { mode: 'admission', now: s.at ?? vec.steps?.[0]?.at ?? at(40), receiver: vec.sender.address,
           typ: TYP.receipt, understood: [CORE], answered: out }, pinnedDocs(vec.sender.address));
-        const want = s.expect.verifyCode ?? 'accept';
+        const want = s.expect.recordsVerdict ?? s.expect.verifyCode ?? 'accept';
         if (got !== want) fail(`${role}/${f} ${s.respond.mismatch ?? ''}: records procedure returned ${got}, vector expects ${want}`);
         if (got === 'accept' && JSON.parse(Buffer.from(s.respond.body.split('.')[1], 'base64url')).source !== s.request?.headers?.['darep-recipient'] && s.request) {
-          fail(`${role}/${f}: accepted receipt source is not the delivery's recipient address (delivery.md §7.4)`);
+          if (s.expect.attemptResult !== 'receipt-mismatch' || s.expect.delivery !== 'queued') {
+            fail(`${role}/${f}: another recipient's valid receipt must be a delivery receipt-mismatch`);
+          }
         }
         if (s.respond.receiptPayload) {
           const p = await verifyJws(s.respond.body, docs, TYP.receipt);

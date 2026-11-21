@@ -49,15 +49,23 @@ for (const role of ['receiver', 'sender']) {
   for (const file of readdirSync(new URL(role + '/', root)).filter(f => f.endsWith('.json')).sort()) {
     test(`delivery vector ${role}/${file}`, async t => {
       const v = load(role + '/' + file);
+      if (v.retryProfile?.jitterPercent === 0) t.mock.method(Math, 'random', () => 0);
       if (role === 'sender') {
         // Cases are independent attempts; steps share durable state and exponential backoff.
         const scenarios = v.cases ? v.cases.map(c => [c]) : [v.steps];
         for (const steps of scenarios) {
           const f = fixture(v, t), { store, config } = f;
           for (const r of Object.values(v.records)) store.transaction(() => store.queueSigned(r.recordBytes));
-          const out = store.db.prepare('SELECT * FROM events WHERE event_id=?').get(v.records.out.envelope.id);
+          const recipient = steps[0].request?.headers['darep-recipient'] ?? v.records.out.envelope.to[0];
+          const out = store.db.prepare('SELECT * FROM events WHERE event_id=? AND recipient=?').get(v.records.out.envelope.id, recipient);
+          let previousBackoff = 0;
           for (const step of steps) {
             if (step.at) f.clock(step.at);
+            if (step.expect.recordsVerdict === 'accept') {
+              const pins = id => documents.find(d => d.id === id && d.addresses.some(a => v.sender.pinned.includes(a)));
+              assert.doesNotThrow(() => verifyRecord(step.respond.body, { typ: typs.receipt, mode: 'admission',
+                now: Date.parse(step.at), receiver: v.sender.address, answered: v.records.out.recordBytes }, pins));
+            }
             let calls = 0;
             if (step.respond) await send(out, config, store, async (url, options) => {
               calls++;
@@ -78,6 +86,16 @@ for (const role of ['receiver', 'sender']) {
             if (expected.attemptResult) assert.equal(attempt.result, expected.attemptResult);
             if (expected.verifyCode) assert.equal(attempt.code, expected.verifyCode);
             if (expected.nextAttemptNotBefore) assert.ok(delivery.next_at >= Date.parse(expected.nextAttemptNotBefore));
+            if (expected.backoff) {
+              assert.ok(delivery.backoff_ms >= expected.backoff.minimumSeconds * 1000, 'initial minimum backoff');
+              if (expected.backoff.nonDecreasing) assert.ok(delivery.backoff_ms >= previousBackoff, 'backoff must not decrease');
+              assert.ok(delivery.next_at >= Date.parse(step.at) + delivery.backoff_ms, 'schedule honors backoff');
+              previousBackoff = delivery.backoff_ms;
+            }
+            if (expected.should?.backoffSeconds !== undefined) {
+              const met = delivery.backoff_ms === expected.should.backoffSeconds * 1000 && delivery.next_at === Date.parse(expected.should.nextAttemptAt);
+              t.diagnostic(`SHOULD ${met ? 'met' : 'not met'}: zero-jitter profile backoff ${expected.should.backoffSeconds}s`);
+            }
             if (step.respond) {
               assert.equal(calls, 1);
               if (!step.respond.connection) {

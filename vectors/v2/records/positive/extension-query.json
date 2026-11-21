@@ -1,0 +1,50 @@
+{
+  "name": "positive/extension-query",
+  "description": "Extension and type URIs permit queries, including an empty query; this optional extension need not be understood.",
+  "spec": "§6.1 U-1/U-2",
+  "context": {
+    "mode": "admission",
+    "now": "2026-11-20T12:00:00Z",
+    "receiver": "acct:carol@vectors.test",
+    "typ": "darep-event+jws",
+    "understood": [
+      "https://darep.org/ext/core/v2",
+      "https://darep.org/ext/work/v2",
+      "https://darep.org/ext/reschedule/v2"
+    ]
+  },
+  "jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTIwMjYtMTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.ewogImRhcmVwIjogIjIiLAogImlkIjogIjJiNjAwNzNjLTU1NmEtNGViNC1hN2QzLTNhYTk5YzBhNWQ3YSIsCiAic291cmNlIjogImFjY3Q6Ym9iQHZlY3RvcnMudGVzdCIsCiAidHlwZSI6ICJodHRwczovL2V4YW1wbGUudGVzdC9leHQvcG9sbC92MT92PTEjdm90ZSIsCiAidGltZSI6ICIyMDI2LTExLTIwVDExOjU4OjAwWiIsCiAidG8iOiBbCiAgImFjY3Q6Y2Fyb2xAdmVjdG9ycy50ZXN0IgogXSwKICJ0aHJlYWQiOiAiMmI2MDA3M2MtNTU2YS00ZWI0LWE3ZDMtM2FhOTljMGE1ZDdhIiwKICJpblJlcGx5VG8iOiBudWxsLAogImV4cGlyZXMiOiAiMjAyNi0xMS0yN1QxMTo1ODowMFoiLAogImV4dCI6IHsKICAiaHR0cHM6Ly9leGFtcGxlLnRlc3QvZXh0L3BvbGwvdjE_dj0xIjoge30KIH0sCiAicmVxdWlyZWQiOiBbXSwKICJncmFudCI6IHsKICAiaWQiOiAiZ3JhbnQtN2YzYSIsCiAgImFjdG9yIjogImFnZW50IgogfSwKICJkYXRhIjogewogICJzdW1tYXJ5IjogIuWQiOaIkOmgkOimvSDwn5eTIiwKICAibmV4dFN0ZXAiOiAi5qC45bCN6I236Jit5paH5qiZ57Gk44CMw6nDqW7jgI3jgIIiLAogICJleHBlY3RlZFJlc3VsdCI6ICLlm57opobkuIDlgIvmmI7norrntZDmnpzjgIIiCiB9Cn0K.fT60ofbOtd5Qd_BoN75GSWI8QoDe1MPzBn2xwGI3nW8K8u0Fmgk4M8I_isstjxTXioeajD9BSG16iePVBFzaBw",
+  "headerUtf8": "{\"alg\":\"ES256\",\"kid\":\"https://bob.vectors.test/.well-known/darep/bob#sig-2026-11\",\"typ\":\"darep-event+jws\"}",
+  "payloadUtf8": "{\n \"darep\": \"2\",\n \"id\": \"2b60073c-556a-4eb4-a7d3-3aa99c0a5d7a\",\n \"source\": \"acct:bob@vectors.test\",\n \"type\": \"https://example.test/ext/poll/v1?v=1#vote\",\n \"time\": \"2026-11-20T11:58:00Z\",\n \"to\": [\n  \"acct:carol@vectors.test\"\n ],\n \"thread\": \"2b60073c-556a-4eb4-a7d3-3aa99c0a5d7a\",\n \"inReplyTo\": null,\n \"expires\": \"2026-11-27T11:58:00Z\",\n \"ext\": {\n  \"https://example.test/ext/poll/v1?v=1\": {}\n },\n \"required\": [],\n \"grant\": {\n  \"id\": \"grant-7f3a\",\n  \"actor\": \"agent\"\n },\n \"data\": {\n  \"summary\": \"合成預覽 🗓\",\n  \"nextStep\": \"核對荷蘭文標籤「één」。\",\n  \"expectedResult\": \"回覆一個明確結果。\"\n }\n}\n",
+  "payloadSha256": "407e8bb8c948e13f94100039aee5572e67988a69f62581eda715707cf280fe9b",
+  "expected": {
+    "verdict": "accept",
+    "kid": "https://bob.vectors.test/.well-known/darep/bob#sig-2026-11",
+    "record": {
+      "darep": "2",
+      "id": "2b60073c-556a-4eb4-a7d3-3aa99c0a5d7a",
+      "source": "acct:bob@vectors.test",
+      "type": "https://example.test/ext/poll/v1?v=1#vote",
+      "time": "2026-11-20T11:58:00Z",
+      "to": [
+        "acct:carol@vectors.test"
+      ],
+      "thread": "2b60073c-556a-4eb4-a7d3-3aa99c0a5d7a",
+      "inReplyTo": null,
+      "expires": "2026-11-27T11:58:00Z",
+      "ext": {
+        "https://example.test/ext/poll/v1?v=1": {}
+      },
+      "required": [],
+      "grant": {
+        "id": "grant-7f3a",
+        "actor": "agent"
+      },
+      "data": {
+        "summary": "合成預覽 🗓",
+        "nextStep": "核對荷蘭文標籤「één」。",
+        "expectedResult": "回覆一個明確結果。"
+      }
+    }
+  }
+}

@@ -18,6 +18,10 @@ Request/response scenarios for [Delivery contract](../../../spec/delivery.md) an
 | `receiver/*.json` | Vectors for a receiver under test: the runner POSTs and checks the response and the stored state. |
 | `sender/*.json` | Vectors for a sender under test: the runner acts as the receiving endpoint and checks what the sender does next. |
 
+### Test-key access (#25)
+
+`test-keys.json` uses `keys.<kid>` with the private JWK directly as the value. Normalize entries to `{kid, privateJwk}`. Records instead use `keys.<alias>.{kid,privateJwk,seed}`; their alias and seed are optional metadata in the common `{kid, privateJwk, alias?, seed?}` view. See the [equivalent loaders](../../README.md#shared-key-access-model-25). These tooling schemas and their key material are unchanged. Dave's existing test key is now listed with both `record` and `provider` purposes in `identities.json` for the multi-recipient scenario.
+
 ## Scenarios
 
 | Vector | What it shows |
@@ -32,9 +36,10 @@ Request/response scenarios for [Delivery contract](../../../spec/delivery.md) an
 | `receiver/unknown-type` | An unknown type without `required[]` is stored and acked; outcome `unsupported`. |
 | `receiver/reject-<code>` | One vector for each pre-store code in the registry (delivery.md §5.1). `reject-malformed` and `reject-wrong-recipient` have several steps. |
 | `sender/receipt-mismatch` | Eight kinds of bad receipt, each with the records.md §8 code it fails with. None counts as delivery, each is kept, and each retry sends the same bytes. |
+| `sender/receipt-other-recipient` | Dave's correctly signed receipt for a record addressed to Carol and Dave passes records §8, but fails delivery to Carol under §7.4 rule 2; retain it and retry unchanged bytes. |
 | `sender/retry-same-bytes` | 503 with `Retry-After`, a dropped connection and a redirect, then success. Same bytes every time. |
 | `sender/permanent-rejection` | A permanent code fails the delivery at once and SHOULD fail dependent records. |
-| `sender/status-fallback` | Classification when there is no recognized code. |
+| `sender/status-fallback` | Status fallback plus recognized-code precedence over deliberately conflicting statuses (500/`malformed`, 400/`unavailable`); the conflicts test sender robustness, not conforming receiver output. |
 | `sender/give-up-at-expiry` | Transient failures until `expires` plus the skew allowance, then `failed`. |
 
 ## Reading a vector
@@ -49,6 +54,14 @@ Request/response scenarios for [Delivery contract](../../../spec/delivery.md) an
 - `applyOutcome` is one of `applied`, `pending`, `refused` or `unsupported` (delivery.md §3.3). `stored: "unchanged"` means nothing new was stored. `applyCount` counts how often the applier ran for the record.
 - `optional: true` on a rejection record means the implementation MAY emit it. If it does, it must match.
 - `should` marks a SHOULD-level expectation. A runner reports it but does not fail on it.
+
+### Retry assertions and test profile (#21)
+
+In `sender/receipt-mismatch`, `expect.backoff.minimumSeconds` asserts the existing one-second initial minimum; `nonDecreasing` compares each underlying backoff delay with the previous one. `nextAttemptNotBefore` is a mandatory schedule floor, not evidence of doubling. The scheduled retry also cannot precede the computed backoff. A harness should observe the implementation's backoff state separately from a `Retry-After` floor and jitter; elapsed time between scripted attempts does not establish the computed delay.
+
+`retryProfile` declares a one-second initial delay, doubling, and zero jitter. The reference runners suppress jitter only for this profile. `expect.should` reports recommended backoff delays of 1, 2, 4, 8, 16, 32, 64 and 128 seconds and the corresponding computed next-attempt times. A deviation is reported, not failed: a two-second first retry or another permitted policy does not fail conformance merely for missing this profile. With jitter enabled, inspect the underlying backoff or control the random source; do not demand exact wall-clock equality with the zero-jitter expectations. Scripted attempt times are stimuli, not a universal retry schedule.
+
+`expect.recordsVerdict` asserts the records §8 verdict independently of the sender's attempt result. In `sender/receipt-other-recipient`, it is `accept` even though delivery to Carol is a `receipt-mismatch`; `verifyCode` records that sender-side failure code.
 
 ## Shapes
 

@@ -115,7 +115,8 @@
         {
           "id": "https://dave.vectors.test/.well-known/darep/dave#sig-1",
           "purpose": [
-            "record"
+            "record",
+            "provider"
           ],
           "publicKeyJwk": {
             "kty": "EC",

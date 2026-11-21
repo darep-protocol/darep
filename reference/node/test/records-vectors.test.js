@@ -201,3 +201,14 @@ test('P-0 permits unknown members and a validUntil at the Unix epoch', () => {
   // Revocation has no ordering constraint relative to the signing window.
   assert.doesNotThrow(() => validateDocument(d));
 });
+
+test('test-only IPv4 URI policy is explicit for document and kid syntax (#19)', () => {
+  for (const [uri, fragment, query] of [
+    ['https://127.0.0.1/identity', false, false],
+    ['https://127.0.0.1/identity#key-1', true, true],
+  ]) {
+    assert.equal(isHttpsUri(uri, { fragment, query, testOnly: false }), false);
+    assert.equal(isHttpsUri(uri, { fragment, query, testOnly: true }), true);
+    assert.equal(isHttpsUri(uri, { fragment, query }), false);
+  }
+});

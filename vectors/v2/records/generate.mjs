@@ -526,6 +526,26 @@ add('negative/type-userinfo', 'type URI contains userinfo, which K-1 forbids.', 
   { payload: pretty(event({ id: uuid('type userinfo'), thread: uuid('type userinfo'), type: 'https://user@example.test/ext/poll/v1#vote', required: [] })),
     key: keys.bob, expected: reject('malformed') });
 
+// Clarification regressions: K-1 syntax is broader than valid pinned key IDs (#18).
+for (const [name, suffix] of [['query', '?v=1#sig-2026-11'], ['empty-query', '?#sig-2026-11'], ['broad-fragment', '#key{wide}']]) {
+  add('negative/kid-' + name, 'K-1 permits this kid syntax, but it cannot match a valid pinned key; step 5, not step 4, fails.', '§3.2 K-1/K-2, §5.1, §8 step 5',
+    { headerText: header(BOB_DOC + suffix), payload: handoffBytes, key: keys.bob, expected: reject('unknown-key') });
+}
+for (const query of ['?', '?v=1']) {
+  const uri = 'https://example.test/ext/poll/v1' + query;
+  const p = pretty(event({ id: uuid('extension query ' + query), thread: uuid('extension query ' + query), type: uri + '#vote', ext: { [uri]: {} }, required: [] }));
+  add('positive/extension-' + (query === '?' ? 'empty-query' : 'query'), 'Extension and type URIs permit queries, including an empty query; this optional extension need not be understood.', '§6.1 U-1/U-2',
+    { payload: p, key: keys.bob, expected: accept(p, keys.bob.kid) });
+}
+// Issuer inconsistency does not add a records-verifier rejection condition (#20).
+{
+  const original = vectors.find(v => v.name === 'positive/receipt');
+  const r = { ...original.expected.record, id: uuid('receipt signing before storedAt'), data: { ...original.expected.record.data, storedAt: '2026-11-20T11:58:02Z' } };
+  const p = tight(r);
+  add('positive/receipt-signing-before-stored-at', 'Verifier acceptance only: time is before storedAt, violating the issuer obligation in delivery §4.1 but not adding a Wire v2 §8 rejection condition.', '§4.4, §8 step 9; delivery §4.1',
+    { context: original.context, headerText: header(keys.carol.kid, 'darep-receipt+jws'), payload: p, key: keys.carol, expected: accept(p, keys.carol.kid) });
+}
+
 // ---------- invalid identity documents (P-0 pin validation) ----------
 
 const badDoc = (name, description, spec, id) => ({

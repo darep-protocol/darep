@@ -327,6 +327,36 @@
       "name": "negative/type-userinfo",
       "verdict": "reject",
       "code": "malformed"
+    },
+    {
+      "name": "negative/kid-query",
+      "verdict": "reject",
+      "code": "unknown-key"
+    },
+    {
+      "name": "negative/kid-empty-query",
+      "verdict": "reject",
+      "code": "unknown-key"
+    },
+    {
+      "name": "negative/kid-broad-fragment",
+      "verdict": "reject",
+      "code": "unknown-key"
+    },
+    {
+      "name": "positive/extension-empty-query",
+      "verdict": "accept",
+      "code": null
+    },
+    {
+      "name": "positive/extension-query",
+      "verdict": "accept",
+      "code": null
+    },
+    {
+      "name": "positive/receipt-signing-before-stored-at",
+      "verdict": "accept",
+      "code": null
     }
   ]
 }

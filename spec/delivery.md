@@ -72,7 +72,7 @@ A receiver MAY run step 4 in the same process turn as step 3 or later from a dur
 
 ### 3.1 Pre-store checks
 
-The receiver MUST evaluate the checks in the order below and report the code of the first one that fails, so that two conforming receivers return the same code for the same delivery. Rows R1–R12 and R13–R14 are steps 1–14 of the verification procedure in [Signed records](records.md) §8, run in admission mode with the delivery's recipient address as the receiver and `darep-event+jws` and `darep-rejection+jws` as the expected `typ` values. Deduplication (D) runs between R12 and R13, so that a late retry of a record already stored still gets its receipt. All codes are defined in the registry (§5.1).
+The receiver MUST evaluate the checks in the order below and report the code of the first one that fails. The order determines the first failure for the same verification context, subject to the explicitly permitted early `rate-limited` response and the C1/R12 choice for unhosted recipients below. Rows R1–R12 and R13–R14 are steps 1–14 of the verification procedure in [Signed records](records.md) §8, run in admission mode with the delivery's recipient address as the receiver and `darep-event+jws` and `darep-rejection+jws` as the expected `typ` values. Deduplication (D) runs between R12 and R13, so that a late retry of a record already stored still gets its receipt. All codes are defined in the registry (§5.1).
 
 | # | Check | Failure code |
 |---|---|---|
@@ -131,7 +131,7 @@ A receiver MUST NOT issue a receipt until all of the following are true:
 
 Storage replicated to other machines counts as durable only if the commit waits for that replication.
 
-`data.storedAt` is the receiver's clock at commit. The receipt's `time` is when it was signed, which is at or after `storedAt`.
+`data.storedAt` is the receiver's clock at commit. The receipt's `time` is when it was signed, which is at or after `storedAt`. This is an issuer obligation; Wire v2 records §8 does not add a verifier rejection condition for `time < data.storedAt`. Applications may report that inconsistency without changing the protocol verification verdict.
 
 ### 4.2 Retention promise
 
@@ -376,3 +376,8 @@ One item remains deferred.
 - **Protocol rename.** Renamed the protocol to DAREP, with `darep-*` `typ` strings and `https://darep.org/` URIs, per the D1 amendment dated 2026-11-21; behavior is unchanged.
 - **Envelope version member.** Renamed the record envelope protocol-version member `ack` to `darep`, retaining the value `"2"`, per the D3 amendment dated 2026-11-21.
 - **Remaining protocol identifiers.** Renamed the identity-document version member to `darep` (value `"2"`), the well-known path to `/.well-known/darep/<name>`, the inbox path to `/darep/v2/inbox`, and the recipient header to `Darep-Recipient`, per the amendment dated 2026-11-21; behavior is unchanged.
+
+## Errata 2026-11-21 (v0.1.1)
+
+- #20: Clarified that receipt signing at or after `storedAt` is an issuer obligation, not an additional verifier check (§4.1).
+- #24: Qualified the deterministic failure-order explanation by the existing early-response exceptions (§3.1).
