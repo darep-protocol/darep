@@ -30,7 +30,8 @@ export function specRevision() {
 }
 
 // Built-in adapters for the two reference implementations in this repository.
+// They are argument vectors, spawned without a shell, so nothing in the checkout path is ever interpreted.
 export const builtinAdapters = {
-  'node-reference': `node "${join(kitRoot, 'adapters', 'node', 'adapter.js')}"`,
-  'python-reference': `"${join(repoRoot, 'reference', 'python', '.venv', 'bin', 'python')}" "${join(kitRoot, 'adapters', 'python', 'adapter.py')}"`,
+  'node-reference': [process.execPath, join(kitRoot, 'adapters', 'node', 'adapter.js')],
+  'python-reference': [join(repoRoot, 'reference', 'python', '.venv', 'bin', 'python'), join(kitRoot, 'adapters', 'python', 'adapter.py')],
 };
