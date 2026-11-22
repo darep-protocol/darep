@@ -6,9 +6,11 @@
   "license": "Apache-2.0",
   "type": "module",
   "engines": { "node": ">=22.18.0" },
+  "workspaces": ["conformance"],
   "scripts": {
     "vectors:check": "node vectors/v2/records/check.mjs && node vectors/v2/delivery/generate.mjs --check",
-    "vectors:generate": "node vectors/v2/records/generate.mjs && node vectors/v2/delivery/generate.mjs"
+    "vectors:generate": "node vectors/v2/records/generate.mjs && node vectors/v2/delivery/generate.mjs",
+    "conformance:test": "npm test --workspace conformance"
   },
   "devDependencies": {
     "jose": "6.2.18"

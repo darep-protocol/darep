@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+Tooling only; the specification and vectors are unchanged.
+
+- Conformance kit 0.1.0 in [`conformance/`](conformance/README.md), run as `npx darep-conformance`: offline vectors through a language-neutral adapter contract, live loopback deliveries in both directions through fault-injecting proxies, JSON and Markdown reports, and adapters for both reference implementations. A verification aid, not certification; [TRADEMARK.md](TRADEMARK.md#conformance-kit-results) says how a passing result may be stated.
+
 ## v0.1.1 (unreleased)
 
 Clarifications and editorial fixes only; Wire v2 conformance is unchanged.
