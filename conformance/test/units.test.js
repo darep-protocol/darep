@@ -45,3 +45,16 @@ test('every case must cite a spec clause', () => {
   const report = new Report({ adapterCommand: 'x', modes: ['offline'] });
   assert.throws(() => report.add({ id: 'a', mode: 'offline', role: 'verifier', status: 'pass' }));
 });
+
+test('a skipped required case takes its role out of scope; an optional one does not', () => {
+  const report = new Report({ adapterCommand: 'x', modes: ['offline'] });
+  report.role('receiver', true);
+  report.role('sender', true);
+  report.add({ id: 'r1', mode: 'offline', role: 'receiver', status: 'pass', refs: ['delivery.md §3'] });
+  report.add({ id: 'r2', mode: 'offline', role: 'receiver', status: 'skip', optional: true, refs: ['delivery.md §3.1 C3'] });
+  report.add({ id: 's1', mode: 'offline', role: 'sender', status: 'pass', refs: ['delivery.md §7'] });
+  report.add({ id: 's2', mode: 'offline', role: 'sender', status: 'skip', refs: ['delivery.md §7.4'] });
+  const s = report.summary();
+  assert.deepEqual(s.tested, ['receiver']);
+  assert.deepEqual(s.partial, ['sender']);
+});

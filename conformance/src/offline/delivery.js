@@ -4,7 +4,7 @@ import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { loadJson, vectorsRoot } from '../repo.js';
 import { check } from '../report.js';
-import { TYP, dotted, deepEqual, payloadOf, referenceVerify } from '../check.js';
+import { CORE, TYP, dotted, deepEqual, payloadOf, referenceVerify } from '../check.js';
 import { rawRequest, scriptedServer } from '../http.js';
 import { checkProblem } from '../problem.js';
 
@@ -37,6 +37,7 @@ export async function deliveryCases(adapter, report, { roles, experimental }) {
       const v = loadJson('delivery', role, file);
       const subset = v.conformance ? 'experimental' : 'core';
       const meta = { id: `delivery/${role}/${file.slice(0, -5)}`, mode: 'offline', role, subset, refs: v.spec ?? [],
+        optional: ['reject-rate-limited.json', 'reject-unavailable.json'].includes(file), // need the optional fault op
         // The work/v2 apply rules (head, turn, transitions) are not normatively published (D8 amendment); only these vectors state them.
         ...(subset === 'experimental' ? { basis: 'vector-only', basisNote: `${v.conformance}: the work/v2 lifecycle rules it checks are not published normative text (D8 amendment)` } : {}) };
       if (subset === 'experimental' && !experimental) {
@@ -104,7 +105,16 @@ async function receiver(adapter, v, file, advisories) {
         if (exp.stored === true) { check(stored.recordBytes === body.toString('utf8'), `${at}: stored record bytes differ from the bytes received`); firstBytes ??= stored.recordBytes; }
         if (exp.stored === 'unchanged' && firstBytes) check(stored.recordBytes === firstBytes, `${at}: the first stored record bytes were replaced`);
         check(stored.receipt === text, `${at}: the issued receipt is not stored byte for byte`);
-        if (exp.receipt) checkReceipt(text, exp.receipt, body.toString('utf8'), document, at);
+        if (exp.receipt) checkReceipt(text, exp.receipt, body.toString('utf8'), document, at, step.at);
+      }
+      if (res.status !== 200 && exp.stored === 'unchanged' && firstBytes && body) {
+        // e.g. id-conflict: the stored record for that dedupe key must keep its first bytes (delivery.md §6).
+        let r = null;
+        try { r = envelopeOf(body.toString('utf8')); } catch { /* not a record */ }
+        if (r?.id) {
+          const kept = await adapter.call('inspectIncoming', { source: r.source, id: r.id });
+          if (kept.found) check(kept.recordBytes === firstBytes, `${at}: the stored record bytes changed after a rejected delivery`);
+        }
       }
       if (exp.receipt === null) check(res.status !== 200, `${at}: a receipt was returned`);
       if (exp.receiptBytesEqualStep !== undefined) {
@@ -151,8 +161,10 @@ async function receiver(adapter, v, file, advisories) {
   return notes.filter(Boolean).join('; ');
 }
 
-function checkReceipt(text, er, answered, document, at) {
-  const got = referenceVerify(text, { typ: TYP.receipt, mode: 'evidence', answered }, [document]);
+function checkReceipt(text, er, answered, document, at, now) {
+  // Judged as the sender would judge it at this moment: admission mode, with the answered record (delivery.md §7.4).
+  const sender = envelopeOf(answered).source;
+  const got = referenceVerify(text, { typ: TYP.receipt, mode: 'admission', now, receiver: sender, understood: [CORE], answered }, [document]);
   check(got.ok, `${at}: the receipt fails the reference verifier: ${got.code} (${got.why})`);
   const r = got.record;
   check(deepEqual(Object.keys(r).sort(), [...er.members].sort()), `${at}: receipt members ${Object.keys(r).sort().join(',')}`);
@@ -196,6 +208,8 @@ async function sender(adapter, v, advisories) {
         await adapter.call('setClock', { now: new Date(instant(out.envelope.time) + 30_000).toISOString() });
         server.answer(c.respond);
         const { result } = await adapter.call('attempt', { id: out.envelope.id, recipient: out.envelope.to[0] });
+        check(server.received.length === 1, `case ${i}: the sender made ${server.received.length} requests for one attempt`);
+        checkRequest(server.received[0], out.recordBytes, out.envelope.to[0], `case ${i}`);
         check(result === c.expect.attemptResult, `case ${i} (HTTP ${c.respond.status}): ${result}; expected ${c.expect.attemptResult}`);
       }
       return `${v.cases.length} cases`;

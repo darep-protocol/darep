@@ -66,7 +66,7 @@ npx darep-conformance all --adapter "./my-adapter"
 The report states:
 
 - **the result**: "Passes the DAREP v0.1 conformance kit (verification aid, not certification)" when no core case failed, or "Does not pass …";
-- **the scope**: the roles tested (verifier, signer, receiver, sender), the modes, and the subset. Only the core subset decides the result;
+- **the scope**: the roles tested (verifier, signer, receiver, sender), the modes, and the subset. Only the core subset decides the result. A role is in scope only if none of its required cases was skipped; cases that need an optional adapter operation (such as `fault`) may be skipped. A run against a checkout whose `spec/` or `vectors/` were changed locally gives no result;
 - **the revision**: the spec label, the git tag, describe output and commit of the checkout the kit ran from, and whether `spec/` or `vectors/` were modified locally, plus the kit version;
 - **every case** with its status, spec references and details: `pass`, `fail`, `skip` (your adapter does not support what the case needs), or `advisory` (a SHOULD-level expectation that was not met, which never fails a run);
 - **traceability**: each case cites the clauses it checks (for example `delivery.md §6` or `records.md TA-2`). A case marked `vector-only` checks a rule that only a vector implies, with no published normative text behind it (today: the experimental `work/v2` scenarios); its result says nothing about conformance;
