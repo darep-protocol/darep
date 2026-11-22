@@ -3,3 +3,5 @@ node_modules/
 __pycache__/
 .darep/
 .DS_Store
+darep-conformance-report/
+conformance-report/

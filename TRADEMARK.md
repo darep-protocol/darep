@@ -17,9 +17,17 @@ Rev.Vision currently holds and stewards the "DAREP" name until a transfer under 
 - Claim compatibility you have not tested, or keep claiming it for a version whose applicable normative requirements your implementation no longer meets.
 - Use the name for a modified protocol that is not compatible with the published specification, unless you clearly say it is a modified or experimental variant.
 
-## Certification
+## Conformance kit results
 
-There is no certification program yet. A conformance kit is planned. When it exists, this policy will say how a passing result may be stated.
+There is no certification program. The [conformance kit](conformance/README.md) is a verification aid: it runs a subset of the normative requirements locally and lists in every report what it does not cover.
+
+If the kit's report says your implementation passes, you may say that it **"passes the DAREP v0.1 conformance kit (verification aid, not certification)"**, when:
+
+- you use that wording, without shortening it;
+- you name the roles that were tested (verifier, signer, receiver, sender), the kit version and the spec revision from the report, and link to the report or publish it where you can;
+- the run was against the published specification and vectors, without local changes to them.
+
+You may not describe a kit result as certification, compliance, approval or endorsement, for example "DAREP certified" or "officially conformant". A passing kit run is evidence for a compatibility claim under "You may, without asking" above; it does not replace meeting all applicable normative requirements.
 
 ## Questions and changes
 

@@ -73,3 +73,33 @@ jobs:
         run: node reference/python/check-vector.mjs
       - name: Live Node-Python interop
         run: reference/python/.venv/bin/python reference/python/verify_interop.py
+
+  conformance:
+    name: Conformance kit against both reference implementations
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The report names the spec tag and commit, which needs the tags.
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: astral-sh/setup-uv@v6
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: npm ci
+      - run: npm ci --prefix reference/node
+      - run: uv sync --locked --project reference/python --extra agent
+      - name: Kit self-test (catches deliberately broken adapters)
+        run: npm test --workspace conformance
+      - name: Node reference provider, offline and live
+        run: npx darep-conformance all --adapter node-reference --experimental --out conformance-report/node
+      - name: Python peer, offline and live
+        run: npx darep-conformance all --adapter python-reference --experimental --out conformance-report/python
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: conformance-reports
+          path: conformance-report/
