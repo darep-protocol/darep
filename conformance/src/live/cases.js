@@ -75,7 +75,14 @@ export async function liveCases(adapter, report, { roles, outDir, patience = 120
       return `implementation ${implAddress}, inbox ${card.inbox} (via proxy ${implProxy.url})`;
     });
     if (!ok) return;
-    const ctx = { adapter, report, kit, kitProxy, implProxy, implDoc, implAddress, wait, patience };
+    // A restarted implementation may come back on another loopback port; the kit's pin points at the proxy, so only
+    // the proxy's target moves.
+    const restart = async () => {
+      const out = await adapter.optional('restart', {});
+      if (out?.inbox) implProxy.target = out.inbox;
+      return out;
+    };
+    const ctx = { adapter, report, kit, kitProxy, implProxy, implDoc, implAddress, wait, patience, restart };
     if (asReceiver) await receiverCases(ctx);
     if (asSender) await senderCases(ctx);
     report.notes.push(`Live mode waited up to ${patience} s for each expected event (--patience). Pins: live-pins.json.`);
@@ -116,7 +123,7 @@ function checkCarrier(e, recipient) {
 
 // ---------- the implementation as receiver ----------
 
-async function receiverCases({ adapter, report, kit, kitProxy, implProxy, implDoc, implAddress, wait, patience }) {
+async function receiverCases({ adapter, report, kit, kitProxy, implProxy, implDoc, implAddress, wait, patience, restart }) {
   const meta = (id, refs) => ({ id: 'live/receiver/' + id, mode: 'live', role: 'receiver', refs });
   const R = kit.R;
   const message = ({ text = 'Conformance kit message', data = { text }, now = Date.now(), lifetime = 7 * DAY, ...rest } = {}) =>
@@ -129,6 +136,7 @@ async function receiverCases({ adapter, report, kit, kitProxy, implProxy, implDo
       understood: [CORE], answered }, [implDoc]);
     check(got.ok, `receipt fails records.md §8 at the sender: ${got.code} (${got.why})`);
     check(got.record.source === implAddress, `receipt source ${got.record.source} is not the delivery's recipient (delivery.md §7.4)`);
+    check(Date.parse(got.record.time) >= Date.parse(got.record.data.storedAt), 'receipt time precedes data.storedAt (delivery.md §4.1, issuer obligation)');
     return got.record;
   };
   const inspect = id => adapter.optional('inspectIncoming', { source: kit.address, id });
@@ -181,7 +189,7 @@ async function receiverCases({ adapter, report, kit, kitProxy, implProxy, implDo
     const dropped = implProxy.log.findLast(e => e.record?.id === record.id);
     check(dropped.fault === 'drop-response' && dropped.response?.status === 200, `the implementation answered ${dropped.response?.status ?? dropped.response?.error}`);
     check(firstTry.outbox.status === 'queued' && firstTry.last.result === 'transient', 'internal: the kit peer saw the dropped answer');
-    const restarted = await adapter.optional('restart', {});
+    const restarted = await restart();
     const res = await kit.deliver(row);
     check(res.outbox.status === 'delivered', `retry after ${restarted ? 'restart' : 'no restart'}: ${res.last?.result} ${res.last?.code ?? ''}`);
     check(res.outbox.receipt === dropped.response.body.toString('latin1'), 'the retry did not get the byte-identical receipt issued before');
@@ -265,7 +273,7 @@ async function receiverCases({ adapter, report, kit, kitProxy, implProxy, implDo
 
 // ---------- the implementation as sender ----------
 
-async function senderCases({ adapter, report, kit, kitProxy, implProxy, implDoc, implAddress, wait, patience }) {
+async function senderCases({ adapter, report, kit, kitProxy, implProxy, implDoc, implAddress, wait, patience, restart }) {
   const meta = (id, refs) => ({ id: 'live/sender/' + id, mode: 'live', role: 'sender', refs });
   const R = kit.R;
   // Every case sends a unique text, so faults can target its request before the adapter has returned the id.
@@ -310,7 +318,9 @@ async function senderCases({ adapter, report, kit, kitProxy, implProxy, implDoc,
     const e1 = await requestFor(id);
     check(e1, `no delivery reached the kit within ${patience} s`);
     check(e1.fault === 'drop-response' && e1.response?.status === 200, `the kit peer refused it: HTTP ${e1.response?.status}`);
-    const restarted = await adapter.optional('restart', {});
+    // Restart only once the implementation has recorded the failed attempt (if the adapter can show it).
+    if (await supportsOutgoing(id)) await poll(async () => ((await outgoing(id))?.attempts?.length ? true : null), wait);
+    const restarted = await restart();
     const e2 = await requestFor(id, 2);
     check(e2, `no retry within ${patience} s after the answer was lost` + (restarted ? ' and the implementation restarted' : ''));
     check(e2.body.equals(e1.body), 'the retry did not send the same record bytes (delivery.md §7.1)');
@@ -397,11 +407,14 @@ async function senderCases({ adapter, report, kit, kitProxy, implProxy, implDoc,
     check(receipt.ok, `receipt for the rejection record fails: ${receipt.code} (${receipt.why})`);
     await sleep(3000);
     check(!kitProxy.log.some(e => e.record?.inReplyTo === rejection.id), 'the implementation answered a rejection record with a rejection record (delivery.md §3.3)');
-    if (!(await supportsOutgoing(first.id))) return 'refusal not inspected (inspectOutgoing unsupported)';
+    const resent = () => kitProxy.log.filter(e => e.record?.id === first.id).length > 1;
+    check(!resent(), 'the refused record was sent again (delivery.md §7.5: MUST NOT resend)');
+    if (!(await supportsOutgoing(first.id))) return 'refusal not inspected (inspectOutgoing unsupported); observed no resend for 3 s';
     // delivery.md §7.5: the sender MUST record the refusal against its record; the delivery stays delivered.
     const refusal = await poll(async () => (await outgoing(first.id))?.refusal ?? null, wait);
     check(refusal, `no refusal recorded against the refused record within ${patience} s (inspectOutgoing.refusal)`);
     check(refusal.code === 'policy-denied', `recorded refusal ${refusal.code}`);
     check((await outgoing(first.id)).status === 'delivered', 'the delivery must stay delivered (delivery.md §7.5)');
+    check(!resent(), 'the refused record was sent again (delivery.md §7.5: MUST NOT resend)');
   });
 }

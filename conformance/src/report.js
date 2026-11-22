@@ -22,9 +22,10 @@ export class Report {
   role(role, tested, reason = null) { this.roles[role] = { tested, reason }; }
   // status: pass | fail | skip | advisory (a SHOULD that was not met; never a failure)
   // basis: 'normative' when the cited spec text states the requirement; 'vector-only' when only a vector implies it.
-  add({ id, title, mode, role, subset = 'core', level = 'MUST', status, refs = [], detail = '', basis = 'normative', basisNote = null }) {
+  // optional: the case needs an optional adapter capability (ADAPTER.md), so skipping it does not take its role out of scope.
+  add({ id, title, mode, role, subset = 'core', level = 'MUST', status, refs = [], detail = '', basis = 'normative', basisNote = null, optional = false }) {
     if (!refs.length) throw new Error(`case ${id} has no spec reference`);
-    this.cases.push({ id, title: title ?? id, mode, role, subset, level, basis, basisNote, status, refs, detail });
+    this.cases.push({ id, title: title ?? id, mode, role, subset, level, basis, basisNote, optional, status, refs, detail });
   }
   // Run fn as one case. fn returns an optional detail string; Failure means fail, Unsupported means skip.
   async run(meta, fn) {
@@ -54,11 +55,17 @@ export class Report {
     const core = this.cases.filter(c => c.subset === 'core');
     const coreFailures = core.filter(c => c.status === 'fail').length;
     const coreRun = core.filter(c => c.status !== 'skip').length;
-    // A role is in the result's scope only if at least one of its core cases actually ran.
-    const tested = ROLES.filter(r => this.roles[r]?.tested && core.some(c => c.role === r && c.status !== 'skip'));
-    const passes = coreFailures === 0 && coreRun > 0 && tested.length > 0;
-    return { rows, coreFailures, coreRun, tested, passes,
+    // A role is in the result's scope only if its core cases ran: at least one MUST case, and no required case skipped.
+    const mine = r => core.filter(c => c.role === r);
+    const tested = ROLES.filter(r => this.roles[r]?.tested && mine(r).some(c => c.level === 'MUST' && c.status !== 'skip' && c.id !== 'live/setup') &&
+      !mine(r).some(c => c.status === 'skip' && !c.optional));
+    const partial = ROLES.filter(r => this.roles[r]?.tested && !tested.includes(r));
+    // A run against locally modified spec or vectors is not a run of the published kit.
+    const modified = specRevision().modified === true;
+    const passes = coreFailures === 0 && coreRun > 0 && tested.length > 0 && !modified;
+    return { rows, coreFailures, coreRun, tested, partial, passes, modified,
       statement: passes ? `Passes the DAREP v0.1 conformance kit (verification aid, not certification).`
+        : modified && coreFailures === 0 ? 'No result: spec/ or vectors/ differ from the published revision, so this run cannot support a claim.'
         : `Does not pass the DAREP v0.1 conformance kit (verification aid, not certification).` };
   }
   toJSON() {
@@ -67,7 +74,7 @@ export class Report {
       report: 'darep-conformance',
       claimWording: CLAIM,
       result: { passes: summary.passes, statement: summary.statement, coreFailures: summary.coreFailures,
-        scope: { roles: summary.tested, modes: this.modes, subset: 'core' } },
+        scope: { roles: summary.tested, notInScope: summary.partial, modes: this.modes, subset: 'core' } },
       kit: { name: kit.name, version: kit.version },
       spec: specRevision(),
       implementation: this.implementation,
@@ -103,6 +110,7 @@ function markdown(r) {
   if (r.result.passes) {
     out.push(`Scope of this result: roles ${r.result.scope.roles.join(', ')}; core subset; ${r.result.scope.modes.join(' and ')} mode. ` +
       'Quote it only together with this scope, the kit version and the spec revision below.', '');
+    if (r.result.scope.notInScope.length) out.push(`Not in scope: ${r.result.scope.notInScope.join(', ')} (a required case was skipped or none ran).`, '');
   }
   out.push('| | |', '|---|---|');
   out.push(`| Implementation | ${esc(impl)} |`);
@@ -111,7 +119,7 @@ function markdown(r) {
   out.push(`| Specification | ${r.spec.label}; tag \`${r.spec.tag}\`, \`${r.spec.describe}\`, commit \`${r.spec.commit}\`${r.spec.modified ? ' (spec or vectors modified locally)' : ''} |`);
   out.push(`| Modes | ${r.result.scope.modes.join(', ')} |`);
   out.push(`| Roles tested | ${Object.entries(r.roles).map(([k, v]) => r.result.scope.roles.includes(k) ? k
-    : `${k}: not tested (${v.tested ? 'every case skipped' : v.reason})`).join('; ')} |`);
+    : `${k}: not tested (${v.tested ? 'required cases skipped' : v.reason})`).join('; ')} |`);
   out.push(`| Run | ${r.startedAt} to ${r.finishedAt} |`, '');
   out.push('## Summary', '', '| Subset | Role | Pass | Fail | Skip | Advisory (SHOULD not met) |', '|---|---|---|---|---|---|');
   for (const row of r.summary) out.push(`| ${row.subset} | ${row.role} | ${row.pass} | ${row.fail} | ${row.skip} | ${row.advisory} |`);
@@ -137,8 +145,9 @@ function markdown(r) {
   for (const item of r.notCovered) out.push(`- **${item.ref}**: ${item.requirement} *${item.why}*`);
   out.push('');
   if (r.notes.length) { out.push('## Notes', ''); for (const n of r.notes) out.push(`- ${n}`); out.push(''); }
-  out.push('## All cases', '', '| Status | Case | Subset | Role | Level | Basis | Spec |', '|---|---|---|---|---|---|---|');
-  for (const c of r.cases) out.push(`| ${c.status} | \`${esc(c.id)}\` | ${c.subset} | ${c.role} | ${c.level} | ${c.basis} | ${esc(c.refs.join(', '))} |`);
+  out.push('## All cases', '', 'Details on passing cases name anything the adapter could not let the kit inspect.', '',
+    '| Status | Case | Subset | Role | Level | Basis | Spec | Detail |', '|---|---|---|---|---|---|---|---|');
+  for (const c of r.cases) out.push(`| ${c.status} | \`${esc(c.id)}\` | ${c.subset} | ${c.role} | ${c.level} | ${c.basis} | ${esc(c.refs.join(', '))} | ${esc(c.detail)} |`);
   out.push('', '## What this report means', '', r.disclaimer, '');
   return out.join('\n');
 }

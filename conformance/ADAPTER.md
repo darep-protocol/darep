@@ -91,6 +91,6 @@ In live mode your implementation runs for real: real clock, its own keys, its ow
 
 **`send`** `{ to, type, data }` → `{ id }`. Create, sign and store an event of that type and data to `to`, and let your worker deliver it as it normally would. The kit only uses `https://darep.org/ext/core/v2#message`.
 
-**`restart`** `{}` → `{}`. Optional. Stop the implementation and start it again from its durable state, on the same inbox URL, with its worker running.
+**`restart`** `{}` → `{ inbox }`. Optional. Stop the implementation and start it again from its durable state, with its worker running. Return the inbox URL it now listens on (a different loopback port is fine: the kit re-targets its proxy, and pins stay as they are).
 
 `inspectIncoming`, `inspectOutgoing` and `stats` work as in offline mode and make more checks possible. Without them, cases still run on what the kit sees on the wire, and the report says what was not inspected.
