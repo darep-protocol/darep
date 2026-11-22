@@ -11,7 +11,7 @@ export function rawRequest(url, { method = 'POST', headers = {}, body = null, ti
     flat.push('content-length', String(bytes.length));
   }
   return new Promise((resolve, reject) => {
-    const req = request({ host: target.hostname, port: target.port, path: target.pathname + target.search, method,
+    const req = request({ host: target.hostname.replace(/^\[(.*)\]$/, '$1'), port: target.port, path: target.pathname + target.search, method,
       headers: flat, setHost: false }, res => {
       const chunks = [];
       res.on('data', c => chunks.push(c));
@@ -50,11 +50,16 @@ export async function scriptedServer() {
     res.writeHead(answer.status, answer.headers ?? {});
     res.end(answer.body ?? '');
   });
+  const trapped = [];
+  const trap = createServer((req, res) => { trapped.push({ method: req.method, url: req.url }); req.resume(); res.writeHead(500); res.end(); });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  await new Promise(resolve => trap.listen(0, '127.0.0.1', resolve));
   const port = server.address().port;
+  const close = s => new Promise(resolve => { s.closeAllConnections(); s.close(resolve); });
   return {
-    url: `http://127.0.0.1:${port}/darep/v2/inbox`, received,
-    answer(...answers) { script = answers; received.length = 0; },
-    close: () => new Promise(resolve => { server.closeAllConnections(); server.close(resolve); }),
+    url: `http://127.0.0.1:${port}/darep/v2/inbox`, received, trapped,
+    trapUrl: `http://127.0.0.1:${trap.address().port}/redirected`,
+    answer(...answers) { script = answers; received.length = 0; trapped.length = 0; },
+    close: async () => { await close(server); await close(trap); },
   };
 }

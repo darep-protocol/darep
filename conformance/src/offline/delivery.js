@@ -6,8 +6,8 @@ import { loadJson, vectorsRoot } from '../repo.js';
 import { check } from '../report.js';
 import { TYP, dotted, deepEqual, payloadOf, referenceVerify } from '../check.js';
 import { rawRequest, scriptedServer } from '../http.js';
+import { checkProblem } from '../problem.js';
 
-const PROBLEM_MEMBERS = new Set(['type', 'title', 'status', 'code', 'detail', 'record']);
 const files = role => readdirSync(join(vectorsRoot, 'delivery', role)).filter(f => f.endsWith('.json')).sort();
 const instant = t => Date.parse(t);
 const envelopeOf = jws => JSON.parse(payloadOf(jws).toString('utf8'));
@@ -36,13 +36,15 @@ export async function deliveryCases(adapter, report, { roles, experimental }) {
     for (const file of files(role)) {
       const v = loadJson('delivery', role, file);
       const subset = v.conformance ? 'experimental' : 'core';
-      const meta = { id: `delivery/${role}/${file.slice(0, -5)}`, mode: 'offline', role, subset, refs: v.spec ?? [] };
+      const meta = { id: `delivery/${role}/${file.slice(0, -5)}`, mode: 'offline', role, subset, refs: v.spec ?? [],
+        // The work/v2 apply rules (head, turn, transitions) are not normatively published (D8 amendment); only these vectors state them.
+        ...(subset === 'experimental' ? { basis: 'vector-only', basisNote: `${v.conformance}: the work/v2 lifecycle rules it checks are not published normative text (D8 amendment)` } : {}) };
       if (subset === 'experimental' && !experimental) {
         report.add({ ...meta, status: 'skip', detail: 'experimental work/v2 scenario; run with --experimental to include it' });
         continue;
       }
       const advisories = [];
-      await report.run(meta, () => (role === 'receiver' ? receiver(adapter, v, file) : sender(adapter, v, advisories)));
+      await report.run(meta, () => (role === 'receiver' ? receiver(adapter, v, file, advisories) : sender(adapter, v, advisories)));
       for (const a of advisories) report.advisory({ ...meta, id: meta.id + '#' + a.id, refs: a.refs ?? meta.refs }, a.met, a.detail);
     }
   }
@@ -50,7 +52,7 @@ export async function deliveryCases(adapter, report, { roles, experimental }) {
 
 // ---------- receiver ----------
 
-async function receiver(adapter, v, file) {
+async function receiver(adapter, v, file, advisories) {
   const { params, document } = setup(v);
   const { inbox } = await adapter.call('reset', { role: 'receiver', ...params((a, url) => url) });
   check(typeof inbox === 'string' && /^http:\/\/(127\.0\.0\.1|localhost|\[::1\]):\d+\//.test(inbox), `reset returned no loopback inbox URL (${inbox})`);
@@ -71,7 +73,8 @@ async function receiver(adapter, v, file) {
       const body = req.bodyFill ? Buffer.alloc(req.bodyFill.length, req.bodyFill.octet)
         : req.body !== undefined && req.body !== null ? Buffer.from(req.body, 'utf8') : null;
       const before = (await adapter.call('stats')).incoming;
-      const res = await rawRequest(new URL(new URL(req.url).pathname, inbox).href, { method: req.method, headers: req.headers ?? {}, body });
+      // The inbox URL is opaque binding configuration (https-binding.md §1.2): use exactly what the adapter returned.
+      const res = await rawRequest(inbox, { method: req.method, headers: req.headers ?? {}, body });
       await adapter.call('tick');
       answers.push(res.status === 200 ? res.body.toString('utf8') : null);
       const text = res.body.toString('utf8');
@@ -79,9 +82,17 @@ async function receiver(adapter, v, file) {
       check((res.headers['content-type'] ?? '').split(';')[0].trim().toLowerCase() === exp.contentType, `${at}: content-type ${res.headers['content-type']}`);
       for (const [name, value] of Object.entries(exp.headers ?? {})) {
         const got = res.headers[name];
-        check(value.startsWith('<') ? /^\d+$/.test(got ?? '') : got === value, `${at}: header ${name} is ${got}; expected ${value}`);
+        if (!value.startsWith('<')) check(got === value, `${at}: header ${name} is ${got}; expected ${value}`);
+        else if (/SHOULD/.test(value)) {
+          // e.g. Retry-After for rate-limited and unavailable: SHOULD-level (https-binding.md §2.3).
+          advisories.push({ id: `${name}-header`, refs: ['https-binding.md §2.3'], met: /^\d+$/.test(got ?? ''), detail: `${name}: ${got ?? 'absent'} (${value})` });
+        } else check(/^\d+$/.test(got ?? ''), `${at}: header ${name} is ${got}; expected ${value}`);
       }
-      if (exp.problem) checkProblem(text, exp.problem, res.status, at);
+      if (exp.problem) {
+        const problem = checkProblem(res, { code: exp.problem.code, status: exp.status, at,
+          recordId: body && body.length < 65_537 ? (() => { try { return envelopeOf(body.toString('utf8'))?.id ?? null; } catch { return null; } })() : null });
+        for (const [k, value] of Object.entries(exp.problem)) check(deepEqual(problem[k], value), `${at}: problem ${k} is ${JSON.stringify(problem[k])}; expected ${JSON.stringify(value)}`);
+      }
       const after = (await adapter.call('stats')).incoming;
       if (exp.stored === false || exp.stored === 'unchanged') check(after === before, `${at}: something was stored (${before} → ${after})`);
       if (exp.stored === true) check(after === before + 1, `${at}: expected one new stored record (${before} → ${after})`);
@@ -138,15 +149,6 @@ async function receiver(adapter, v, file) {
     }
   }
   return notes.filter(Boolean).join('; ');
-}
-
-function checkProblem(text, expected, status, at) {
-  let problem;
-  try { problem = JSON.parse(text); } catch { check(false, `${at}: problem body is not JSON`); }
-  for (const [k, value] of Object.entries(expected)) check(deepEqual(problem[k], value), `${at}: problem ${k} is ${JSON.stringify(problem[k])}; expected ${JSON.stringify(value)}`);
-  check(Object.keys(problem).every(k => PROBLEM_MEMBERS.has(k)), `${at}: problem has members outside https-binding §2.3: ${Object.keys(problem).join(', ')}`);
-  check(problem.type === 'https://darep.org/problems/' + problem.code, `${at}: problem type ${problem.type}`);
-  check(problem.status === status && typeof problem.title === 'string', `${at}: problem status/title`);
 }
 
 function checkReceipt(text, er, answered, document, at) {
@@ -212,8 +214,11 @@ async function sender(adapter, v, advisories) {
       if (req) {
         const before = await adapter.call('inspectOutgoing', key);
         check(before.status === 'queued', `${at}: delivery is ${before.status} before the attempt`);
-        server.answer(step.respond);
+        // A redirect points at a loopback trap: a sender that follows it (https-binding.md §2.1, §3) is caught there.
+        const respond = step.respond.headers?.location ? { ...step.respond, headers: { ...step.respond.headers, location: server.trapUrl } } : step.respond;
+        server.answer(respond);
         const { result } = await adapter.call('attempt', key);
+        check(server.trapped.length === 0, `${at}: the sender followed a redirect`);
         check(server.received.length === 1, `${at}: the sender made ${server.received.length} requests for one attempt`);
         const got = server.received[0];
         checkRequest(got, v.records[name].recordBytes, recipient, at);

@@ -20,6 +20,8 @@ Options
   --roles LIST         Comma-separated subset of ${ROLES.join(',')} (default: every role the adapter declares).
   --experimental       Also run the experimental work/v2 delivery scenarios (reported separately).
   --out DIR            Report directory (default: ./darep-conformance-report).
+  --patience SECONDS   Live mode: how long to wait for an expected retry, apply or rejection (default 120).
+                       The spec sets minimum delays only; raise this if your backoff starts later.
   --version            Print the kit version.
 
 Exit status: 0 passes, 1 does not pass, 2 usage or setup error.
@@ -32,7 +34,7 @@ process.on('warning', w => { if (w.name !== 'ExperimentalWarning') console.warn(
 async function main() {
   const { values, positionals } = parseArgs({ allowPositionals: true, options: {
     adapter: { type: 'string' }, roles: { type: 'string' }, experimental: { type: 'boolean' },
-    out: { type: 'string' }, help: { type: 'boolean' }, version: { type: 'boolean' },
+    out: { type: 'string' }, help: { type: 'boolean' }, version: { type: 'boolean' }, patience: { type: 'string' },
   } });
   if (values.version) { console.log(`${kit.name} ${kit.version}`); return 0; }
   const mode = positionals[0];
@@ -72,7 +74,13 @@ async function main() {
     }
     if (modes.includes('live')) {
       const { liveCases } = await import('../src/live/cases.js');
-      await liveCases(adapter, report, { roles, outDir });
+      const patience = Number(values.patience ?? 120);
+      if (!(patience > 0)) { console.error('--patience must be a positive number of seconds'); return 2; }
+      try { await liveCases(adapter, report, { roles, outDir, patience }); }
+      catch (error) {
+        console.error(`Live mode could not run (the kit's own peer or proxies failed): ${error.message}`);
+        return 2;
+      }
     }
   } finally {
     await adapter.close();

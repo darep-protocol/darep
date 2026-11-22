@@ -30,7 +30,8 @@ test('the Node reference adapter passes offline, with the claim wording and scop
   assert.equal(report.claimWording, 'passes the DAREP v0.1 conformance kit (verification aid, not certification)');
   assert.deepEqual(report.result.scope.roles, ['verifier', 'signer', 'receiver', 'sender']);
   assert.ok(report.notCovered.length > 5);
-  assert.ok(report.cases.filter(c => c.subset === 'experimental').every(c => c.status === 'skip'));
+  assert.ok(report.cases.filter(c => c.subset === 'experimental').every(c => c.status === 'skip' && c.basis === 'vector-only'));
+  assert.ok(report.cases.every(c => c.refs.length > 0 && ['normative', 'vector-only'].includes(c.basis)), 'every case is traceable');
 });
 
 const defects = {

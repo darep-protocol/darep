@@ -21,8 +21,10 @@ export class Report {
   }
   role(role, tested, reason = null) { this.roles[role] = { tested, reason }; }
   // status: pass | fail | skip | advisory (a SHOULD that was not met; never a failure)
-  add({ id, title, mode, role, subset = 'core', level = 'MUST', status, refs = [], detail = '' }) {
-    this.cases.push({ id, title: title ?? id, mode, role, subset, level, status, refs, detail });
+  // basis: 'normative' when the cited spec text states the requirement; 'vector-only' when only a vector implies it.
+  add({ id, title, mode, role, subset = 'core', level = 'MUST', status, refs = [], detail = '', basis = 'normative', basisNote = null }) {
+    if (!refs.length) throw new Error(`case ${id} has no spec reference`);
+    this.cases.push({ id, title: title ?? id, mode, role, subset, level, basis, basisNote, status, refs, detail });
   }
   // Run fn as one case. fn returns an optional detail string; Failure means fail, Unsupported means skip.
   async run(meta, fn) {
@@ -52,7 +54,8 @@ export class Report {
     const core = this.cases.filter(c => c.subset === 'core');
     const coreFailures = core.filter(c => c.status === 'fail').length;
     const coreRun = core.filter(c => c.status !== 'skip').length;
-    const tested = ROLES.filter(r => this.roles[r]?.tested);
+    // A role is in the result's scope only if at least one of its core cases actually ran.
+    const tested = ROLES.filter(r => this.roles[r]?.tested && core.some(c => c.role === r && c.status !== 'skip'));
     const passes = coreFailures === 0 && coreRun > 0 && tested.length > 0;
     return { rows, coreFailures, coreRun, tested, passes,
       statement: passes ? `Passes the DAREP v0.1 conformance kit (verification aid, not certification).`
@@ -76,6 +79,7 @@ export class Report {
       cases: this.cases,
       notCovered,
       notes: this.notes,
+      traceability: 'Every case lists the spec clauses it checks (refs). basis "vector-only" marks a check that only a vector implies.',
       disclaimer: 'A verification aid, not certification. Conformance means meeting all applicable normative ' +
         'requirements of DAREP Wire v2; this kit tests a subset of them (see notCovered). Experimental extensions ' +
         '(work/v2, reschedule/v2) are reported separately and do not affect the core result.',
@@ -106,7 +110,8 @@ function markdown(r) {
   out.push(`| Kit | ${r.kit.name} ${r.kit.version} |`);
   out.push(`| Specification | ${r.spec.label}; tag \`${r.spec.tag}\`, \`${r.spec.describe}\`, commit \`${r.spec.commit}\`${r.spec.modified ? ' (spec or vectors modified locally)' : ''} |`);
   out.push(`| Modes | ${r.result.scope.modes.join(', ')} |`);
-  out.push(`| Roles tested | ${Object.entries(r.roles).map(([k, v]) => v.tested ? k : `~~${k}~~ (${v.reason})`).join(', ')} |`);
+  out.push(`| Roles tested | ${Object.entries(r.roles).map(([k, v]) => r.result.scope.roles.includes(k) ? k
+    : `${k}: not tested (${v.tested ? 'every case skipped' : v.reason})`).join('; ')} |`);
   out.push(`| Run | ${r.startedAt} to ${r.finishedAt} |`, '');
   out.push('## Summary', '', '| Subset | Role | Pass | Fail | Skip | Advisory (SHOULD not met) |', '|---|---|---|---|---|---|');
   for (const row of r.summary) out.push(`| ${row.subset} | ${row.role} | ${row.pass} | ${row.fail} | ${row.skip} | ${row.advisory} |`);
@@ -122,13 +127,18 @@ function markdown(r) {
   section('Failures', r.cases.filter(c => c.status === 'fail'), 'None.');
   section('Advisory findings (SHOULD)', r.cases.filter(c => c.status === 'advisory'), 'None.');
   section('Skipped', r.cases.filter(c => c.status === 'skip'), 'None.');
+  const vectorOnly = r.cases.filter(c => c.basis === 'vector-only');
+  out.push('## Checks with no normative text behind them', '',
+    'Every case cites the clauses it checks. These cases exist only because a vector implies them; no published normative text states the rule, so their result says nothing about conformance.', '');
+  if (!vectorOnly.length) out.push('None in this run.', '');
+  else { for (const c of vectorOnly) out.push(`- \`${esc(c.id)}\` (${c.status}): ${esc(c.basisNote)}`); out.push(''); }
   out.push('## Requirements not covered by this kit', '',
     'Passing the kit does not show that these requirements are met. Check them by review or with your own tests.', '');
   for (const item of r.notCovered) out.push(`- **${item.ref}**: ${item.requirement} *${item.why}*`);
   out.push('');
   if (r.notes.length) { out.push('## Notes', ''); for (const n of r.notes) out.push(`- ${n}`); out.push(''); }
-  out.push('## All cases', '', '| Status | Case | Subset | Role | Level | Spec |', '|---|---|---|---|---|---|');
-  for (const c of r.cases) out.push(`| ${c.status} | \`${esc(c.id)}\` | ${c.subset} | ${c.role} | ${c.level} | ${esc(c.refs.join(', '))} |`);
+  out.push('## All cases', '', '| Status | Case | Subset | Role | Level | Basis | Spec |', '|---|---|---|---|---|---|---|');
+  for (const c of r.cases) out.push(`| ${c.status} | \`${esc(c.id)}\` | ${c.subset} | ${c.role} | ${c.level} | ${c.basis} | ${esc(c.refs.join(', '))} |`);
   out.push('', '## What this report means', '', r.disclaimer, '');
   return out.join('\n');
 }

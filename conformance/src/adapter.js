@@ -16,7 +16,10 @@ export class Adapter {
     this.pending = new Map();
     this.nextId = 1;
     this.exited = null;
-    this.child = spawn(command, { cwd, shell: true, stdio: ['pipe', 'pipe', 'pipe'] });
+    // A user-supplied command string runs through the shell, as typed; a built-in is an argv array with no shell.
+    this.child = Array.isArray(command)
+      ? spawn(command[0], command.slice(1), { cwd, stdio: ['pipe', 'pipe', 'pipe'] })
+      : spawn(command, { cwd, shell: true, stdio: ['pipe', 'pipe', 'pipe'] });
     this.child.stderr.setEncoding('utf8');
     this.child.stderr.on('data', chunk => log(chunk));
     this.child.on('exit', (code, signal) => {

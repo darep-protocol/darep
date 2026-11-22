@@ -69,6 +69,7 @@ The report states:
 - **the scope**: the roles tested (verifier, signer, receiver, sender), the modes, and the subset. Only the core subset decides the result;
 - **the revision**: the spec label, the git tag, describe output and commit of the checkout the kit ran from, and whether `spec/` or `vectors/` were modified locally, plus the kit version;
 - **every case** with its status, spec references and details: `pass`, `fail`, `skip` (your adapter does not support what the case needs), or `advisory` (a SHOULD-level expectation that was not met, which never fails a run);
+- **traceability**: each case cites the clauses it checks (for example `delivery.md §6` or `records.md TA-2`). A case marked `vector-only` checks a rule that only a vector implies, with no published normative text behind it (today: the experimental `work/v2` scenarios); its result says nothing about conformance;
 - **requirements not covered**: what passing the kit does not show, such as retention for 30 days, power-loss durability, TLS, identity-document serving and key rotation.
 
 If you state the result publicly, use the exact wording above together with the kit version, the roles and the spec revision, and link to the report if you can. See [TRADEMARK.md](../TRADEMARK.md#conformance-kit-results). Do not call it certification, compliance or endorsement.
@@ -80,12 +81,13 @@ darep-conformance <offline|live|all> --adapter <command|node-reference|python-re
   --roles verifier,signer,receiver,sender   test only these roles (default: all the adapter declares)
   --experimental                            include the experimental work/v2 delivery scenarios
   --out DIR                                 report directory (default ./darep-conformance-report)
+  --patience SECONDS                        live mode: longest wait for an expected event (default 120)
 ```
 
 ## Limits worth knowing
 
 - Live mode runs on loopback `http`, which the HTTPS binding allows for local testing only (https-binding.md §1.3). It does not test TLS.
-- Live mode takes about 20 seconds because it waits for real retries. It observes only the first retries of your backoff schedule.
+- Live mode takes about 30 seconds against the reference implementations, because it waits for real retries. The spec sets only minimum delays, so the kit waits up to `--patience` seconds (default 120) for each expected retry, apply outcome or rejection record; a failure that says "not observed within N s" may mean your schedule is slower, so raise it. Only the first retries of your backoff schedule are observed.
 - A restart in live mode restarts your process; it cannot simulate a power loss.
 - The kit tests what it can observe. A conformant implementation must also meet the requirements the report lists as not covered.
 - Found a case where the kit or a vector seems to contradict the spec? Open an issue. The spec text wins over the kit.
