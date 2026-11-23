@@ -62,7 +62,7 @@ Identity documents are referenced by full URLs (`kid`/`id`). If the recommended 
 
 Every URL in this binding MUST use the `https` scheme. Clients MUST validate the server certificate chain and host name. TLS 1.3 is RECOMMENDED and TLS 1.2 is the minimum.
 
-For local testing only, a provider MAY use `http` when the host is a loopback address (`127.0.0.1`, `[::1]` or `localhost`). A sender MUST refuse an `http` URL for any other host.
+For local testing only, a provider MAY use `http` for its inbox when the host is a loopback address (`127.0.0.1`, `[::1]` or `localhost`). A sender MUST refuse an `http` URL for any other host. This exception covers inbox delivery only. It does not extend to serving identity documents (§5): a document's `id` is an `https:` URL ([Signed records](records.md) §5.1) and MUST equal the request URL (§5.2), so a document served over `http` does not satisfy §5.2.
 
 TLS protects the transfer only. Authenticity comes from the record signature, and receivers MUST NOT treat the TLS client identity, IP address or any request header as the sender's identity.
 
@@ -222,3 +222,7 @@ Media-type registration remains deferred. The identity-document path is provisio
 - **Protocol rename.** Renamed the protocol to DAREP, with `darep-*` `typ` strings and `https://darep.org/` URIs, per the D1 amendment dated 2026-11-21; behavior is unchanged.
 - **Envelope version member.** Renamed the record envelope protocol-version member `ack` to `darep`, retaining the value `"2"`, per the D3 amendment dated 2026-11-21.
 - **Remaining protocol identifiers.** Renamed the identity-document version member to `darep` (value `"2"`), the well-known path to `/.well-known/darep/<name>`, the inbox path to `/darep/v2/inbox`, and the recipient header to `Darep-Recipient`, per the amendment dated 2026-11-21; behavior is unchanged.
+
+## Errata 2026-11-23 (v0.1.1)
+
+- #17: Stated that the loopback `http` exception covers inbox delivery only. Identity-document serving stays HTTPS, because §5.2 requires the document `id`, an `https:` URL, to equal the request URL (§1.3).

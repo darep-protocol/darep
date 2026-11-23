@@ -292,17 +292,17 @@ An identity document says which keys speak for which addresses. In A1 it exists 
 | `darep` | `"2"`. |
 | `id` | Absolute `https:` URL satisfying K-1's normalized URI rules, with no fragment (`#`), no query (`?`) and no userinfo, of at most 2048 characters. RECOMMENDED form: `https://<domain>/.well-known/darep/<name>`. |
 | `addresses` | 1 or more `acct:` addresses this document speaks for (TA-4). |
-| `updated` | Instant (§7.1) of the last change. Informational. |
+| `updated` | REQUIRED. Instant (§7.1) of the last change. Informational. |
 | `keys` | 1 or more key entries, each with a distinct `id`. |
 | `keys[].id` | The document `id` + `#` + a fragment of 1–64 characters from `[A-Za-z0-9._-]`. This is the `kid` a signer uses. |
 | `keys[].purpose` | Non-empty array of distinct values from §5.2. |
-| `keys[].publicKeyJwk` | A public P-256 key as a JWK ([RFC 7517](https://www.rfc-editor.org/rfc/rfc7517)): exactly `kty: "EC"`, `crv: "P-256"`, `x`, `y`. It MUST NOT contain `d`. |
+| `keys[].publicKeyJwk` | A public P-256 key as a JWK ([RFC 7517](https://www.rfc-editor.org/rfc/rfc7517)): exactly `kty: "EC"`, `crv: "P-256"`, `x`, `y`. It MUST NOT contain `d`. `x` and `y` are each the canonical unpadded base64url encoding of a full 32-octet coordinate ([RFC 7518 §6.2.1.2–6.2.1.3](https://www.rfc-editor.org/rfc/rfc7518#section-6.2.1.2)): exactly 43 characters from `[A-Za-z0-9_-]`, with zero unused bits in the last character, as S-1 requires for JWS segments. |
 | `keys[].validFrom` | Instant. The key signs nothing dated earlier. |
 | `keys[].validUntil` | OPTIONAL instant, later than `validFrom`. The key signs nothing dated at or after it. Set it to retire a key in a planned rotation. |
 | `keys[].revoked` | OPTIONAL instant at which the owner declared the key compromised or withdrawn. See §5.4. |
 | `keys[].account` | Reserved for a linked external account as a [CAIP-10](https://standards.chainagnostic.org/CAIPs/caip-10) identifier. Not built in A1. |
 
-A verifier MUST ignore document members it does not understand. The document is not itself signed in A1. Its authority comes from the owner's pin (TA-2).
+A verifier MUST ignore document members it does not understand, including unknown members of a key entry. This does not relax `publicKeyJwk`, whose members are exact. The document is not itself signed in A1. Its authority comes from the owner's pin (TA-2).
 
 ### 5.2 Key purposes
 
@@ -515,3 +515,7 @@ Normative publication of the experimental `work/v2` extension remains future wor
 - #18: Clarified URI-slot query and fragment rules and step-5 key-resolution failures (§3.2).
 - #19: Explained local selection of the shared test-only IPv4 policy (§3.2, §8 inputs).
 - #20: Distinguished the receipt signing-time obligation from verifier rejection conditions (§4.4).
+
+## Errata 2026-11-23 (v0.1.1)
+
+- From #8: Stated in §5.1 that `updated` is REQUIRED, as the 2026-11-21 P-0 errata already say; that `x` and `y` are the canonical unpadded base64url encoding of a full 32-octet coordinate (43 characters, zero unused bits), which the v0.1 pin cases `jwk-x-padded`, `jwk-x-short`, `jwk-x-noncanonical` and their `y` counterparts already require; and that unknown key-entry members are ignored like other unknown document members, while `publicKeyJwk` stays exact.
