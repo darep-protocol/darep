@@ -18,6 +18,8 @@ Clarifications and editorial fixes only; Wire v2 conformance is unchanged.
 - #23: Isolate the multi-recipient receipt source check with a valid receipt from another recipient.
 - #24: Qualify the deterministic failure-order explanation by its existing exceptions.
 - #25: Document both test-key schemas and equivalent loaders into a common normalized view.
+- #17: Limit the loopback `http` exception to inbox delivery; identity-document serving stays HTTPS.
+- From #8: State in records §5.1 that `updated` is REQUIRED, that JWK coordinates are canonical 43-character unpadded base64url (as the v0.1 pin cases already require), and that unknown key-entry members are ignored.
 
 ## Spec v0.1 = DAREP Wire v2 (frozen), 2026-11-21
 
