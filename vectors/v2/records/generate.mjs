@@ -631,11 +631,57 @@ for (const field of ['x', 'y']) {
   });
 }
 
+// ---------- harness self-test fixtures ----------
+// Not conformance vectors: they check the runners' own comparison modes (README "Harness self-test fixtures").
+const selftest = [];
+{
+  const id = uuid('selftest-numbers');
+  const head = { darep: '2', id, source: BOB, type: 'https://vectors.test/ext/numbers/v1#sample', time: T, to: [CAROL],
+    thread: id, inReplyTo: null, expires: EXP, ext: {}, required: [], grant: { id: 'grant-7f3a', actor: 'agent' } };
+  // Number lexemes that differ from their shortest form, so the payload bytes still pin the exact text (NC1).
+  const text = JSON.stringify(head).slice(0, -1) + ',"data":{"ratio":0.10,"hundred":1e2,"amount":123456.789,"small":[2.5e-3]}}';
+  const p = Buffer.from(text, 'utf8');
+  const before = vectors.length;
+  add('selftest/numbers-binary64', 'Harness self-test fixture, not a conformance vector. Numbers in expected.record are compared after rounding both sides to IEEE 754 binary64 (expected.numbers). A verifier that keeps less precision, such as binary32, must fail it.',
+    '§8, J-1', { payload: p, key: keys.bob, expected: { ...accept(p, keys.bob.kid), numbers: 'binary64' } });
+  selftest.push(...vectors.splice(before));
+}
+
+// Pin updates (§5.5): an old and a new snapshot of one identity document, and whether the update may be a routine
+// rotation. Only rules the frozen text states are used here; address-set changes other than removal are left out.
+const pinUpdates = [];
+{
+  const old = identities[0];
+  const clone = () => JSON.parse(JSON.stringify(old));
+  const keyIndex = kid => old.keys.findIndex(k => k.id === kid);
+  const update = (name, expected, description, mutate, base = clone) => {
+    const before = base();
+    const after = JSON.parse(JSON.stringify(before));
+    mutate(after);
+    pinUpdates.push({ name, description, spec: '§5.5', expected, level: expected === 'routine' ? 'SHOULD' : 'MUST', old: before, new: after });
+  };
+  const newKey = { id: BOB_DOC + '#sig-2026-12', purpose: ['record'], publicKeyJwk: keys.dave.pub, validFrom: '2026-12-01T00:00:00Z' };
+  update('unchanged', 'routine', 'The same snapshot again.', () => {});
+  update('key-added', 'routine', 'A new key is added; every existing key is unchanged.', d => { d.keys.push(newKey); d.updated = '2026-11-20T00:00:00Z'; });
+  update('valid-until-earlier', 'routine', 'An existing validUntil moves earlier.', d => { d.keys[keyIndex(keys.bobOld.kid)].validUntil = '2026-11-10T00:00:00Z'; });
+  update('revoked-added', 'routine', 'An existing key gains revoked.', d => { d.keys[keyIndex(keys.bob.kid)].revoked = '2026-11-19T00:00:00Z'; });
+  update('key-removed', 'owner-decision', 'An existing key is missing from the new snapshot.', d => { d.keys.splice(keyIndex(keys.bobOld.kid), 1); });
+  update('public-key-changed', 'owner-decision', 'An existing key id now has a different publicKeyJwk.', d => { d.keys[keyIndex(keys.bob.kid)].publicKeyJwk = keys.dave.pub; });
+  update('purpose-changed', 'owner-decision', 'An existing key gains a purpose.', d => { d.keys[keyIndex(keys.bob.kid)].purpose = ['record', 'provider']; });
+  update('valid-from-changed', 'owner-decision', 'An existing key has a different validFrom.', d => { d.keys[keyIndex(keys.bob.kid)].validFrom = '2026-10-01T00:00:00Z'; });
+  update('valid-until-later', 'owner-decision', 'An existing validUntil moves later.', d => { d.keys[keyIndex(keys.bobOld.kid)].validUntil = '2026-12-15T00:00:00Z'; });
+  update('valid-until-removed', 'owner-decision', 'An existing validUntil is removed, which moves it later.', d => { delete d.keys[keyIndex(keys.bobOld.kid)].validUntil; });
+  update('revoked-removed', 'owner-decision', 'An existing revoked is removed.', d => { delete d.keys[keyIndex(keys.bobRevoked.kid)].revoked; });
+  update('id-changed', 'owner-decision', 'The document id differs.', d => { d.id = 'https://bob.vectors.test/.well-known/darep/robert'; });
+  update('address-removed', 'owner-decision', 'An address listed in the old snapshot is missing from the new one.',
+    d => { d.addresses = [BOB]; }, () => ({ ...clone(), addresses: [BOB, 'acct:robert@vectors.test'] }));
+}
+
 // ---------- write ----------
 
 selfTest();
 const sorted = obj => JSON.stringify(obj, null, 2) + '\n';
-for (const dir of ['positive', 'negative']) {
+for (const dir of ['positive', 'negative', 'selftest']) {
   await rm(new URL(dir + '/', here), { recursive: true, force: true });
   await mkdir(new URL(dir + '/', here), { recursive: true });
 }
@@ -653,6 +699,11 @@ await writeFile(new URL('identities.json', here), sorted({
 await writeFile(new URL('invalid-identities.json', here), sorted({
   usage: 'Invalid identity documents that MUST fail pin validation (records.md §5.1, §5.3 P-0).',
   cases: invalidIdentities,
+}));
+for (const v of selftest) await writeFile(new URL(v.name + '.json', here), sorted(v));
+await writeFile(new URL('selftest/pin-updates.json', here), sorted({
+  usage: 'Harness self-test fixture for the optional checkUpdate adapter operation, not conformance vectors. Each case is an old and a new snapshot of one pinned identity document (records.md §5.5). expected is routine (a monotonic update, which an implementation SHOULD accept without a new trust decision) or owner-decision (any other change, which MUST be presented to the owner).',
+  cases: pinUpdates,
 }));
 const index = [];
 for (const v of vectors) {

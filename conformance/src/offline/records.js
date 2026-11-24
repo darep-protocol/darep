@@ -1,13 +1,30 @@
 // Offline mode, verifier and signer roles: the records vectors through the adapter.
-import { loadJson } from '../repo.js';
+import { existsSync, readdirSync } from 'node:fs';
+import { join } from 'node:path';
+import { loadJson, vectorsRoot } from '../repo.js';
 import { check } from '../report.js';
+import { Unsupported } from '../adapter.js';
 import { deepEqual, headerOf, payloadOf, referenceVerify, sha256 } from '../check.js';
 
 const REFS = ['records.md §8'];
 
-export async function verifierCases(adapter, report) {
+// Numbers reach the kit through the adapter's JSON line, so the kit always holds them as binary64 values; deepEqual
+// therefore compares them in binary64 in either mode. expected.numbers is still validated, so a vector asking for a
+// mode the kit does not know fails loudly instead of passing.
+function recordMatches(got, exp) {
+  check(['exact', 'binary64'].includes(exp.numbers ?? 'exact'), `unknown expected.numbers mode ${exp.numbers}`);
+  return deepEqual(got, exp.record);
+}
+
+// selftest: run the harness self-test fixtures (records/selftest/) instead of the conformance vectors.
+export async function verifierCases(adapter, report, { selftest = false } = {}) {
   const meta = (id, refs = REFS) => ({ id, mode: 'offline', role: 'verifier', subset: 'core', refs });
   const { documents } = loadJson('records', 'identities.json');
+  const vectors = selftest
+    ? readdirSync(join(vectorsRoot, 'records', 'selftest')).filter(f => f.endsWith('.json') && f !== 'pin-updates.json')
+      .sort().map(f => ({ name: 'selftest/' + f.slice(0, -5) }))
+    : loadJson('records', 'index.json').vectors;
+  if (selftest) return recordCases(adapter, report, meta, documents, vectors);
   for (const document of documents) {
     await report.run(meta('identities/valid/' + document.id.split('/').pop(), ['records.md §5.1', '§5.3 P-0']), async () => {
       const out = await adapter.call('validateIdentity', { document });
@@ -20,7 +37,11 @@ export async function verifierCases(adapter, report) {
       check(out.verdict === 'reject', 'accepted an invalid identity document as a pin');
     });
   }
-  for (const { name } of loadJson('records', 'index.json').vectors) {
+  await recordCases(adapter, report, meta, documents, vectors);
+}
+
+async function recordCases(adapter, report, meta, documents, vectors) {
+  for (const { name } of vectors) {
     const v = loadJson('records', name + '.json');
     await report.run(meta('records/' + name, [v.spec, 'records.md §8'].filter(Boolean)), async () => {
       const c = v.context;
@@ -37,10 +58,34 @@ export async function verifierCases(adapter, report) {
       }
       check(out.verdict === 'accept', `rejected with ${out.code}; expected accept`);
       check(out.kid === exp.kid, `kid ${out.kid}; expected ${exp.kid}`);
-      check(deepEqual(out.record, exp.record), 'parsed record differs from the vector');
+      check(recordMatches(out.record, exp), 'parsed record differs from the vector');
       check(out.payloadSha256 === v.payloadSha256, 'payload digest differs (bytes re-serialized? NC1)');
       return 'accept';
     });
+  }
+}
+
+// Pin updates (records.md §5.5) through the optional checkUpdate operation. An owner-decision expectation is a MUST;
+// routine is a SHOULD, reported as advisory. Runs records/pin-updates.json when the vectors have it, or the self-test
+// fixture with selftest.
+export async function pinUpdateCases(adapter, report, { selftest = false } = {}) {
+  const file = selftest ? ['selftest', 'pin-updates.json'] : ['pin-updates.json'];
+  if (!existsSync(join(vectorsRoot, 'records', ...file))) return;
+  for (const c of loadJson('records', ...file).cases) {
+    const meta = { id: `pin-update/${selftest ? 'selftest/' : ''}${c.name}`, mode: 'offline', role: 'verifier', subset: 'core',
+      refs: ['records.md ' + c.spec], optional: true, level: c.level };
+    let result;
+    try {
+      ({ result } = await adapter.call('checkUpdate', { old: c.old, new: c.new }));
+    } catch (error) {
+      if (error instanceof Unsupported) { report.add({ ...meta, status: 'skip', detail: 'the adapter has no checkUpdate operation' }); continue; }
+      report.add({ ...meta, status: 'fail', detail: error.message });
+      continue;
+    }
+    const detail = `${c.description} Expected ${c.expected}; got ${result}.`;
+    if (!['routine', 'owner-decision'].includes(result)) report.add({ ...meta, status: 'fail', detail: `checkUpdate returned ${JSON.stringify(result)}` });
+    else if (c.level === 'SHOULD') report.advisory(meta, result === c.expected, detail);
+    else report.add({ ...meta, status: result === c.expected ? 'pass' : 'fail', detail });
   }
 }
 

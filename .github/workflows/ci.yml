@@ -98,6 +98,8 @@ jobs:
         run: npx darep-conformance all --adapter node-reference --experimental --out conformance-report/node
       - name: Python peer, offline and live
         run: npx darep-conformance all --adapter python-reference --experimental --out conformance-report/python
+      - name: Python peer, harness self-test fixtures
+        run: npx darep-conformance offline --adapter python-reference --selftest --out conformance-report/python-selftest
       - uses: actions/upload-artifact@v4
         if: always()
         with:

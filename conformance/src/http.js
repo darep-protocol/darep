@@ -38,7 +38,16 @@ export function readAll(stream, limit = 1 << 20) {
 export const headerCount = (rawHeaders, name) =>
   rawHeaders.filter((v, i) => i % 2 === 0 && v.toLowerCase() === name).length;
 
-// A loopback endpoint that answers each request from a script and records what it received.
+// The exact response octets of a respond.raw script: text (UTF-8), base64 or fill segments, in order.
+export function rawOctets(raw) {
+  return Buffer.concat(raw.segments.map(s => s.text !== undefined ? Buffer.from(s.text, 'utf8')
+    : s.base64 !== undefined ? Buffer.from(s.base64, 'base64') : Buffer.alloc(s.fill.length, s.fill.octet)));
+}
+
+// A loopback endpoint that answers each request from a script and records what it received. An answer with raw
+// ({ segments, end }) is written to the socket octet for octet, bypassing the HTTP server's own framing, and the
+// connection is then closed ("close") or reset ("reset"): status line, headers, transfer coding, truncation and size
+// are all the vector's.
 export async function scriptedServer() {
   const received = [];
   let script = [];
@@ -47,6 +56,11 @@ export async function scriptedServer() {
     received.push({ method: req.method, url: req.url, headers: req.headers, rawHeaders: req.rawHeaders, body });
     const answer = script.shift() ?? { status: 503, headers: { 'retry-after': '1' }, body: '' };
     if (answer.connection) { req.socket.destroy(); return; }
+    if (answer.raw) {
+      const socket = req.socket;
+      socket.write(rawOctets(answer.raw), () => (answer.raw.end === 'reset' ? socket.resetAndDestroy() : socket.end()));
+      return;
+    }
     res.writeHead(answer.status, answer.headers ?? {});
     res.end(answer.body ?? '');
   });

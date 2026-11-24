@@ -49,6 +49,32 @@ for (const [name, expected] of Object.entries(defects)) {
   });
 }
 
+test('the harness self-test fixtures pass on the Node reference adapter, and are not a conformance result', async () => {
+  const { code, report } = await run('node-reference', {}, ['--selftest']);
+  assert.equal(code, 0, failed(report).join(', '));
+  assert.equal(report.selftest, true);
+  assert.equal(report.claimWording, null);
+  assert.match(report.result.statement, /Not a conformance result/);
+  assert.ok(report.cases.every(c => c.id.includes('selftest/')), 'only self-test fixtures run');
+  assert.ok(report.cases.some(c => c.id === 'pin-update/selftest/key-removed' && c.status === 'pass'));
+});
+
+const selftestDefects = {
+  'outcome-by-id': ['delivery/selftest/receiver/same-id-two-sources'],
+  'lenient-body': ['delivery/selftest/receiver/binary-body'],
+  'naive-http-client': ['delivery/selftest/sender/raw-framing'],
+  'verify-binary32': ['records/selftest/numbers-binary64'],
+  'update-always-routine': ['pin-update/selftest/key-removed', 'pin-update/selftest/address-removed', 'pin-update/selftest/valid-until-later'],
+};
+for (const [name, expected] of Object.entries(selftestDefects)) {
+  test(`harness defect "${name}" is caught by the self-test fixtures`, async () => {
+    const { code, report } = await run(`"${process.execPath}" "${mutant}"`, { DAREP_MUTANT: name }, ['--selftest']);
+    assert.equal(code, 1);
+    const ids = failed(report);
+    for (const id of expected) assert.ok(ids.includes(id), `${id} not caught: ${ids.join(', ')}`);
+  });
+}
+
 test('roles the adapter does not declare are reported as not tested', async () => {
   const { report } = await run('node-reference', {}, ['--roles', 'verifier']);
   assert.equal(report.roles.verifier.tested, true);

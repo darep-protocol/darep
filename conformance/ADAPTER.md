@@ -17,7 +17,7 @@ Instants are RFC 3339 strings such as `2026-11-20T10:00:30Z`. Records, receipts 
 | Role | Operations | Mode |
 |---|---|---|
 | any | `describe`, `stop` | both |
-| verifier | `verify`, `validateIdentity` | offline |
+| verifier | `verify`, `validateIdentity`; optionally `checkUpdate` | offline |
 | signer | `sign` | offline |
 | receiver | `reset`, `setClock`, `tick`, `stats`, `inspectIncoming`; optionally `fault`, `inspectThread`, `seedOutgoing` | offline |
 | sender | `reset`, `setClock`, `tick`, `queueSigned`, `attempt`, `inspectOutgoing`, `due` | offline |
@@ -37,6 +37,8 @@ The roles follow the spec: a verifier and a signer as in [records.md §11](../sp
 Run [records.md §8](../spec/records.md#8-verification-procedure-and-codes) on `jws`. `context` is `{ typ: [..], mode: "admission" | "evidence", now, receiver, understood: [..], answered }`, as in the [records vectors](../vectors/v2/records/README.md#vector-format); `receiver` and `answered` may be `null`. `identities` is the list of pinned identity documents. `record` is the parsed payload, `payloadSha256` the lowercase hex SHA-256 of the exact payload bytes, `code` a registry code.
 
 **`validateIdentity`** `{ document }` → `{ verdict: "accept" | "reject" }`. Would you accept this identity document as a pin (records.md §5.1, P-0)?
+
+**`checkUpdate`** `{ old, new }` → `{ result: "routine" | "owner-decision" }`. Optional. `old` is the pinned identity document and `new` a newer snapshot of it. Answer `routine` if you would accept `new` as a routine rotation with no new trust decision, and `owner-decision` if you would present it to the owner as a new trust decision ([records.md §5.5](../spec/records.md#55-updating-a-pinned-snapshot-in-a1)). Cases that expect `owner-decision` are MUST-level; cases that expect `routine` are SHOULD-level and only advisory. Without it, the pin-update cases are skipped.
 
 **`sign`** `{ payload, typ, kid, privateJwk }` → `{ jws }`. Serialize `payload` (an envelope object) your own way, sign it with the P-256 private JWK under `kid` and `typ`, and return the compact JWS. The kit checks it with the spec's reference verifier and compares the signed payload with `payload`.
 
@@ -71,7 +73,7 @@ A receiver starts an HTTP inbox on loopback and returns its URL; the kit posts t
 
 **`fault`** `{ kind: "rate-limited" | "unavailable", source? }` → `{}`. Optional. Make the next deliveries fail capacity checks (C3) with that code. Without it, `reject-rate-limited` and `reject-unavailable` are skipped.
 
-**`inspectThread`** `{ thread }` → `{ head, applyOrder: [ids] }`. Optional; used for apply-order checks.
+**`inspectThread`** `{ thread }` → `{ head, applyOrder: [ids], applied: [{ source, id }] }`. Optional; used for apply-order checks. `applied` lists the same records as `applyOrder`, with their sources; record ids are unique per source only (delivery.md §6), so without it the kit cannot check the apply order of a vector that reuses an id.
 
 **`seedOutgoing`** `{ recordBytes }` → `{}`. Optional, experimental scenarios only: a record this party already sent and applied.
 

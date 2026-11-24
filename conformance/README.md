@@ -82,6 +82,8 @@ darep-conformance <offline|live|all> --adapter <command|node-reference|python-re
   --experimental                            include the experimental work/v2 delivery scenarios
   --out DIR                                 report directory (default ./darep-conformance-report)
   --patience SECONDS                        live mode: longest wait for an expected event (default 120)
+  --selftest                                offline only: run the harness self-test fixtures instead of the
+                                            vectors (checks the kit's runners; not a conformance result)
 ```
 
 ## Limits worth knowing
@@ -98,4 +100,4 @@ darep-conformance <offline|live|all> --adapter <command|node-reference|python-re
 npm test --workspace conformance
 ```
 
-The self-test runs the kit against the Node reference adapter and against [deliberately broken variants](test/mutant-adapter.js) of it, to show that the checks can fail.
+The self-test runs the kit against the Node reference adapter and against [deliberately broken variants](test/mutant-adapter.js) of it, to show that the checks can fail. With `--selftest`, the kit runs the harness self-test fixtures in `vectors/v2/records/selftest/` and `vectors/v2/delivery/selftest/` instead of the vectors; the self-test uses that mode to show that source-qualified record keys, `bodyBase64` request bodies, raw response framing, binary64 number comparison and the `checkUpdate` operation each catch a broken variant. CI also runs `--selftest` against the Python adapter.

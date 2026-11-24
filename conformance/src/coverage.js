@@ -2,7 +2,7 @@
 // mistaken for a complete conformance determination.
 export const notCovered = [
   { ref: 'records.md §5.4–§5.5', requirement: 'Key rotation, revocation handling over time, and monotonic updates of a pinned identity document.',
-    why: 'The adapter contract has no pin-update operation; the vectors cover revoked and retired keys at verification time only.' },
+    why: 'The adapter contract has an optional checkUpdate operation, but there are no pin-update vectors yet (only harness self-test fixtures); the vectors cover revoked and retired keys at verification time only.' },
   { ref: 'records.md §4, §8 (signer)', requirement: 'A signer refuses to produce records that fail verification, and selects a key valid for the purpose at the record time.',
     why: 'Signer cases check that what the implementation signs verifies; they do not ask it to sign invalid envelopes.' },
   { ref: 'delivery.md §4.1', requirement: 'Durable storage that survives a host power loss before a receipt is issued.',

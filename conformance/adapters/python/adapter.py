@@ -105,6 +105,11 @@ def validate_identity(p):
     return {"verdict": "accept"}
 
 
+def check_update(p):
+    """records.md §5.5: may the new snapshot replace the pinned one as a routine rotation?"""
+    return {"result": "routine" if wire.is_monotonic_update(p["old"], p["new"]) else "owner-decision"}
+
+
 def sign(p):
     key = mailbox_db.private_key_from_jwk(p["privateJwk"])
     return {"jws": wire.sign(wire.serialize(p["payload"]), key, p["kid"], p["typ"])}
@@ -195,10 +200,11 @@ def inspect_thread(p):
     s = store()
     with s.connection() as db:
         state = s.state(db, p["thread"])
-    order = [r["rid"] for r in rows(
-        "SELECT r.rid FROM apply_log l JOIN records r USING(seq) WHERE l.outcome='applied' AND r.thread=? "
-        "AND r.typ=? ORDER BY l.id", p["thread"], wire.TYP_EVENT)]
-    return {"head": (state or {}).get("head"), "applyOrder": order}
+    applied = rows(
+        "SELECT r.source, r.rid FROM apply_log l JOIN records r USING(seq) WHERE l.outcome='applied' AND r.thread=? "
+        "AND r.typ=? ORDER BY l.id", p["thread"], wire.TYP_EVENT)
+    return {"head": (state or {}).get("head"), "applyOrder": [r["rid"] for r in applied],
+            "applied": [{"source": r["source"], "id": r["rid"]} for r in applied]}
 
 
 def queue_signed(p):
@@ -310,7 +316,7 @@ def stop(_):
 
 
 OPS = {
-    "describe": describe, "verify": verify, "validateIdentity": validate_identity, "sign": sign, "reset": reset,
+    "describe": describe, "verify": verify, "validateIdentity": validate_identity, "checkUpdate": check_update, "sign": sign, "reset": reset,
     "setClock": set_clock, "fault": fault, "seedOutgoing": seed_outgoing, "tick": tick, "stats": stats,
     "inspectIncoming": inspect_incoming, "inspectThread": inspect_thread, "queueSigned": queue_signed,
     "attempt": attempt, "inspectOutgoing": inspect_outgoing, "due": due, "liveStart": live_start, "send": send,

@@ -37,6 +37,7 @@ An `attacker` key exists in `keys.json` with `kid: null` and is deliberately abs
 | `invalid-identities.json` | Negative identity-document cases that MUST fail pin validation (records.md §5.1, §5.3 P-0). |
 | `index.json` | Every vector's name and expected verdict and code. |
 | `positive/*.json`, `negative/*.json` | One vector each. |
+| `selftest/` | Harness self-test fixtures, not conformance vectors (see below). Not listed in `index.json`. |
 | `keys.json` | Test keys (see above). Verifiers do not need this file. |
 | `generate.mjs` | Writes all of the above. |
 | `check.mjs` | Reference verifier: records.md §8, one numbered step per check. It also validates `identities.json` as pins (P-0) and prints why each rejection fired. |
@@ -61,10 +62,12 @@ An `attacker` key exists in `keys.json` with `kid: null` and is deliberately abs
   "payloadUtf8": "{\n \"darep\": \"2\", …",  // null when the payload is not valid UTF-8; then payloadHex
   "payloadSha256": "…",                // SHA-256 of the exact payload bytes
   "expected": { "verdict": "reject", "code": "expired" }
-  // positives: { "verdict": "accept", "kid": "…", "record": { …parsed payload… } }
+  // positives: { "verdict": "accept", "kid": "…", "record": { …parsed payload… }, "numbers"?: "exact" | "binary64" }
   // positive/receipt also has "receiptFor": the vector whose payloadSha256 it must equal
 }
 ```
+
+`expected.numbers` says how runners compare the numbers in `expected.record` with the parsed record. Absent or `"exact"`, the values must be equal. `"binary64"` rounds the numbers on both sides to IEEE 754 binary64 first, for payloads whose number lexemes carry more precision than binary64 (a parser that keeps arbitrary-size integers, such as Python's, would otherwise differ from one that does not). The exact lexemes stay pinned by `payloadUtf8` and `payloadSha256` (NC1).
 
 `headerUtf8`, `payloadUtf8` and `payloadSha256` exist for readers and cross-checks. A verifier under test should be given only `jws`, `context` and `identities.json`.
 
@@ -96,5 +99,9 @@ Work and reschedule payloads here illustrate signed envelopes; passing these rec
 | | `kid-uppercase-host`, `kid-hyphen-host`, `kid-single-label-host`, `kid-default-port`, `kid-dot-segment`, `kid-hex-ipv4`, `kid-octal-ipv4`, `kid-userinfo` → `bad-header` |
 | | `type-uppercase-host`, `type-trailing-hyphen-host`, `type-default-port`, `type-dot-segment`, `type-userinfo` → `malformed` |
 | | Pin validation (`invalid-identities.json`): `id-with-query`, `id-with-empty-query`, `id-with-empty-fragment`, `id-uppercase-host`, `id-default-port`, plus missing/wrong-type fields, empty keys, invalid addresses, key IDs, purposes, instants, validity ordering and JWK coordinates → reject (P-0) |
+
+## Harness self-test fixtures
+
+`selftest/` holds fixtures that check the vector runners, not implementations: `numbers-binary64.json` (a records vector in the format above, with `expected.numbers: "binary64"`) and `pin-updates.json` (cases for the conformance kit's optional `checkUpdate` adapter operation: an old and a new snapshot of one identity document, and whether records.md §5.5 lets the update be a routine rotation, a SHOULD, or requires an owner decision, a MUST). They use only behaviour the frozen text already fixes. Each runner's own tests show a deliberately wrong implementation failing them: `check.mjs`, `reference/node/test/records-vectors.test.js`, `reference/python/test_peer.py` and the kit's `--selftest` mode.
 
 Rejection codes are defined in the code registry, [delivery.md §5](../../../spec/delivery.md#5-rejections-and-the-code-registry). Delivery-contract vectors (deduplication, ordering, problem+json, sender behaviour) belong to `vectors/v2/delivery/`. `check.mjs` exports `verifyRecord`, which the delivery generator's `--check` runs over every record in those vectors.

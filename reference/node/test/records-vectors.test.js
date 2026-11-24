@@ -19,11 +19,24 @@ assert.equal(new Set(documents.map(d => d.id)).size, documents.length);
 assert.equal(new Set(documents.flatMap(d => d.addresses)).size, documents.flatMap(d => d.addresses).length);
 const resolve = id => documents.find(d => d.id === id) ?? null;
 
-function run(vector) {
+// expected.numbers "binary64" compares numbers after rounding both sides to binary64; a JavaScript number already is
+// one, so only the comparison changes (no -0/+0 distinction). Exact lexemes stay pinned by payloadUtf8 (NC1).
+function assertRecord(got, expected, numbers = 'exact') {
+  assert.ok(['exact', 'binary64'].includes(numbers), 'unknown expected.numbers mode ' + numbers);
+  if (numbers === 'exact') return assert.deepEqual(got, expected);
+  const same = (a, b) => typeof a === 'number' || typeof b === 'number' ? typeof a === typeof b && a === b
+    : Array.isArray(a) || Array.isArray(b) ? Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((x, i) => same(x, b[i]))
+    : a && b && typeof a === 'object' && typeof b === 'object'
+      ? Object.keys(a).length === Object.keys(b).length && Object.keys(a).every(k => Object.hasOwn(b, k) && same(a[k], b[k]))
+      : a === b;
+  assert.ok(same(got, expected), 'parsed record differs (binary64 comparison)');
+}
+
+function run(vector, verify = verifyRecord) {
   const c = vector.context;
   const context = { ...c, now: Date.parse(c.now) };
   try {
-    const out = verifyRecord(vector.jws, context, resolve);
+    const out = verify(vector.jws, context, resolve);
     return { verdict: 'accept', kid: out.kid, record: out.record, sha: sha256(out.payload), body: out.body };
   } catch (error) {
     if (!(error instanceof RecordRejection)) throw error;
@@ -48,7 +61,7 @@ for (const name of files) {
     }
     assert.equal(got.verdict, 'accept', got.why);
     assert.equal(got.kid, vector.expected.kid);
-    assert.deepEqual(got.record, vector.expected.record);
+    assertRecord(got.record, vector.expected.record, vector.expected.numbers);
     assert.equal(got.sha, vector.payloadSha256);
     // NC1: the stored body is the exact payload text, never a re-serialization.
     assert.equal(got.body, vector.payloadUtf8);
@@ -59,6 +72,20 @@ for (const name of files) {
     }
   });
 }
+
+test('harness: binary64 number comparison passes the verifier and catches one that keeps binary32 precision', () => {
+  const vector = load('selftest/numbers-binary64.json');
+  assert.equal(vector.expected.numbers, 'binary64');
+  const got = run(vector);
+  assert.equal(got.verdict, 'accept', got.why);
+  assertRecord(got.record, vector.expected.record, 'binary64');
+  const fround = v => typeof v === 'number' ? Math.fround(v) : Array.isArray(v) ? v.map(fround)
+    : v && typeof v === 'object' ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, fround(x)])) : v;
+  const lossy = run(vector, (...args) => { const out = verifyRecord(...args); return { ...out, record: fround(out.record) }; });
+  assert.throws(() => assertRecord(lossy.record, vector.expected.record, 'binary64'), /binary64 comparison/);
+  assert.doesNotThrow(() => assertRecord({ n: -0 }, { n: 0 }, 'binary64'));
+  assert.throws(() => assertRecord({ n: '1' }, { n: 1 }, 'binary64'));
+});
 
 test('evidence mode accepts an expired record but still refuses a revoked key', () => {
   const expired = load('positive/evidence-mode-expired.json');

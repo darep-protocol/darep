@@ -104,6 +104,118 @@ class VectorTests(unittest.TestCase):
         self.assertEqual(skipped, [])
 
 
+def naive_post(url, body, headers, limit=peer.RESPONSE_LIMIT, timeout=10):
+    """A deliberately wrong HTTP client: reads to EOF and keeps the transfer coding in the body."""
+    from urllib.parse import urlsplit
+
+    parts = urlsplit(url)
+    with socket.create_connection((parts.hostname, parts.port), timeout=timeout) as conn:
+        head = f"POST {parts.path} HTTP/1.1\r\nHost: {parts.netloc}\r\nContent-Length: {len(body)}\r\nConnection: close\r\n"
+        head += "".join(f"{k}: {v}\r\n" for k, v in headers.items()) + "\r\n"
+        conn.sendall(head.encode("latin1") + body)
+        data = b""
+        while chunk := conn.recv(65536):
+            data += chunk
+    head, _, rest = data.partition(b"\r\n\r\n")
+    lines = head.decode("latin1").split("\r\n")
+    fields = dict((k.strip().lower(), v.strip()) for k, v in (line.split(":", 1) for line in lines[1:]))
+    return int(lines[0].split()[1]), fields, rest[: limit + 1]
+
+
+class HarnessSelfTests(unittest.TestCase):
+    """The vector runner's own capabilities, each shown to catch a deliberately wrong implementation."""
+
+    fixtures = run_vectors.SELFTEST
+
+    def test_selftest_fixtures_pass_on_the_peer(self):
+        for path in sorted((self.fixtures / "receiver").glob("*.json")):
+            with self.subTest(fixture=path.stem):
+                self.assertTrue(run_vectors.run_receiver(path).startswith("ok"))
+        for path in sorted((self.fixtures / "sender").glob("*.json")):
+            with self.subTest(fixture=path.stem):
+                self.assertTrue(run_vectors.run_sender(path).startswith("ok"))
+
+    def test_records_are_keyed_by_source_and_id(self):
+        vector = run_vectors.load(self.fixtures / "receiver" / "same-id-two-sources.json")
+        shared = vector["records"]["fromBob"]["envelope"]["id"]
+        with self.assertRaisesRegex(run_vectors.Failure, "name the source"):
+            run_vectors.record_key(vector, shared)
+        self.assertEqual(run_vectors.record_key(vector, shared, "acct:dave@vectors.test"), ("acct:dave@vectors.test", shared))
+        real = mailbox_db.Mailbox.set_outcome
+
+        def by_id(store, db, row, outcome, code=None, detail=None):
+            # Wrong: writes the outcome to every stored record with this id, whatever its source.
+            result = real(store, db, row, outcome, code, detail)
+            db.execute("UPDATE records SET outcome=? WHERE rid=? AND direction=?", (outcome, row["rid"], row["direction"]))
+            return result
+
+        with patch.object(mailbox_db.Mailbox, "set_outcome", by_id):
+            with self.assertRaisesRegex(run_vectors.Failure, "afterApply"):
+                run_vectors.run_receiver(vector)
+
+    def test_body_base64_is_sent_octet_for_octet(self):
+        vector = run_vectors.load(self.fixtures / "receiver" / "binary-body.json")
+        sent = run_vectors.request_body(vector["steps"][1]["request"])
+        self.assertEqual(sent[:2], b"\xff\xfe")
+        real = mailbox_db.Mailbox.handle_inbox
+
+        def lenient(store, method, headers, body):
+            # Wrong: drops octets it cannot decode instead of refusing the body.
+            return real(store, method, headers, bytes(b for b in body if b < 0x80) if body else body)
+
+        with patch.object(mailbox_db.Mailbox, "handle_inbox", lenient):
+            with self.assertRaisesRegex(run_vectors.Failure, "step 1: status 200"):
+                run_vectors.run_receiver(vector)
+
+    def test_binary64_number_comparison(self):
+        match = run_vectors.records_match
+        self.assertTrue(match({"n": 9007199254740993}, {"n": 9007199254740992}, "binary64"))
+        self.assertFalse(match({"n": 9007199254740993}, {"n": 9007199254740992}))
+        self.assertTrue(match({"n": [0.1, 10**400]}, {"n": [0.1, float("inf")]}, "binary64"))
+        self.assertFalse(match({"n": True}, {"n": 1}, "binary64"))
+        self.assertFalse(match({"n": "1"}, {"n": 1}, "binary64"))
+        identities = run_vectors.load(run_vectors.RECORDS / "identities.json")["documents"]
+        self.assertEqual(run_vectors.run_record("selftest/numbers-binary64", identities), "accept")
+        import struct
+
+        def binary32(value):
+            if isinstance(value, float):
+                return struct.unpack("f", struct.pack("f", value))[0]
+            if isinstance(value, dict):
+                return {k: binary32(v) for k, v in value.items()}
+            return [binary32(v) for v in value] if isinstance(value, list) else value
+
+        def lossy(*args, **kwargs):
+            # Wrong: keeps numbers at binary32 precision.
+            out = wire.verify_record(*args, **kwargs)
+            out.record = binary32(out.record)
+            return out
+
+        with self.assertRaisesRegex(run_vectors.Failure, "parsed record differs"):
+            run_vectors.run_record("selftest/numbers-binary64", identities, verify=lossy)
+
+    def test_raw_responder_writes_exact_octets(self):
+        raw = {"segments": [{"text": "HTTP/1.1 204 No Content\r\n"}, {"base64": "WC1CaW46IP8NCg=="},
+                            {"fill": {"octet": "a", "length": 3}}, {"text": "\r\n\r\n"}], "end": "close"}
+        responder = run_vectors.RawResponder()
+        try:
+            responder.script = raw
+            with socket.create_connection(("127.0.0.1", int(responder.url.split(":")[2].split("/")[0])), timeout=5) as conn:
+                conn.sendall(b"POST /darep/v2/inbox HTTP/1.1\r\nHost: x\r\nContent-Length: 2\r\n\r\nhi")
+                data = b""
+                while chunk := conn.recv(4096):
+                    data += chunk
+        finally:
+            responder.close()
+        self.assertEqual(data, b"HTTP/1.1 204 No Content\r\nX-Bin: \xff\r\naaa\r\n\r\n")
+        self.assertEqual(responder.received[0]["body"], b"hi")
+
+    def test_raw_framing_catches_a_client_that_keeps_chunk_framing(self):
+        path = self.fixtures / "sender" / "raw-framing.json"
+        with self.assertRaisesRegex(run_vectors.Failure, "step 1"):
+            run_vectors.run_sender(path, post=naive_post)
+
+
 def http_transport(receiver):
     """Deliver through the receiver's binding entry point, in process, as the HTTPS handler would."""
 

@@ -1,0 +1,120 @@
+{
+  "vector": "delivery/selftest/sender/raw-framing",
+  "generatedBy": "vectors/v2/delivery/generate.mjs",
+  "testOnly": true,
+  "role": "sender",
+  "selftest": "Harness self-test fixture: it checks the vector runners and is not a conformance vector.",
+  "clock": "Each step has \"at\": the sender clock when the attempt is made. Runners inject it and act as the receiving endpoint.",
+  "description": "The runner answers with exact response octets. A connection reset in the middle of the response head is a transient failure. A receipt sent with chunked transfer coding, split across chunks, is a delivery; a sender that does not remove the chunk framing sees a body that is not the receipt.",
+  "spec": [
+    "https-binding.md §2.2",
+    "https-binding.md §3",
+    "delivery.md §7.2"
+  ],
+  "sender": {
+    "address": "acct:bob@vectors.test",
+    "signingKeys": [
+      "https://bob.vectors.test/.well-known/darep/bob#sig-1"
+    ],
+    "pinned": [
+      "acct:carol@vectors.test"
+    ]
+  },
+  "records": {
+    "out": {
+      "envelope": {
+        "darep": "2",
+        "id": "5f1c77d5-abbb-4aa9-bef9-dc466c9e295c",
+        "type": "https://darep.org/ext/core/v2#message",
+        "source": "acct:bob@vectors.test",
+        "to": [
+          "acct:carol@vectors.test"
+        ],
+        "thread": "5f1c77d5-abbb-4aa9-bef9-dc466c9e295c",
+        "inReplyTo": null,
+        "time": "2026-11-20T10:00:00Z",
+        "expires": "2026-11-27T10:00:00Z",
+        "ext": {},
+        "required": [],
+        "grant": {
+          "id": "grant-vectors-bob",
+          "actor": "agent"
+        },
+        "data": {
+          "text": "Answered with raw framing."
+        }
+      },
+      "payloadUtf8": "{\"darep\":\"2\",\"id\":\"5f1c77d5-abbb-4aa9-bef9-dc466c9e295c\",\"type\":\"https://darep.org/ext/core/v2#message\",\"source\":\"acct:bob@vectors.test\",\"to\":[\"acct:carol@vectors.test\"],\"thread\":\"5f1c77d5-abbb-4aa9-bef9-dc466c9e295c\",\"inReplyTo\":null,\"time\":\"2026-11-20T10:00:00Z\",\"expires\":\"2026-11-27T10:00:00Z\",\"ext\":{},\"required\":[],\"grant\":{\"id\":\"grant-vectors-bob\",\"actor\":\"agent\"},\"data\":{\"text\":\"Answered with raw framing.\"}}",
+      "payloadSha256": "e85ce3c8dc1bfa16181623a40a0fc745de65301deb9a4c8ff1ba2ab52748fc20",
+      "recordBytes": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.eyJkYXJlcCI6IjIiLCJpZCI6IjVmMWM3N2Q1LWFiYmItNGFhOS1iZWY5LWRjNDY2YzllMjk1YyIsInR5cGUiOiJodHRwczovL2RhcmVwLm9yZy9leHQvY29yZS92MiNtZXNzYWdlIiwic291cmNlIjoiYWNjdDpib2JAdmVjdG9ycy50ZXN0IiwidG8iOlsiYWNjdDpjYXJvbEB2ZWN0b3JzLnRlc3QiXSwidGhyZWFkIjoiNWYxYzc3ZDUtYWJiYi00YWE5LWJlZjktZGM0NjZjOWUyOTVjIiwiaW5SZXBseVRvIjpudWxsLCJ0aW1lIjoiMjAyNi0xMS0yMFQxMDowMDowMFoiLCJleHBpcmVzIjoiMjAyNi0xMS0yN1QxMDowMDowMFoiLCJleHQiOnt9LCJyZXF1aXJlZCI6W10sImdyYW50Ijp7ImlkIjoiZ3JhbnQtdmVjdG9ycy1ib2IiLCJhY3RvciI6ImFnZW50In0sImRhdGEiOnsidGV4dCI6IkFuc3dlcmVkIHdpdGggcmF3IGZyYW1pbmcuIn19.l7dgE2WtygbWrXWtQ92iDOcHrg7sFqPdHPFNlz6Mw0dOR3LwkZ2AfmMy6r0tMJ0z-zwK0mkdANNMLGYfmPEJUA"
+    }
+  },
+  "steps": [
+    {
+      "at": "2026-11-20T10:00:30Z",
+      "request": {
+        "method": "POST",
+        "url": "https://carol.vectors.test/darep/v2/inbox",
+        "headers": {
+          "content-type": "application/jose",
+          "darep-recipient": "acct:carol@vectors.test"
+        },
+        "bodyEqualsRecord": "out"
+      },
+      "respond": {
+        "raw": {
+          "segments": [
+            {
+              "text": "HTTP/1.1 200 OK\r\nContent-Type: applic"
+            }
+          ],
+          "end": "reset"
+        }
+      },
+      "expect": {
+        "delivery": "queued",
+        "attemptResult": "transient"
+      }
+    },
+    {
+      "at": "2026-11-20T10:01:00Z",
+      "request": {
+        "method": "POST",
+        "url": "https://carol.vectors.test/darep/v2/inbox",
+        "headers": {
+          "content-type": "application/jose",
+          "darep-recipient": "acct:carol@vectors.test"
+        },
+        "bodyEqualsRecord": "out"
+      },
+      "respond": {
+        "raw": {
+          "segments": [
+            {
+              "text": "HTTP/1.1 200 OK\r\nContent-Type: application/jose\r\nTransfer-Encoding: chunked\r\nConnection: close\r\n\r\n"
+            },
+            {
+              "text": "64\r\neyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vY2Fyb2wudmVjdG9ycy50ZXN0Ly53ZWxsLWtub3duL2RhcmVwL2Nhcm9sI3Jj\r\n"
+            },
+            {
+              "text": "12c\r\ncHQtMSIsInR5cCI6ImRhcmVwLXJlY2VpcHQrandzIn0.eyJkYXJlcCI6IjIiLCJpZCI6IjVhOWJkYzFiLWQ0NjgtNGEwNy05YTRkLWYxNDZkN2UwYmI4OSIsInNvdXJjZSI6ImFjY3Q6Y2Fyb2xAdmVjdG9ycy50ZXN0IiwidHlwZSI6Imh0dHBzOi8vZGFyZXAub3JnL2V4dC9jb3JlL3YyI3JlY2VpcHQiLCJ0aW1lIjoiMjAyNi0xMS0yMFQxMDowMDo0MFoiLCJ0byI6WyJhY2N0OmJvYkB2ZWN0b3Jz\r\n"
+            },
+            {
+              "text": "1a3\r\nLnRlc3QiXSwidGhyZWFkIjoiNWYxYzc3ZDUtYWJiYi00YWE5LWJlZjktZGM0NjZjOWUyOTVjIiwiaW5SZXBseVRvIjoiNWYxYzc3ZDUtYWJiYi00YWE5LWJlZjktZGM0NjZjOWUyOTVjIiwiZXh0Ijp7fSwicmVxdWlyZWQiOltdLCJkYXRhIjp7InNoYTI1NiI6ImU4NWNlM2M4ZGMxYmZhMTYxODE2MjNhNDBhMGZjNzQ1ZGU2NTMwMWRlYjlhNGM4ZmYxYmEyYWI1Mjc0OGZjMjAiLCJzdG9yZWRBdCI6IjIwMjYtMTEtMjBUMTA6MDA6NDBaIn19.8ErXLRrHtMszqC6OHuWgGWLHUXxgFw8Q47C0ttVZK7Qn42ooP6o3TvcK6cE05alpoUxrJ_3tEizgGPQ5rLW8eQ\r\n"
+            },
+            {
+              "text": "0\r\n\r\n"
+            }
+          ],
+          "end": "close",
+          "decodedBody": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vY2Fyb2wudmVjdG9ycy50ZXN0Ly53ZWxsLWtub3duL2RhcmVwL2Nhcm9sI3JjcHQtMSIsInR5cCI6ImRhcmVwLXJlY2VpcHQrandzIn0.eyJkYXJlcCI6IjIiLCJpZCI6IjVhOWJkYzFiLWQ0NjgtNGEwNy05YTRkLWYxNDZkN2UwYmI4OSIsInNvdXJjZSI6ImFjY3Q6Y2Fyb2xAdmVjdG9ycy50ZXN0IiwidHlwZSI6Imh0dHBzOi8vZGFyZXAub3JnL2V4dC9jb3JlL3YyI3JlY2VpcHQiLCJ0aW1lIjoiMjAyNi0xMS0yMFQxMDowMDo0MFoiLCJ0byI6WyJhY2N0OmJvYkB2ZWN0b3JzLnRlc3QiXSwidGhyZWFkIjoiNWYxYzc3ZDUtYWJiYi00YWE5LWJlZjktZGM0NjZjOWUyOTVjIiwiaW5SZXBseVRvIjoiNWYxYzc3ZDUtYWJiYi00YWE5LWJlZjktZGM0NjZjOWUyOTVjIiwiZXh0Ijp7fSwicmVxdWlyZWQiOltdLCJkYXRhIjp7InNoYTI1NiI6ImU4NWNlM2M4ZGMxYmZhMTYxODE2MjNhNDBhMGZjNzQ1ZGU2NTMwMWRlYjlhNGM4ZmYxYmEyYWI1Mjc0OGZjMjAiLCJzdG9yZWRBdCI6IjIwMjYtMTEtMjBUMTA6MDA6NDBaIn19.8ErXLRrHtMszqC6OHuWgGWLHUXxgFw8Q47C0ttVZK7Qn42ooP6o3TvcK6cE05alpoUxrJ_3tEizgGPQ5rLW8eQ"
+        }
+      },
+      "expect": {
+        "delivery": "delivered",
+        "attemptResult": "delivered",
+        "receiptStored": "byte-identical to respond.raw.decodedBody"
+      }
+    }
+  ]
+}
