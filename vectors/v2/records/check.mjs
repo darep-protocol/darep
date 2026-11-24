@@ -377,6 +377,13 @@ for (const file of selftests) {
   console.log(`${passes && caught ? 'ok  ' : 'FAIL'} selftest/${file.slice(0, -5)} → matches ${passes}, binary32 verifier caught ${caught}`);
   if (!(passes && caught)) failures++;
 }
-console.log(failures ? `${failures} vector(s) failed` : `all ${vectors.length} vectors, ${invalidPins.length} pin cases and ${selftests.length} harness self-tests match records.md`);
+// The kit promises checkUpdate adapters that both snapshots of every pin-update case pass pin validation (P-0).
+const { cases: pinUpdates } = await load('selftest/pin-updates.json');
+for (const c of pinUpdates) {
+  for (const [label, d] of [['old', c.old], ['new', c.new]]) {
+    try { validatePins([d]); } catch (e) { console.log(`FAIL selftest/pin-updates ${c.name}: ${label} is not a valid pin (${e.message})`); failures++; }
+  }
+}
+console.log(failures ? `${failures} vector(s) failed` : `all ${vectors.length} vectors, ${invalidPins.length} pin cases, ${selftests.length} harness self-tests and ${pinUpdates.length} pin-update fixtures match records.md`);
 process.exit(failures ? 1 : 0);
 }

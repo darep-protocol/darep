@@ -41,12 +41,12 @@ async function main() {
   if (values.version) { console.log(`${kit.name} ${kit.version}`); return 0; }
   const mode = positionals[0];
   if (values.help || !['offline', 'live', 'all'].includes(mode) || !values.adapter) { console.log(usage); return values.help ? 0 : 2; }
+  if (values.selftest && mode !== 'offline') { console.error('--selftest runs in offline mode only'); return 2; }
   const command = builtinAdapters[values.adapter] ?? values.adapter;
   const outDir = resolve(values.out ?? 'darep-conformance-report');
   mkdirSync(outDir, { recursive: true });
   const logFile = createWriteStream(join(outDir, 'adapter.log'));
   const modes = mode === 'all' ? ['offline', 'live'] : [mode];
-  if (values.selftest && mode !== 'offline') { console.error('--selftest runs in offline mode only'); return 2; }
   // Name a built-in adapter rather than its local path, so a published report does not carry local paths.
   const report = new Report({ adapterCommand: builtinAdapters[values.adapter] ? `${values.adapter} (built-in)` : command, modes,
     selftest: Boolean(values.selftest) });

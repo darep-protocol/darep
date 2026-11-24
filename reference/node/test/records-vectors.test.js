@@ -85,6 +85,7 @@ test('harness: binary64 number comparison passes the verifier and catches one th
   assert.throws(() => assertRecord(lossy.record, vector.expected.record, 'binary64'), /binary64 comparison/);
   assert.doesNotThrow(() => assertRecord({ n: -0 }, { n: 0 }, 'binary64'));
   assert.throws(() => assertRecord({ n: '1' }, { n: 1 }, 'binary64'));
+  assert.throws(() => assertRecord({ n: 1 }, { n: 1 }, 'approximately'), /unknown expected.numbers/);
 });
 
 test('evidence mode accepts an expired record but still refuses a revoked key', () => {

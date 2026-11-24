@@ -1487,7 +1487,7 @@
     },
     {
       "name": "id-changed",
-      "description": "The document id differs.",
+      "description": "The document id differs (with its key ids, so that both snapshots stay valid pins).",
       "spec": "§5.5",
       "expected": "owner-decision",
       "level": "MUST",
@@ -1564,7 +1564,7 @@
         "updated": "2026-11-01T00:00:00Z",
         "keys": [
           {
-            "id": "https://bob.vectors.test/.well-known/darep/bob#sig-2026-01",
+            "id": "https://bob.vectors.test/.well-known/darep/robert#sig-2026-01",
             "purpose": [
               "record"
             ],
@@ -1578,7 +1578,7 @@
             "revoked": "2026-05-01T00:00:00Z"
           },
           {
-            "id": "https://bob.vectors.test/.well-known/darep/bob#sig-2026-05",
+            "id": "https://bob.vectors.test/.well-known/darep/robert#sig-2026-05",
             "purpose": [
               "record"
             ],
@@ -1592,7 +1592,7 @@
             "validUntil": "2026-11-15T00:00:00Z"
           },
           {
-            "id": "https://bob.vectors.test/.well-known/darep/bob#sig-2026-11",
+            "id": "https://bob.vectors.test/.well-known/darep/robert#sig-2026-11",
             "purpose": [
               "record"
             ],
@@ -1605,7 +1605,7 @@
             "validFrom": "2026-11-01T00:00:00Z"
           },
           {
-            "id": "https://bob.vectors.test/.well-known/darep/bob#provider-2026-11",
+            "id": "https://bob.vectors.test/.well-known/darep/robert#provider-2026-11",
             "purpose": [
               "provider"
             ],

@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { loadJson, vectorsRoot } from '../repo.js';
 import { check } from '../report.js';
 import { CORE, TYP, dotted, deepEqual, payloadOf, referenceVerify } from '../check.js';
-import { rawRequest, scriptedServer } from '../http.js';
+import { rawHead, rawRequest, scriptedServer, strictBase64 } from '../http.js';
 import { checkProblem } from '../problem.js';
 
 const files = dir => readdirSync(join(vectorsRoot, 'delivery', ...dir.split('/'))).filter(f => f.endsWith('.json')).sort();
@@ -24,7 +24,7 @@ export function recordKey(v, ref, source) {
 // The exact request octets: bodyFill, bodyBase64 (any octets) or body (text, sent as UTF-8).
 export function requestBody(req) {
   if (req.bodyFill) return Buffer.alloc(req.bodyFill.length, req.bodyFill.octet);
-  if (req.bodyBase64 !== undefined) return Buffer.from(req.bodyBase64, 'base64');
+  if (req.bodyBase64 !== undefined) return strictBase64(req.bodyBase64);
   return req.body !== undefined && req.body !== null ? Buffer.from(req.body, 'utf8') : null;
 }
 
@@ -90,7 +90,7 @@ async function receiver(adapter, v, file, advisories) {
   const answers = [];
   const notes = [];
   let last = null; // { source, id } of the record the current step is about
-  let firstBytes = null;
+  const firstBytes = new Map(); // "source id" -> the record bytes stored first under that dedupe key
   for (const [i, step] of v.steps.entries()) {
     const at = `step ${i}`;
     await adapter.call('setClock', { now: step.at });
@@ -127,18 +127,23 @@ async function receiver(adapter, v, file, advisories) {
         last = { source: r.source, id: r.id };
         const stored = await adapter.call('inspectIncoming', last);
         check(stored.found, `${at}: the record is not stored`);
-        if (exp.stored === true) { check(stored.recordBytes === body.toString('utf8'), `${at}: stored record bytes differ from the bytes received`); firstBytes ??= stored.recordBytes; }
-        if (exp.stored === 'unchanged' && firstBytes) check(stored.recordBytes === firstBytes, `${at}: the first stored record bytes were replaced`);
+        const k = `${last.source} ${last.id}`;
+        if (exp.stored === true) {
+          check(stored.recordBytes === body.toString('utf8'), `${at}: stored record bytes differ from the bytes received`);
+          if (!firstBytes.has(k)) firstBytes.set(k, stored.recordBytes);
+        }
+        if (exp.stored === 'unchanged' && firstBytes.has(k)) check(stored.recordBytes === firstBytes.get(k), `${at}: the first stored record bytes were replaced`);
         check(stored.receipt === text, `${at}: the issued receipt is not stored byte for byte`);
         if (exp.receipt) checkReceipt(text, exp.receipt, body.toString('utf8'), document, at, step.at);
       }
-      if (res.status !== 200 && exp.stored === 'unchanged' && firstBytes && body) {
+      if (res.status !== 200 && exp.stored === 'unchanged' && body) {
         // e.g. id-conflict: the stored record for that dedupe key must keep its first bytes (delivery.md §6).
         let r = null;
         try { r = envelopeOf(body.toString('utf8')); } catch { /* not a record */ }
         if (r?.id) {
           const kept = await adapter.call('inspectIncoming', { source: r.source, id: r.id });
-          if (kept.found) check(kept.recordBytes === firstBytes, `${at}: the stored record bytes changed after a rejected delivery`);
+          const first = firstBytes.get(`${r.source} ${r.id}`);
+          if (kept.found && first) check(kept.recordBytes === first, `${at}: the stored record bytes changed after a rejected delivery`);
         }
       }
       if (exp.receipt === null) check(res.status !== 200, `${at}: a receipt was returned`);
@@ -286,8 +291,9 @@ async function sender(adapter, v, advisories) {
       if (exp.evidenceKept) {
         const kept = exp.evidenceKept;
         if ((step.respond.body !== undefined || step.respond.raw) && /body|receipt bytes/.test(kept)) check(lastAttempt?.body === respondBody(step.respond), `${at}: response body not kept as evidence`);
-        if (/status/.test(kept)) check(lastAttempt?.status === step.respond.status, `${at}: response status not kept as evidence`);
-        if (/retry-after/.test(kept)) check(String(lastAttempt?.headers?.['retry-after']) === step.respond.headers['retry-after'], `${at}: Retry-After not kept as evidence`);
+        const head = step.respond.raw ? rawHead(step.respond.raw) : { status: step.respond.status, headers: step.respond.headers ?? {} };
+        if (/status/.test(kept)) check(lastAttempt?.status === head.status, `${at}: response status not kept as evidence`);
+        if (/retry-after/.test(kept)) check(String(lastAttempt?.headers?.['retry-after']) === head.headers['retry-after'], `${at}: Retry-After not kept as evidence`);
       }
       const nextAt = state.nextAttemptAt ? instant(state.nextAttemptAt) : null;
       if (exp.nextAttemptNotBefore) {

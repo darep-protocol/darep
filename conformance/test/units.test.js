@@ -3,6 +3,25 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { checkProblem } from '../src/problem.js';
 import { Failure, Report } from '../src/report.js';
+import { recordKey, requestBody } from '../src/offline/delivery.js';
+import { rawHead, rawOctets } from '../src/http.js';
+
+test('harness helpers: source-qualified keys, strict base64 bodies and raw octets', () => {
+  const v = { records: { a: { envelope: { id: 'x', source: 'acct:a@t.test' } }, b: { envelope: { id: 'x', source: 'acct:b@t.test' } },
+    c: { envelope: { id: 'y', source: 'acct:a@t.test' } } } };
+  assert.throws(() => recordKey(v, 'x'), Failure);
+  assert.deepEqual(recordKey(v, 'x', 'acct:b@t.test'), { source: 'acct:b@t.test', id: 'x' });
+  assert.deepEqual(recordKey(v, 'y'), { source: 'acct:a@t.test', id: 'y' });
+  assert.deepEqual(recordKey(v, { source: 's', id: 'x' }), { source: 's', id: 'x' });
+  assert.deepEqual([...requestBody({ bodyBase64: '//4=' })], [0xff, 0xfe]);
+  assert.throws(() => requestBody({ bodyBase64: '//4' }), /invalid base64/);
+  const raw = { segments: [{ text: 'HTTP/1.1 503 Busy\r\nRetry-After: 7\r\n\r\n' }, { base64: '/w==' }, { fill: { octet: 'a', length: 2 } }], end: 'reset' };
+  assert.deepEqual(rawOctets(raw), Buffer.concat([Buffer.from('HTTP/1.1 503 Busy\r\nRetry-After: 7\r\n\r\n'), Buffer.from([0xff]), Buffer.from('aa')]));
+  assert.deepEqual(rawHead(raw), { status: 503, headers: { 'retry-after': '7' } });
+  assert.equal(rawHead({ segments: [{ text: 'HTTP/1.1 200 OK\r\n' }] }).status, null);
+  assert.throws(() => rawOctets({ segments: [], end: 'rst' }), /raw.end/);
+  assert.throws(() => rawOctets({ segments: [{ fill: { octet: 'ab', length: 1 } }] }), /one octet/);
+});
 
 const response = (status, problem, headers = {}) => ({ status, headers: { 'content-type': 'application/problem+json', ...headers },
   body: Buffer.from(JSON.stringify(problem)) });

@@ -672,7 +672,11 @@ const pinUpdates = [];
   update('valid-until-later', 'owner-decision', 'An existing validUntil moves later.', d => { d.keys[keyIndex(keys.bobOld.kid)].validUntil = '2026-12-15T00:00:00Z'; });
   update('valid-until-removed', 'owner-decision', 'An existing validUntil is removed, which moves it later.', d => { delete d.keys[keyIndex(keys.bobOld.kid)].validUntil; });
   update('revoked-removed', 'owner-decision', 'An existing revoked is removed.', d => { delete d.keys[keyIndex(keys.bobRevoked.kid)].revoked; });
-  update('id-changed', 'owner-decision', 'The document id differs.', d => { d.id = 'https://bob.vectors.test/.well-known/darep/robert'; });
+  update('id-changed', 'owner-decision', 'The document id differs (with its key ids, so that both snapshots stay valid pins).', d => {
+    const id = 'https://bob.vectors.test/.well-known/darep/robert';
+    for (const k of d.keys) k.id = id + k.id.slice(d.id.length);
+    d.id = id;
+  });
   update('address-removed', 'owner-decision', 'An address listed in the old snapshot is missing from the new one.',
     d => { d.addresses = [BOB]; }, () => ({ ...clone(), addresses: [BOB, 'acct:robert@vectors.test'] }));
 }

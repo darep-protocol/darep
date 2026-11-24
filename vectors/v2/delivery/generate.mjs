@@ -555,13 +555,15 @@ const raw = {
   text: text => ({ text }),
   // HTTP/1.1 chunked transfer coding (RFC 9112 §7.1) of the given text, in chunks of the given sizes.
   chunked: (text, sizes) => {
-    const bytes = Buffer.from(text, 'utf8');
+    if (!/^[\x20-\x7e]*$/.test(text)) throw new Error('chunked() takes printable ASCII only; use base64 segments otherwise');
+    const bytes = Buffer.from(text, 'ascii');
     const out = [];
     let offset = 0;
     for (const size of sizes) {
+      if (!(size > 0)) throw new Error('chunk sizes must be positive');
       const part = bytes.subarray(offset, offset + size);
       offset += part.length;
-      out.push({ text: part.length.toString(16) + '\r\n' + part.toString('utf8') + '\r\n' });
+      out.push({ text: part.length.toString(16) + '\r\n' + part.toString('ascii') + '\r\n' });
     }
     if (offset !== bytes.length) throw new Error('chunk sizes do not cover the body');
     out.push({ text: '0\r\n\r\n' });
@@ -710,7 +712,10 @@ async function check() {
       // Every receipt the runner returns goes through records.md §8 as the sender, with the delivered record as R.
       const out = vec.records.out.recordBytes;
       for (const s of [...(vec.steps ?? []), ...(vec.cases ?? [])]) {
-        const receiptBytes = s.respond?.raw ? s.respond.raw.decodedBody : s.respond?.body;
+        // A raw response counts as a receipt only when its own head says 200 application/jose.
+        const rawHead = s.respond?.raw ? Buffer.concat(s.respond.raw.segments.map(x => Buffer.from(x.text ?? '', 'utf8'))).toString('latin1').split('\r\n\r\n') : null;
+        const rawIsReceipt = rawHead?.length > 1 && /^HTTP\/1\.1 200 /.test(rawHead[0]) && /\r\ncontent-type:\s*application\/jose\s*(\r\n|$)/i.test(rawHead[0]);
+        const receiptBytes = s.respond?.raw ? (rawIsReceipt ? s.respond.raw.decodedBody : undefined) : s.respond?.body;
         if (!receiptBytes || (!s.respond.raw && s.respond.headers?.['content-type'] !== 'application/jose')) continue;
         const got = recordsVerdict(receiptBytes, { mode: 'admission', now: s.at ?? vec.steps?.[0]?.at ?? at(40), receiver: vec.sender.address,
           typ: TYP.receipt, understood: [CORE], answered: out }, pinnedDocs(vec.sender.address));
