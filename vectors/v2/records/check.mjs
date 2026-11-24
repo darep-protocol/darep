@@ -7,7 +7,7 @@
 // deliberately avoids a JOSE library so that each step maps to one numbered step in §8.
 
 import { createHash, createPublicKey, verify as nodeVerify } from 'node:crypto';
-import { readFile } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 
 const here = new URL('./', import.meta.url);
@@ -303,6 +303,26 @@ export function validatePins(documents) {
   }
 }
 
+// Compares a parsed record with a vector's expected.record. expected.numbers selects how numbers compare:
+// absent or "exact" (the default) requires equal values; "binary64" rounds both sides to IEEE 754 binary64 first,
+// for vectors whose number lexemes exceed binary64 precision. The exact lexemes stay pinned by payloadUtf8 (NC1).
+export function recordsMatch(got, expected, numbers = 'exact') {
+  if (!['exact', 'binary64'].includes(numbers)) throw new Error('unknown expected.numbers mode: ' + numbers);
+  if (numbers === 'exact') return JSON.stringify(got) === JSON.stringify(expected);
+  // A JavaScript number is already a binary64 value, so the parsed values compare directly here; runners whose JSON
+  // parser keeps more precision (Python's arbitrary-size integers) round both sides first.
+  const same = (a, b) => {
+    if (typeof a === 'number' || typeof b === 'number') return typeof a === typeof b && a === b;
+    if (Array.isArray(a) || Array.isArray(b)) return Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((x, i) => same(x, b[i]));
+    if (a && b && typeof a === 'object' && typeof b === 'object') {
+      const ka = Object.keys(a).sort(), kb = Object.keys(b).sort();
+      return ka.length === kb.length && ka.every((k, i) => k === kb[i] && same(a[k], b[k]));
+    }
+    return a === b;
+  };
+  return same(got, expected);
+}
+
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) await main();
 
 async function main() {
@@ -325,7 +345,7 @@ for (const { name } of vectors) {
   let ok = got.verdict === v.expected.verdict;
   if (ok && got.verdict === 'reject') ok = got.code === v.expected.code;
   if (ok && got.verdict === 'accept') {
-    ok = got.kid === v.expected.kid && JSON.stringify(got.record) === JSON.stringify(v.expected.record) && got.sha === v.payloadSha256;
+    ok = got.kid === v.expected.kid && recordsMatch(got.record, v.expected.record, v.expected.numbers) && got.sha === v.payloadSha256;
     if (ok && v.payloadUtf8 !== null) ok = Buffer.from(v.jws.split('.')[1], 'base64url').toString('utf8') === v.payloadUtf8;
   }
   if (ok && v.expected.receiptFor) {
@@ -344,6 +364,19 @@ for (const c of invalidPins) {
   console.log(`${rejected ? 'ok  ' : 'FAIL'} pin/${c.name} → ${rejected ? `reject (${why})` : 'accept MISMATCH'}`);
   if (!rejected) failures++;
 }
-console.log(failures ? `${failures} vector(s) failed` : `all ${vectors.length} vectors and ${invalidPins.length} pin cases match records.md`);
+// Harness self-test: each fixture passes with this verifier, and fails when the parsed numbers lose precision.
+const fround = value => typeof value === 'number' ? Math.fround(value) : Array.isArray(value) ? value.map(fround)
+  : value && typeof value === 'object' ? Object.fromEntries(Object.entries(value).map(([k, x]) => [k, fround(x)])) : value;
+// pin-updates.json has its own format: it is for the kit's optional checkUpdate operation.
+const selftests = (await readdir(new URL('selftest/', import.meta.url))).filter(f => f.endsWith('.json') && f !== 'pin-updates.json').sort();
+for (const file of selftests) {
+  const v = await load('selftest/' + file);
+  const out = verifyRecord(v.jws, v.context, documents);
+  const passes = recordsMatch(out.record, v.expected.record, v.expected.numbers);
+  const caught = !recordsMatch(fround(out.record), v.expected.record, v.expected.numbers);
+  console.log(`${passes && caught ? 'ok  ' : 'FAIL'} selftest/${file.slice(0, -5)} → matches ${passes}, binary32 verifier caught ${caught}`);
+  if (!(passes && caught)) failures++;
+}
+console.log(failures ? `${failures} vector(s) failed` : `all ${vectors.length} vectors, ${invalidPins.length} pin cases and ${selftests.length} harness self-tests match records.md`);
 process.exit(failures ? 1 : 0);
 }

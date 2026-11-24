@@ -1,5 +1,6 @@
 // Offline mode, receiver and sender roles: the delivery vectors, driven through the adapter with an injected clock.
 // The kit talks to the receiver's loopback inbox over real HTTP, and plays the receiving endpoint for the sender.
+// Stored records are addressed by (source, id): record ids are unique per source only (delivery.md §6).
 import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { loadJson, vectorsRoot } from '../repo.js';
@@ -8,7 +9,31 @@ import { CORE, TYP, dotted, deepEqual, payloadOf, referenceVerify } from '../che
 import { rawRequest, scriptedServer } from '../http.js';
 import { checkProblem } from '../problem.js';
 
-const files = role => readdirSync(join(vectorsRoot, 'delivery', role)).filter(f => f.endsWith('.json')).sort();
+const files = dir => readdirSync(join(vectorsRoot, 'delivery', ...dir.split('/'))).filter(f => f.endsWith('.json')).sort();
+
+// (source, id) for a vector reference: { source, id }, or an id plus an optional source. A bare id must name exactly
+// one source among the vector's records; a vector holding two records with one id must say which it means.
+export function recordKey(v, ref, source) {
+  if (ref && typeof ref === 'object') return { source: ref.source, id: ref.id };
+  if (source) return { source, id: ref };
+  const sources = [...new Set(Object.values(v.records ?? {}).filter(r => r.envelope?.id === ref).map(r => r.envelope.source))];
+  check(sources.length === 1, `vector reference ${ref} matches ${sources.length} sources; the vector must name the source`);
+  return { source: sources[0], id: ref };
+}
+
+// The exact request octets: bodyFill, bodyBase64 (any octets) or body (text, sent as UTF-8).
+export function requestBody(req) {
+  if (req.bodyFill) return Buffer.alloc(req.bodyFill.length, req.bodyFill.octet);
+  if (req.bodyBase64 !== undefined) return Buffer.from(req.bodyBase64, 'base64');
+  return req.body !== undefined && req.body !== null ? Buffer.from(req.body, 'utf8') : null;
+}
+
+// The response body a sender should see: body, or for raw octets the declared raw.decodedBody.
+function respondBody(respond) {
+  if (!respond.raw) return respond.body;
+  check(respond.raw.decodedBody !== undefined, 'the vector compares a raw response body but declares no decodedBody');
+  return respond.raw.decodedBody;
+}
 const instant = t => Date.parse(t);
 const envelopeOf = jws => JSON.parse(payloadOf(jws).toString('utf8'));
 
@@ -30,13 +55,15 @@ function setup(v) {
   };
 }
 
-export async function deliveryCases(adapter, report, { roles, experimental }) {
+// selftest: run the harness self-test fixtures (delivery/selftest/) instead of the conformance vectors.
+export async function deliveryCases(adapter, report, { roles, experimental, selftest = false }) {
   for (const role of ['receiver', 'sender']) {
     if (!roles.includes(role)) continue;
-    for (const file of files(role)) {
-      const v = loadJson('delivery', role, file);
+    const dir = selftest ? `selftest/${role}` : role;
+    for (const file of files(dir)) {
+      const v = loadJson('delivery', ...dir.split('/'), file);
       const subset = v.conformance ? 'experimental' : 'core';
-      const meta = { id: `delivery/${role}/${file.slice(0, -5)}`, mode: 'offline', role, subset, refs: v.spec ?? [],
+      const meta = { id: `delivery/${dir}/${file.slice(0, -5)}`, mode: 'offline', role, subset, refs: v.spec ?? [],
         optional: ['reject-rate-limited.json', 'reject-unavailable.json'].includes(file), // need the optional fault op
         // The work/v2 apply rules (head, turn, transitions) are not normatively published (D8 amendment); only these vectors state them.
         ...(subset === 'experimental' ? { basis: 'vector-only', basisNote: `${v.conformance}: the work/v2 lifecycle rules it checks are not published normative text (D8 amendment)` } : {}) };
@@ -60,7 +87,6 @@ async function receiver(adapter, v, file, advisories) {
   for (const prior of v.priorState ?? []) await adapter.call('seedOutgoing', { recordBytes: v.records[prior.record].recordBytes });
   if (file === 'reject-rate-limited.json') await adapter.call('fault', { kind: 'rate-limited', source: 'acct:bob@vectors.test' });
   if (file === 'reject-unavailable.json') await adapter.call('fault', { kind: 'unavailable' });
-  const sourceOf = id => Object.values(v.records).find(r => r.envelope.id === id)?.envelope.source;
   const answers = [];
   const notes = [];
   let last = null; // { source, id } of the record the current step is about
@@ -71,8 +97,7 @@ async function receiver(adapter, v, file, advisories) {
     const exp = step.expect;
     const req = step.request;
     if (req) {
-      const body = req.bodyFill ? Buffer.alloc(req.bodyFill.length, req.bodyFill.octet)
-        : req.body !== undefined && req.body !== null ? Buffer.from(req.body, 'utf8') : null;
+      const body = requestBody(req);
       const before = (await adapter.call('stats')).incoming;
       // The inbox URL is opaque binding configuration (https-binding.md §1.2): use exactly what the adapter returned.
       const res = await rawRequest(inbox, { method: req.method, headers: req.headers ?? {}, body });
@@ -131,8 +156,10 @@ async function receiver(adapter, v, file, advisories) {
       if (exp.rejectionRecord) notes.push(checkRejection(stored, exp.rejectionRecord, document, at));
     }
     for (const item of exp.afterApply ?? []) {
-      const dep = await adapter.call('inspectIncoming', { source: sourceOf(item.record), id: item.record });
-      check(dep.outcome === item.applyOutcome, `${at}: ${item.record} outcome ${dep.outcome}; expected ${item.applyOutcome}`);
+      const key = recordKey(v, item.record, item.source);
+      const dep = await adapter.call('inspectIncoming', key);
+      check(dep.found, `${at}: ${key.source} ${key.id} is not stored`);
+      check(dep.outcome === item.applyOutcome, `${at}: ${key.source} ${key.id} outcome ${dep.outcome}; expected ${item.applyOutcome}`);
       if (item.rejectionRecord) notes.push(checkRejection(dep, item.rejectionRecord, document, at));
     }
   }
@@ -142,18 +169,30 @@ async function receiver(adapter, v, file, advisories) {
       const { rejections } = await adapter.call('stats');
       check(rejections === final.rejectionRecords, `final: ${rejections} rejection records; expected ${final.rejectionRecords}`);
     }
-    for (const id of final.stored ?? []) {
-      const record = Object.values(v.records).find(r => r.envelope.id === id).envelope;
-      const found = (await adapter.call('inspectIncoming', { source: record.source, id })).found ||
-        (await adapter.call('inspectOutgoing', { id, recipient: record.to[0] })).found;
-      check(found, `final: ${id} not stored`);
+    for (const ref of final.stored ?? []) {
+      const { source, id } = recordKey(v, ref);
+      const record = Object.values(v.records).find(r => r.envelope.id === id && r.envelope.source === source).envelope;
+      // Outgoing records are this party's own, so their id alone names them.
+      const found = (await adapter.call('inspectIncoming', { source, id })).found ||
+        (source === v.receiver.address && (await adapter.call('inspectOutgoing', { id, recipient: record.to[0] })).found);
+      check(found, `final: ${source} ${id} not stored`);
     }
     if (final.applyOrder || final.threadHead) {
       const thread = v.records[Object.keys(v.records)[0]].envelope.thread;
       const state = await adapter.optional('inspectThread', { thread });
       if (!state) notes.push('apply order and thread head not checked (inspectThread unsupported)');
       else {
-        if (final.applyOrder) check(deepEqual(state.applyOrder, final.applyOrder), `final: apply order ${JSON.stringify(state.applyOrder)}`);
+        if (final.applyOrder) {
+          const expected = final.applyOrder.map(ref => recordKey(v, ref));
+          // inspectThread's applied list carries sources; an adapter without it is compared by id, which is exact
+          // only while every id in the vector belongs to one source.
+          if (state.applied) check(deepEqual(state.applied, expected), `final: apply order ${JSON.stringify(state.applied)}; expected ${JSON.stringify(expected)}`);
+          else {
+            const ids = Object.values(v.records).map(r => r.envelope?.id).filter(Boolean);
+            if (new Set(ids).size !== ids.length) notes.push('apply order not checked: the vector reuses an id and inspectThread reports no sources');
+            else check(deepEqual(state.applyOrder, expected.map(k => k.id)), `final: apply order ${JSON.stringify(state.applyOrder)}`);
+          }
+        }
         if (final.threadHead) check(state.head === final.threadHead, `final: thread head ${state.head}`);
       }
     }
@@ -229,7 +268,7 @@ async function sender(adapter, v, advisories) {
         const before = await adapter.call('inspectOutgoing', key);
         check(before.status === 'queued', `${at}: delivery is ${before.status} before the attempt`);
         // A redirect points at a loopback trap: a sender that follows it (https-binding.md §2.1, §3) is caught there.
-        const respond = step.respond.headers?.location ? { ...step.respond, headers: { ...step.respond.headers, location: server.trapUrl } } : step.respond;
+        const respond = step.respond.raw ? step.respond : step.respond.headers?.location ? { ...step.respond, headers: { ...step.respond.headers, location: server.trapUrl } } : step.respond;
         server.answer(respond);
         const { result } = await adapter.call('attempt', key);
         check(server.trapped.length === 0, `${at}: the sender followed a redirect`);
@@ -246,7 +285,7 @@ async function sender(adapter, v, advisories) {
       if (exp.verifyCode) check(lastAttempt?.code === exp.verifyCode, `${at}: recorded code ${lastAttempt?.code}; expected ${exp.verifyCode}`);
       if (exp.evidenceKept) {
         const kept = exp.evidenceKept;
-        if (step.respond.body !== undefined && /body|receipt bytes/.test(kept)) check(lastAttempt?.body === step.respond.body, `${at}: response body not kept as evidence`);
+        if ((step.respond.body !== undefined || step.respond.raw) && /body|receipt bytes/.test(kept)) check(lastAttempt?.body === respondBody(step.respond), `${at}: response body not kept as evidence`);
         if (/status/.test(kept)) check(lastAttempt?.status === step.respond.status, `${at}: response status not kept as evidence`);
         if (/retry-after/.test(kept)) check(String(lastAttempt?.headers?.['retry-after']) === step.respond.headers['retry-after'], `${at}: Retry-After not kept as evidence`);
       }
@@ -275,7 +314,7 @@ async function sender(adapter, v, advisories) {
         const { deliveries } = await adapter.call('due');
         check(!deliveries.some(d => d.id === key.id && d.recipient === recipient), `${at}: further attempts are still due`);
       }
-      if (exp.receiptStored) check(state.receipt === step.respond.body, `${at}: receipt not stored byte for byte`);
+      if (exp.receiptStored) check(state.receipt === respondBody(step.respond), `${at}: receipt not stored byte for byte`);
       for (const [id, dep] of Object.entries(exp.dependentRecords ?? {})) {
         const d = await adapter.call('inspectOutgoing', { id, recipient });
         advisories.push({ id: 'dependent-records', refs: ['delivery.md §7.3'], met: d.status === 'failed' && (d.attempts?.length ?? 0) === 0,

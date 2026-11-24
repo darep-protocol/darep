@@ -10,7 +10,8 @@ export class Failure extends Error {}
 export const check = (condition, why) => { if (!condition) throw new Failure(why); };
 
 export class Report {
-  constructor({ adapterCommand, modes }) {
+  constructor({ adapterCommand, modes, selftest = false }) {
+    this.selftest = selftest; // harness self-test fixtures only: never a conformance result
     this.startedAt = new Date().toISOString();
     this.adapterCommand = adapterCommand;
     this.modes = modes;
@@ -62,6 +63,11 @@ export class Report {
     const partial = ROLES.filter(r => this.roles[r]?.tested && !tested.includes(r));
     // A run against locally modified spec or vectors is not a run of the published kit.
     const modified = specRevision().modified === true;
+    if (this.selftest) {
+      const passes = coreFailures === 0 && coreRun > 0;
+      return { rows, coreFailures, coreRun, tested, partial, passes, modified,
+        statement: `Harness self-test ${passes ? 'passed' : 'failed'}: the kit's runners against this adapter on the self-test fixtures. Not a conformance result.` };
+    }
     const passes = coreFailures === 0 && coreRun > 0 && tested.length > 0 && !modified;
     return { rows, coreFailures, coreRun, tested, partial, passes, modified,
       statement: passes ? `Passes the DAREP v0.1 conformance kit (verification aid, not certification).`
@@ -72,7 +78,8 @@ export class Report {
     const summary = this.summary();
     return {
       report: 'darep-conformance',
-      claimWording: CLAIM,
+      claimWording: this.selftest ? null : CLAIM,
+      selftest: this.selftest,
       result: { passes: summary.passes, statement: summary.statement, coreFailures: summary.coreFailures,
         scope: { roles: summary.tested, notInScope: summary.partial, modes: this.modes, subset: 'core' } },
       kit: { name: kit.name, version: kit.version },
@@ -107,7 +114,7 @@ function markdown(r) {
   const impl = r.implementation ? `${r.implementation.name} ${r.implementation.version ?? ''}`.trim() : 'unknown';
   out.push('# DAREP conformance kit report', '');
   out.push(`**${r.result.statement}**`, '');
-  if (r.result.passes) {
+  if (r.result.passes && !r.selftest) {
     out.push(`Scope of this result: roles ${r.result.scope.roles.join(', ')}; core subset; ${r.result.scope.modes.join(' and ')} mode. ` +
       'Quote it only together with this scope, the kit version and the spec revision below.', '');
     if (r.result.scope.notInScope.length) out.push(`Not in scope: ${r.result.scope.notInScope.join(', ')} (a required case was skipped or none ran).`, '');

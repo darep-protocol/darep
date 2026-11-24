@@ -545,6 +545,90 @@ async function senderVectors() {
   return v;
 }
 
+// ---------- harness self-test fixtures ----------
+// These are not conformance vectors. They exercise runner capabilities (source-qualified record keys, binary request
+// bodies, raw HTTP response framing) with behaviour the frozen text already fixes, so each runner can show that a
+// deliberately wrong implementation fails them. Runners load them only from their own self-tests.
+
+const SELFTEST = 'Harness self-test fixture: it checks the vector runners and is not a conformance vector.';
+const raw = {
+  text: text => ({ text }),
+  // HTTP/1.1 chunked transfer coding (RFC 9112 §7.1) of the given text, in chunks of the given sizes.
+  chunked: (text, sizes) => {
+    const bytes = Buffer.from(text, 'utf8');
+    const out = [];
+    let offset = 0;
+    for (const size of sizes) {
+      const part = bytes.subarray(offset, offset + size);
+      offset += part.length;
+      out.push({ text: part.length.toString(16) + '\r\n' + part.toString('utf8') + '\r\n' });
+    }
+    if (offset !== bytes.length) throw new Error('chunk sizes do not cover the body');
+    out.push({ text: '0\r\n\r\n' });
+    return out;
+  },
+};
+
+async function selftestReceiverVectors() {
+  const v = {};
+  const base = { role: 'receiver', selftest: SELFTEST, clock: 'Each step has "at": the receiver clock at that moment. Runners inject it.' };
+  const carolReceiver = { address: addr('carol'), inbox: inbox('carol'), signingKeys: [kid('carol', 'sig-1'), kid('carol', 'rcpt-1')], pinned: [addr('bob'), addr('dave')], extensions: [CORE] };
+
+  // Two records with the same id from two sources are two dedupe keys (delivery.md §6). Their outcomes differ, so a
+  // runner that finds stored records by id alone inspects the wrong one.
+  const shared = uuid('selftest-shared-id');
+  const fromBob = await record(envelope({ name: 'selftest-shared-id', from: 'bob', to: ['carol'], data: { text: 'From Bob.' } }), { who: 'bob' });
+  const fromDave = await record(envelope({ name: 'selftest-shared-id', from: 'dave', to: ['carol'], time: at(5),
+    type: 'https://vectors.test/ext/survey/v1#question', data: { question: 'From Dave, same id.' } }), { who: 'dave' });
+  if (fromBob.envelope.id !== shared || fromDave.envelope.id !== shared) throw new Error('self-test records must share one id');
+  const bobKey = { source: addr('bob'), id: shared };
+  const daveKey = { source: addr('dave'), id: shared };
+  v['same-id-two-sources'] = { ...base, description: 'Bob and Dave each send a record with the same id. They are different dedupe keys, so both are stored and acknowledged. Bob\'s core message is applied; Dave\'s record of an unknown type is unsupported. Runners must address stored records by (source, id).',
+    spec: ['delivery.md §6', 'delivery.md §3.3'], receiver: carolReceiver, records: { fromBob, fromDave },
+    steps: [
+      step({ at: at(30), request: post('carol', fromBob.recordBytes), expect: expectReceipt(fromBob, 'carol', at(30), 'applied') }),
+      step({ at: at(40), request: post('carol', fromDave.recordBytes), expect: expectReceipt(fromDave, 'carol', at(40), 'unsupported') }),
+      step({ at: at(50), event: 'no delivery; inspect both records', expect: { afterApply: [
+        { record: shared, source: addr('bob'), applyOutcome: 'applied' },
+        { record: shared, source: addr('dave'), applyOutcome: 'unsupported' },
+      ] } }),
+    ],
+    finalState: { applyOrder: [bobKey], stored: [bobKey, daveKey] } };
+
+  // bodyBase64 carries exact request octets, including octets that are not UTF-8.
+  const plain = await record(envelope({ name: 'selftest-binary-plain', from: 'bob', to: ['carol'], data: { text: 'Sent as base64.' } }), { who: 'bob' });
+  const prefixed = await record(envelope({ name: 'selftest-binary-prefixed', from: 'bob', to: ['carol'], data: { text: 'Preceded by two octets that are not UTF-8.' } }), { who: 'bob' });
+  const binaryPost = bytes => { const { body, ...rest } = post('carol', null); return { ...rest, bodyBase64: bytes.toString('base64') }; };
+  v['binary-body'] = { ...base, description: 'Request bodies given as bodyBase64 are sent octet for octet. A record sent that way is accepted as usual. The same kind of record preceded by the octets 0xFF 0xFE is not a compact JWS and is refused as malformed before storage; a receiver that drops octets it cannot decode would accept it.',
+    spec: ['delivery.md §3.1', 'https-binding.md §2.1'], receiver: carolReceiver, records: { plain, prefixed },
+    steps: [
+      step({ at: at(30), request: binaryPost(Buffer.from(plain.recordBytes, 'ascii')), expect: expectReceipt(plain, 'carol', at(30), 'applied') }),
+      step({ at: at(40), request: binaryPost(Buffer.concat([Buffer.from([0xff, 0xfe]), Buffer.from(prefixed.recordBytes, 'ascii')])), expect: problem(400, 'malformed') }),
+    ] };
+  return v;
+}
+
+async function selftestSenderVectors() {
+  const v = {};
+  const base = { role: 'sender', selftest: SELFTEST, clock: 'Each step has "at": the sender clock when the attempt is made. Runners inject it and act as the receiving endpoint.' };
+  const sender = { address: addr('bob'), signingKeys: [kid('bob', 'sig-1')], pinned: [addr('carol')] };
+  const out = await record(envelope({ name: 'selftest-raw-out', from: 'bob', to: ['carol'], data: { text: 'Answered with raw framing.' } }), { who: 'bob' });
+  const ok = await receipt(receiptPayload({ name: 'selftest-raw-ok', rec: out, receiver: 'carol', storedAt: at(40) }), { who: 'carol' });
+  const sameBytes = { request: { method: 'POST', url: inbox('carol'), headers: { 'content-type': 'application/jose', 'darep-recipient': addr('carol') }, bodyEqualsRecord: 'out' } };
+  v['raw-framing'] = { ...base, description: 'The runner answers with exact response octets. A connection reset in the middle of the response head is a transient failure. A receipt sent with chunked transfer coding, split across chunks, is a delivery; a sender that does not remove the chunk framing sees a body that is not the receipt.',
+    spec: ['https-binding.md §2.2', 'https-binding.md §3', 'delivery.md §7.2'], sender, records: { out },
+    steps: [
+      step({ at: at(30), ...sameBytes, respond: { raw: { segments: [raw.text('HTTP/1.1 200 OK\r\nContent-Type: applic')], end: 'reset' } },
+        expect: { delivery: 'queued', attemptResult: 'transient' } }),
+      step({ at: at(60), ...sameBytes, respond: { raw: {
+        segments: [raw.text('HTTP/1.1 200 OK\r\nContent-Type: application/jose\r\nTransfer-Encoding: chunked\r\nConnection: close\r\n\r\n'),
+          ...raw.chunked(ok.receiptBytes, [100, 300, ok.receiptBytes.length - 400])],
+        end: 'close', decodedBody: ok.receiptBytes } },
+      expect: { delivery: 'delivered', attemptResult: 'delivered', receiptStored: 'byte-identical to respond.raw.decodedBody' } }),
+    ] };
+  return v;
+}
+
 // ---------- check mode ----------
 
 const RECORDS_CODES = new Set(['malformed', 'unsupported-alg', 'bad-header', 'unknown-key', 'bad-signature', 'unsupported-version',
@@ -572,8 +656,9 @@ async function check() {
   const pinnedDocs = who => docs.filter(d => (ids.pinnedBy[who] ?? []).some(a => d.addresses.includes(a)));
   let n = 0; let procedure = 0;
   const fail = msg => { throw new Error(msg); };
-  for (const role of ['receiver', 'sender']) for (const f of (await readdir(join(here, role))).filter(f => f.endsWith('.json'))) {
-    const vec = JSON.parse(await readFile(join(here, role, f), 'utf8'));
+  const dirs = [['receiver', 'receiver'], ['sender', 'sender'], ['receiver', 'selftest/receiver'], ['sender', 'selftest/sender']];
+  for (const [role, dir] of dirs) for (const f of (await readdir(join(here, dir))).filter(f => f.endsWith('.json'))) {
+    const vec = JSON.parse(await readFile(join(here, dir, f), 'utf8'));
     // These records are built to fail signature verification against the published keys.
     const mustFail = { 'reject-bad-header.json': ['r'], 'reject-unsupported-alg.json': ['r'], 'reject-bad-signature.json': ['tampered'] };
     for (const [name, r] of Object.entries(vec.records ?? {})) {
@@ -597,7 +682,7 @@ async function check() {
       const me = vec.receiver;
       const mine = pinnedDocs(me.address);
       for (const s of vec.steps ?? []) {
-        const body = s.request?.body;
+        const body = s.request?.bodyBase64 !== undefined ? Buffer.from(s.request.bodyBase64, 'base64').toString('latin1') : s.request?.body;
         const recipient = s.request?.headers?.['darep-recipient'];
         if (typeof body !== 'string' || !recipient || s.request.headers['content-type'] !== 'application/jose') continue; // carrier checks C1/C2
         const duplicate = s.expect.receiptBytesEqualStep !== undefined;
@@ -625,12 +710,13 @@ async function check() {
       // Every receipt the runner returns goes through records.md §8 as the sender, with the delivered record as R.
       const out = vec.records.out.recordBytes;
       for (const s of [...(vec.steps ?? []), ...(vec.cases ?? [])]) {
-        if (!s.respond?.body || s.respond.headers?.['content-type'] !== 'application/jose') continue;
-        const got = recordsVerdict(s.respond.body, { mode: 'admission', now: s.at ?? vec.steps?.[0]?.at ?? at(40), receiver: vec.sender.address,
+        const receiptBytes = s.respond?.raw ? s.respond.raw.decodedBody : s.respond?.body;
+        if (!receiptBytes || (!s.respond.raw && s.respond.headers?.['content-type'] !== 'application/jose')) continue;
+        const got = recordsVerdict(receiptBytes, { mode: 'admission', now: s.at ?? vec.steps?.[0]?.at ?? at(40), receiver: vec.sender.address,
           typ: TYP.receipt, understood: [CORE], answered: out }, pinnedDocs(vec.sender.address));
         const want = s.expect.recordsVerdict ?? s.expect.verifyCode ?? 'accept';
         if (got !== want) fail(`${role}/${f} ${s.respond.mismatch ?? ''}: records procedure returned ${got}, vector expects ${want}`);
-        if (got === 'accept' && JSON.parse(Buffer.from(s.respond.body.split('.')[1], 'base64url')).source !== s.request?.headers?.['darep-recipient'] && s.request) {
+        if (got === 'accept' && JSON.parse(Buffer.from(receiptBytes.split('.')[1], 'base64url')).source !== s.request?.headers?.['darep-recipient'] && s.request) {
           if (s.expect.attemptResult !== 'receipt-mismatch' || s.expect.delivery !== 'queued') {
             fail(`${role}/${f}: another recipient's valid receipt must be a delivery receipt-mismatch`);
           }
@@ -674,6 +760,16 @@ async function main() {
       await writeFile(join(here, role, name + '.json'), JSON.stringify({ ...header(name, role), ...body }, null, 2) + '\n');
     }
     console.log(`${role}: ${Object.keys(vecs).length} vectors`);
+  }
+  await rm(join(here, 'selftest'), { recursive: true, force: true });
+  for (const [role, build] of [['receiver', selftestReceiverVectors], ['sender', selftestSenderVectors]]) {
+    await mkdir(join(here, 'selftest', role), { recursive: true });
+    const vecs = await build();
+    for (const [name, body] of Object.entries(vecs)) {
+      const head = { vector: `delivery/selftest/${role}/${name}`, generatedBy: 'vectors/v2/delivery/generate.mjs', testOnly: true };
+      await writeFile(join(here, 'selftest', role, name + '.json'), JSON.stringify({ ...head, ...body }, null, 2) + '\n');
+    }
+    console.log(`selftest/${role}: ${Object.keys(vecs).length} harness fixtures`);
   }
 }
 

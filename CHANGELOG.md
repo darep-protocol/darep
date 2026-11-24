@@ -5,6 +5,7 @@
 Tooling only; the specification and vectors are unchanged.
 
 - Conformance kit 0.1.0 in [`conformance/`](conformance/README.md), run as `npx darep-conformance`: offline vectors through a language-neutral adapter contract, live loopback deliveries in both directions through fault-injecting proxies, JSON and Markdown reports, and adapters for both reference implementations. A verification aid, not certification; [TRADEMARK.md](TRADEMARK.md#conformance-kit-results) says how a passing result may be stated.
+- Vector-runner capabilities for the spec v0.2 work, with no change to any existing vector or expectation: the Node, Python and kit delivery runners address stored records by `(source, id)`; delivery vectors may carry request bodies as `bodyBase64` and sender responses as raw octets (`respond.raw`), served by a loopback TCP responder; records vectors may compare numbers in binary64 (`expected.numbers`); the kit's adapter contract gains an optional `checkUpdate` operation for pin updates (records.md §5.5). The Node runner now sends receiver vectors over real HTTP to the provider's inbox handler. Harness self-test fixtures in `vectors/v2/*/selftest/`, which are not conformance vectors, show each capability catching a deliberately wrong implementation in every runner (`darep-conformance offline --selftest` for the kit).
 
 ## v0.1.1 (unreleased)
 

@@ -12,7 +12,7 @@ import { pathToFileURL } from 'node:url';
 import { Store } from '../../../reference/node/src/store.js';
 import { initialize } from '../../../reference/node/src/config.js';
 import { advance, ownerGrant, parseAction, publicCard, Problem } from '../../../reference/node/src/protocol.js';
-import { makeEventRecord, RecordRejection, sha256, signRecord, typs, validateDocument, verifyRecord } from '../../../reference/node/src/records.js';
+import { isMonotonicUpdate, makeEventRecord, RecordRejection, sha256, signRecord, typs, validateDocument, verifyRecord } from '../../../reference/node/src/records.js';
 import { handleProviderEndpoint, send, startProvider } from '../../../reference/node/src/provider.js';
 
 const pkg = { name: 'darep-reference-node', version: '0.1.0' };
@@ -70,6 +70,10 @@ export const ops = {
   validateIdentity({ document }) {
     try { validateDocument(document); return { verdict: 'accept' }; } catch { return { verdict: 'reject' }; }
   },
+  // records.md §5.5: may the new snapshot replace the pinned one as a routine rotation?
+  checkUpdate({ old, new: next }) {
+    return { result: isMonotonicUpdate(old, next) ? 'routine' : 'owner-decision' };
+  },
   sign({ payload, typ, kid, privateJwk }) {
     return { jws: signRecord(JSON.stringify(payload), { kid, key: createPrivateKey({ key: privateJwk, format: 'jwk' }) }, typ) };
   },
@@ -89,7 +93,7 @@ export const ops = {
     const setOutcome = store.outcome.bind(store);
     store.outcome = (row, outcome, code) => {
       const result = setOutcome(row, outcome, code);
-      if (outcome === 'applied' && row.typ === typs.event && row.direction === 'in') applied.push({ thread: row.topic, id: row.event_id });
+      if (outcome === 'applied' && row.typ === typs.event && row.direction === 'in') applied.push({ thread: row.topic, source: row.actor, id: row.event_id });
       return result;
     };
     const runtime = { config, store, extensions };
@@ -123,7 +127,7 @@ export const ops = {
       const state = advance(store.state(envelope.thread), envelope, parseAction(envelope));
       store.db.prepare('INSERT OR REPLACE INTO threads VALUES (?,?,?)').run(state.threadId, JSON.stringify(state), row.row_id);
     });
-    offline.applied.push({ thread: envelope.thread, id: envelope.id });
+    offline.applied.push({ thread: envelope.thread, source: envelope.source, id: envelope.id });
     return {};
   },
   tick() { current().applyReady(); return {}; },
@@ -150,7 +154,8 @@ export const ops = {
   inspectThread({ thread }) {
     if (!offline) throw new Unsupported('inspectThread is for offline mode');
     return { head: offline.store.state(thread)?.head ?? null,
-      applyOrder: offline.applied.filter(a => a.thread === thread).map(a => a.id) };
+      applyOrder: offline.applied.filter(a => a.thread === thread).map(a => a.id),
+      applied: offline.applied.filter(a => a.thread === thread).map(({ source, id }) => ({ source, id })) };
   },
   queueSigned({ recordBytes }) {
     offline.store.transaction(() => offline.store.queueSigned(recordBytes));

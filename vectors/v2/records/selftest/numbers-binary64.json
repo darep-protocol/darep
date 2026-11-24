@@ -1,0 +1,52 @@
+{
+  "name": "selftest/numbers-binary64",
+  "description": "Harness self-test fixture, not a conformance vector. Numbers in expected.record are compared after rounding both sides to IEEE 754 binary64 (expected.numbers). A verifier that keeps less precision, such as binary32, must fail it.",
+  "spec": "§8, J-1",
+  "context": {
+    "mode": "admission",
+    "now": "2026-11-20T12:00:00Z",
+    "receiver": "acct:carol@vectors.test",
+    "typ": "darep-event+jws",
+    "understood": [
+      "https://darep.org/ext/core/v2",
+      "https://darep.org/ext/work/v2",
+      "https://darep.org/ext/reschedule/v2"
+    ]
+  },
+  "jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imh0dHBzOi8vYm9iLnZlY3RvcnMudGVzdC8ud2VsbC1rbm93bi9kYXJlcC9ib2Ijc2lnLTIwMjYtMTEiLCJ0eXAiOiJkYXJlcC1ldmVudCtqd3MifQ.eyJkYXJlcCI6IjIiLCJpZCI6IjljYzdmMGIxLTViMzYtNDM3ZS04ZDBjLTlkMzA2NDY0YmEwZiIsInNvdXJjZSI6ImFjY3Q6Ym9iQHZlY3RvcnMudGVzdCIsInR5cGUiOiJodHRwczovL3ZlY3RvcnMudGVzdC9leHQvbnVtYmVycy92MSNzYW1wbGUiLCJ0aW1lIjoiMjAyNi0xMS0yMFQxMTo1ODowMFoiLCJ0byI6WyJhY2N0OmNhcm9sQHZlY3RvcnMudGVzdCJdLCJ0aHJlYWQiOiI5Y2M3ZjBiMS01YjM2LTQzN2UtOGQwYy05ZDMwNjQ2NGJhMGYiLCJpblJlcGx5VG8iOm51bGwsImV4cGlyZXMiOiIyMDI2LTExLTI3VDExOjU4OjAwWiIsImV4dCI6e30sInJlcXVpcmVkIjpbXSwiZ3JhbnQiOnsiaWQiOiJncmFudC03ZjNhIiwiYWN0b3IiOiJhZ2VudCJ9LCJkYXRhIjp7InJhdGlvIjowLjEwLCJodW5kcmVkIjoxZTIsImFtb3VudCI6MTIzNDU2Ljc4OSwic21hbGwiOlsyLjVlLTNdfX0.CidTjZuRZZTLqoDQrud-vRnw04AevwtAwZcHF56LdmGU5r1hq99L9jHhCn4TEvmKIP9ZFFdWQ2dKZB4NQiNoag",
+  "headerUtf8": "{\"alg\":\"ES256\",\"kid\":\"https://bob.vectors.test/.well-known/darep/bob#sig-2026-11\",\"typ\":\"darep-event+jws\"}",
+  "payloadUtf8": "{\"darep\":\"2\",\"id\":\"9cc7f0b1-5b36-437e-8d0c-9d306464ba0f\",\"source\":\"acct:bob@vectors.test\",\"type\":\"https://vectors.test/ext/numbers/v1#sample\",\"time\":\"2026-11-20T11:58:00Z\",\"to\":[\"acct:carol@vectors.test\"],\"thread\":\"9cc7f0b1-5b36-437e-8d0c-9d306464ba0f\",\"inReplyTo\":null,\"expires\":\"2026-11-27T11:58:00Z\",\"ext\":{},\"required\":[],\"grant\":{\"id\":\"grant-7f3a\",\"actor\":\"agent\"},\"data\":{\"ratio\":0.10,\"hundred\":1e2,\"amount\":123456.789,\"small\":[2.5e-3]}}",
+  "payloadSha256": "134c0e3305514f3ff1d7b5f274cf899c5cd707abad2030dde5fc369640da7574",
+  "expected": {
+    "verdict": "accept",
+    "kid": "https://bob.vectors.test/.well-known/darep/bob#sig-2026-11",
+    "record": {
+      "darep": "2",
+      "id": "9cc7f0b1-5b36-437e-8d0c-9d306464ba0f",
+      "source": "acct:bob@vectors.test",
+      "type": "https://vectors.test/ext/numbers/v1#sample",
+      "time": "2026-11-20T11:58:00Z",
+      "to": [
+        "acct:carol@vectors.test"
+      ],
+      "thread": "9cc7f0b1-5b36-437e-8d0c-9d306464ba0f",
+      "inReplyTo": null,
+      "expires": "2026-11-27T11:58:00Z",
+      "ext": {},
+      "required": [],
+      "grant": {
+        "id": "grant-7f3a",
+        "actor": "agent"
+      },
+      "data": {
+        "ratio": 0.1,
+        "hundred": 100,
+        "amount": 123456.789,
+        "small": [
+          0.0025
+        ]
+      }
+    },
+    "numbers": "binary64"
+  }
+}

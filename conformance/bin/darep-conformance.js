@@ -19,6 +19,8 @@ Options
   --adapter CMD        Command that starts your adapter (see conformance/ADAPTER.md), or a built-in name.
   --roles LIST         Comma-separated subset of ${ROLES.join(',')} (default: every role the adapter declares).
   --experimental       Also run the experimental work/v2 delivery scenarios (reported separately).
+  --selftest           Offline only: run the harness self-test fixtures (vectors/v2/*/selftest/) instead of the
+                       vectors. Checks the kit's own runners; the result is not a conformance result.
   --out DIR            Report directory (default: ./darep-conformance-report).
   --patience SECONDS   Live mode: how long to wait for an expected retry, apply or rejection (default 120).
                        The spec sets minimum delays only; raise this if your backoff starts later.
@@ -33,7 +35,7 @@ process.on('warning', w => { if (w.name !== 'ExperimentalWarning') console.warn(
 
 async function main() {
   const { values, positionals } = parseArgs({ allowPositionals: true, options: {
-    adapter: { type: 'string' }, roles: { type: 'string' }, experimental: { type: 'boolean' },
+    adapter: { type: 'string' }, roles: { type: 'string' }, experimental: { type: 'boolean' }, selftest: { type: 'boolean' },
     out: { type: 'string' }, help: { type: 'boolean' }, version: { type: 'boolean' }, patience: { type: 'string' },
   } });
   if (values.version) { console.log(`${kit.name} ${kit.version}`); return 0; }
@@ -44,8 +46,10 @@ async function main() {
   mkdirSync(outDir, { recursive: true });
   const logFile = createWriteStream(join(outDir, 'adapter.log'));
   const modes = mode === 'all' ? ['offline', 'live'] : [mode];
+  if (values.selftest && mode !== 'offline') { console.error('--selftest runs in offline mode only'); return 2; }
   // Name a built-in adapter rather than its local path, so a published report does not carry local paths.
-  const report = new Report({ adapterCommand: builtinAdapters[values.adapter] ? `${values.adapter} (built-in)` : command, modes });
+  const report = new Report({ adapterCommand: builtinAdapters[values.adapter] ? `${values.adapter} (built-in)` : command, modes,
+    selftest: Boolean(values.selftest) });
   const adapter = new Adapter(command, { cwd: process.cwd(), log: chunk => logFile.write(chunk) });
   try {
     let described;
@@ -66,11 +70,13 @@ async function main() {
     }
     console.log(`${kit.name} ${kit.version}: testing ${described.name} ${described.version ?? ''} (${modes.join(', ')}; roles ${roles.join(', ') || 'none'})`);
     if (modes.includes('offline')) {
-      const { verifierCases, signerCases } = await import('../src/offline/records.js');
+      const { verifierCases, signerCases, pinUpdateCases } = await import('../src/offline/records.js');
       const { deliveryCases } = await import('../src/offline/delivery.js');
-      if (roles.includes('verifier')) await verifierCases(adapter, report);
-      if (roles.includes('signer')) await signerCases(adapter, report);
-      await deliveryCases(adapter, report, { roles, experimental: Boolean(values.experimental) });
+      const selftest = Boolean(values.selftest);
+      if (roles.includes('verifier')) await verifierCases(adapter, report, { selftest });
+      if (roles.includes('verifier')) await pinUpdateCases(adapter, report, { selftest });
+      if (roles.includes('signer') && !selftest) await signerCases(adapter, report);
+      await deliveryCases(adapter, report, { roles, experimental: Boolean(values.experimental), selftest });
     }
     if (modes.includes('live')) {
       const { liveCases } = await import('../src/live/cases.js');
