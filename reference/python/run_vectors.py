@@ -12,6 +12,7 @@ needs a type outside core/v2, work/v2 and message, and the skip is reported with
 """
 
 import base64
+import errno
 from contextlib import closing, nullcontext
 import http.client
 import json
@@ -84,9 +85,9 @@ def records_match(got, expected, numbers="exact"):
     return same(got, expected)
 
 
-def run_record(name, identities, verify=None):
-    """`verify` replaces wire.verify_record; the self-tests pass a deliberately wrong verifier."""
-    v = load(RECORDS / (name + ".json"))
+def run_record(name, identities, verify=None, vector=None):
+    """`verify` replaces wire.verify_record and `vector` the file; the self-tests pass deliberately wrong ones."""
+    v = vector or load(RECORDS / (name + ".json"))
     verify = verify or wire.verify_record
     c = v["context"]
     typs = c["typ"] if isinstance(c["typ"], list) else [c["typ"]]
@@ -290,6 +291,7 @@ def run_receiver(path):
         notes = []
         try:
             receipts, last = [], None
+            first_bytes = {}  # (source, id) -> the record bytes stored first under that dedupe key
             for i, step in enumerate(vector["steps"]):
                 fx.at(step["at"])
                 exp = step["expect"]
@@ -325,8 +327,16 @@ def run_receiver(path):
                     if stored is True:
                         check(after == before + 1 and last is not None and last["jws"] == body.decode(),
                               f"step {i}: record bytes not stored exactly")
-                    if stored == "unchanged" and last is not None:
-                        check(last["jws"] == vector["steps"][0]["request"]["body"], "first record bytes replaced")
+                        first_bytes.setdefault(key_of(last), last["jws"])
+                    if stored == "unchanged" and body:
+                        try:
+                            sent = wire.strict_json(wire.payload_bytes(body.decode()))
+                            key = (sent["source"], sent["id"])
+                        except Exception:  # not a record: nothing is stored under its key
+                            key = None
+                        kept = fx.record_row(key, "in") if key in first_bytes else None
+                        if kept is not None:
+                            check(kept["jws"] == first_bytes[key], f"step {i}: first record bytes replaced")
                     if exp.get("receipt"):
                         er = exp["receipt"]
                         v = wire.verify_record(rbody.decode(), [er["typ"]], wire.Pins([fx.document]), mode="evidence",
@@ -399,6 +409,7 @@ def run_receiver(path):
 
 def raw_octets(raw):
     """The exact response octets of a `respond.raw` script: text (UTF-8), base64 or fill segments, in order."""
+    check(raw.get("end", "close") in ("close", "reset"), "raw.end must be close or reset")
     out = b""
     for seg in raw["segments"]:
         if "text" in seg:
@@ -406,8 +417,20 @@ def raw_octets(raw):
         elif "base64" in seg:
             out += base64.b64decode(seg["base64"], validate=True)
         else:
+            check(len(seg["fill"]["octet"].encode()) == 1, "fill.octet must be one octet")
             out += seg["fill"]["octet"].encode() * seg["fill"]["length"]
     return out
+
+
+def respond_head(respond):
+    """(status, lowercase headers) the sender should see; (None, {}) for a raw response with no complete head."""
+    if "raw" not in respond:
+        return respond.get("status"), {k.lower(): v for k, v in respond.get("headers", {}).items()}
+    octets = raw_octets(respond["raw"])
+    if b"\r\n\r\n" not in octets:
+        return None, {}
+    lines = octets.split(b"\r\n\r\n", 1)[0].decode("latin1").split("\r\n")
+    return int(lines[0].split()[1]), {k.strip().lower(): v.strip() for k, v in (l.split(":", 1) for l in lines[1:])}
 
 
 class RawResponder:
@@ -458,11 +481,17 @@ class RawResponder:
             body += chunk
         self.received.append({"requestLine": lines[0], "headers": headers, "body": body})
         raw = self.script
-        conn.sendall(raw_octets(raw))
-        if raw.get("end") == "reset":
-            conn.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER, struct.pack("ii", 1, 0))
-        else:
-            conn.shutdown(socket.SHUT_WR)
+        try:
+            conn.sendall(raw_octets(raw))
+            if raw.get("end") == "reset":
+                conn.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER, struct.pack("ii", 1, 0))
+            else:
+                conn.shutdown(socket.SHUT_WR)
+        except (BrokenPipeError, ConnectionResetError):
+            pass  # the sender stopped reading early, for example at its response size limit
+        except OSError as err:
+            if err.errno != errno.ENOTCONN:
+                raise
 
     def close(self):
         self.sock.close()
@@ -553,6 +582,8 @@ def sender_steps(vector, post, responder):
                 else:
                     send = fake_send(case["respond"], expected, calls)
                 got = peer.attempt(fx.store, row, send)
+                if responder:
+                    check(not responder.errors, f"case {i}: raw responder failed: {responder.errors}")
                 check(got == case["expect"]["attemptResult"], f"case {i}: {got}, expected {case['expect']['attemptResult']}")
         return "ok (" + str(len(vector["cases"])) + " cases)"
     with tempfile.TemporaryDirectory(prefix="darep-vector-") as root:
@@ -576,7 +607,7 @@ def sender_steps(vector, post, responder):
                 if exp.get("recordsVerdict") == "accept":
                     with fx.store.connection() as db:
                         pins = fx.store.pins(db)
-                    wire.verify_record(step["respond"]["body"], (wire.TYP_RECEIPT,), pins,
+                    wire.verify_record(respond_body(step["respond"]), (wire.TYP_RECEIPT,), pins,
                                        now=fx.clock[0], receiver=fx.address, answered=row["jws"])
                 zero_jitter = vector.get("retryProfile", {}).get("jitterPercent") == 0
                 if "raw" in step["respond"]:
@@ -587,6 +618,7 @@ def sender_steps(vector, post, responder):
                     got = peer.attempt(fx.store, row, send)
                 if responder:
                     check(not responder.errors, f"step {i}: raw responder failed: {responder.errors}")
+                    responder.errors.clear()
                 check(len(calls) == 1 and calls[0][1] == vector["records"][name]["recordBytes"].encode(),
                       f"step {i}: did not send the stored bytes exactly once")
                 check(got == exp.get("attemptResult", got), f"step {i}: attempt {got}, expected {exp.get('attemptResult')}")
@@ -597,10 +629,11 @@ def sender_steps(vector, post, responder):
                     kept = exp["evidenceKept"]
                     if "body" in kept or "receipt bytes" in kept:
                         check(attempt["body"] == respond_body(step["respond"]).encode(), f"step {i}: response body not kept")
+                    status, rheaders = respond_head(step["respond"])
                     if "status" in kept:
-                        check(attempt["status"] == step["respond"]["status"], f"step {i}: status not kept")
+                        check(attempt["status"] == status, f"step {i}: status not kept")
                     if "retry-after" in kept:
-                        check(json.loads(attempt["headers"]).get("retry-after") == step["respond"]["headers"]["retry-after"],
+                        check(json.loads(attempt["headers"]).get("retry-after") == rheaders["retry-after"],
                               f"step {i}: retry-after not kept")
             else:
                 fx.store.tick()

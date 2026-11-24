@@ -64,7 +64,8 @@ export class Report {
     // A run against locally modified spec or vectors is not a run of the published kit.
     const modified = specRevision().modified === true;
     if (this.selftest) {
-      const passes = coreFailures === 0 && coreRun > 0;
+      // Every self-test fixture must run: a skip would hide an adapter operation that went missing.
+      const passes = coreFailures === 0 && coreRun > 0 && !this.cases.some(c => c.status === 'skip');
       return { rows, coreFailures, coreRun, tested, partial, passes, modified,
         statement: `Harness self-test ${passes ? 'passed' : 'failed'}: the kit's runners against this adapter on the self-test fixtures. Not a conformance result.` };
     }

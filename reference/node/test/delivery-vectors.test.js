@@ -33,10 +33,16 @@ function recordKey(v, ref, source) {
 }
 const incoming = (store, key) => store.db.prepare("SELECT * FROM events WHERE direction='in' AND actor=? AND event_id=?").get(key.source, key.id);
 
+// Strict base64 (RFC 4648 §4, padded): Buffer.from(…, 'base64') would silently drop invalid characters.
+function base64(text) {
+  assert.ok(/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(text), 'invalid base64 in vector');
+  return Buffer.from(text, 'base64');
+}
+
 // The exact request octets: bodyFill, bodyBase64 (any octets) or body (text, sent as UTF-8).
 function requestBody(req, v) {
   if (req.bodyFill) return Buffer.alloc(req.bodyFill.length, req.bodyFill.octet);
-  if (req.bodyBase64 !== undefined) return Buffer.from(req.bodyBase64, 'base64');
+  if (req.bodyBase64 !== undefined) return base64(req.bodyBase64);
   if (req.body !== undefined && req.body !== null) return Buffer.from(req.body, 'utf8');
   if (req.bodyEqualsRecord) return Buffer.from(v.records[req.bodyEqualsRecord].recordBytes, 'utf8');
   return null;
@@ -44,8 +50,23 @@ function requestBody(req, v) {
 
 // The exact response octets of a respond.raw script: text (UTF-8), base64 or fill segments, in order.
 function rawOctets(raw) {
-  return Buffer.concat(raw.segments.map(s => s.text !== undefined ? Buffer.from(s.text, 'utf8')
-    : s.base64 !== undefined ? Buffer.from(s.base64, 'base64') : Buffer.alloc(s.fill.length, s.fill.octet)));
+  assert.ok(['close', 'reset', undefined].includes(raw.end), 'raw.end must be close or reset');
+  return Buffer.concat(raw.segments.map(s => {
+    if (s.text !== undefined) return Buffer.from(s.text, 'utf8');
+    if (s.base64 !== undefined) return base64(s.base64);
+    assert.equal(Buffer.byteLength(s.fill.octet), 1, 'fill.octet must be one octet');
+    return Buffer.alloc(s.fill.length, s.fill.octet);
+  }));
+}
+// (status, lowercase headers) the sender should see; status null for a raw response with no complete head.
+function respondHead(respond) {
+  if (!respond.raw) return { status: respond.status, headers: respond.headers ?? {} };
+  const octets = rawOctets(respond.raw);
+  const end = octets.indexOf('\r\n\r\n');
+  if (end < 0) return { status: null, headers: {} };
+  const lines = octets.subarray(0, end).toString('latin1').split('\r\n');
+  return { status: Number(lines[0].split(' ')[1]),
+    headers: Object.fromEntries(lines.slice(1).map(l => [l.slice(0, l.indexOf(':')).trim().toLowerCase(), l.slice(l.indexOf(':') + 1).trim()])) };
 }
 
 // A loopback TCP endpoint that reads one HTTP request per connection and writes the scripted octets exactly, then
@@ -53,7 +74,10 @@ function rawOctets(raw) {
 async function rawResponder() {
   const received = [];
   let script = null;
+  const sockets = new Set();
   const server = createTcpServer(socket => {
+    sockets.add(socket);
+    socket.on('close', () => sockets.delete(socket));
     let data = Buffer.alloc(0);
     socket.on('error', () => {});
     socket.on('data', chunk => {
@@ -65,13 +89,15 @@ async function rawResponder() {
       if (data.length < end + 4 + length) return;
       socket.removeAllListeners('data');
       received.push({ requestLine: head[0], headers: head.slice(1), body: data.subarray(end + 4, end + 4 + length) });
-      socket.write(rawOctets(script), () => (script.end === 'reset' ? socket.resetAndDestroy() : socket.end()));
+      socket.write(rawOctets(script), () => {
+        if (!socket.destroyed) (script.end === 'reset' ? socket.resetAndDestroy() : socket.end());
+      });
     });
   });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   return { url: `http://127.0.0.1:${server.address().port}/darep/v2/inbox`, received,
-    answer(raw) { script = raw; },
-    close: () => new Promise(resolve => server.close(resolve)) };
+    answer(raw) { script = raw; received.length = 0; },
+    close: () => new Promise(resolve => { for (const s of sockets) s.destroy(); server.close(resolve); }) };
 }
 
 // One HTTP request with exact octets; resolves to { status, headers, body: Buffer }.
@@ -158,7 +184,7 @@ async function runSender(v, t, { transport = fetch } = {}) {
       if (step.at) f.clock(step.at);
       if (step.expect.recordsVerdict === 'accept') {
         const pins = id => documents.find(d => d.id === id && d.addresses.some(a => v.sender.pinned.includes(a)));
-        assert.doesNotThrow(() => verifyRecord(step.respond.body, { typ: typs.receipt, mode: 'admission',
+        assert.doesNotThrow(() => verifyRecord(respondBody(step.respond), { typ: typs.receipt, mode: 'admission',
           now: Date.parse(step.at), receiver: v.sender.address, answered: v.records.out.recordBytes }, pins));
       }
       let calls = 0;
@@ -195,8 +221,13 @@ async function runSender(v, t, { transport = fetch } = {}) {
       }
       if (step.respond) {
         assert.equal(calls, 1);
-        if (step.respond.raw) assert.equal(raw.received.length > 0 && raw.received.at(-1).body.toString('latin1'), v.records.out.recordBytes);
-        else if (!step.respond.connection) {
+        if (step.respond.raw) {
+          assert.equal(raw.received.length, 1, `${at}: the sender made ${raw.received.length} requests to the raw responder`);
+          assert.equal(raw.received[0].body.toString('latin1'), v.records.out.recordBytes);
+          const head = respondHead(step.respond);
+          if (head.status !== null) assert.equal(attempt.status, head.status, `${at}: evidence status`);
+          if (step.respond.raw.decodedBody !== undefined) assert.equal(attempt.body, step.respond.raw.decodedBody, `${at}: evidence body`);
+        } else if (!step.respond.connection) {
           assert.equal(attempt.status, step.respond.status);
           assert.equal(attempt.body, step.respond.body ?? '');
           fields(JSON.parse(attempt.headers), step.respond.headers ?? {});

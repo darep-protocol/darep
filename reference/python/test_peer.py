@@ -194,6 +194,22 @@ class HarnessSelfTests(unittest.TestCase):
         with self.assertRaisesRegex(run_vectors.Failure, "parsed record differs"):
             run_vectors.run_record("selftest/numbers-binary64", identities, verify=lossy)
 
+        # run_record forwards expected.numbers: a value that differs exactly but agrees in binary64.
+        def wide(*args, **kwargs):
+            out = wire.verify_record(*args, **kwargs)
+            out.record = {**out.record, "data": {**out.record["data"], "wide": 9007199254740993}}
+            return out
+
+        vector = run_vectors.load(run_vectors.RECORDS / "selftest" / "numbers-binary64.json")
+        vector["expected"]["record"]["data"]["wide"] = 9007199254740992
+        self.assertEqual(run_vectors.run_record("x", identities, verify=wide, vector=vector), "accept")
+        vector["expected"]["numbers"] = "exact"
+        with self.assertRaisesRegex(run_vectors.Failure, "parsed record differs"):
+            run_vectors.run_record("x", identities, verify=wide, vector=vector)
+        vector["expected"]["numbers"] = "approximately"
+        with self.assertRaisesRegex(run_vectors.Failure, "unknown expected.numbers"):
+            run_vectors.run_record("x", identities, verify=wide, vector=vector)
+
     def test_raw_responder_writes_exact_octets(self):
         raw = {"segments": [{"text": "HTTP/1.1 204 No Content\r\n"}, {"base64": "WC1CaW46IP8NCg=="},
                             {"fill": {"octet": "a", "length": 3}}, {"text": "\r\n\r\n"}], "end": "close"}
@@ -209,6 +225,17 @@ class HarnessSelfTests(unittest.TestCase):
             responder.close()
         self.assertEqual(data, b"HTTP/1.1 204 No Content\r\nX-Bin: \xff\r\naaa\r\n\r\n")
         self.assertEqual(responder.received[0]["body"], b"hi")
+        responder = run_vectors.RawResponder()
+        try:
+            responder.script = {"segments": [{"text": "HTTP/1.1 200 OK\r\n"}], "end": "reset"}
+            with socket.create_connection(("127.0.0.1", int(responder.url.split(":")[2].split("/")[0])), timeout=5) as conn:
+                conn.sendall(b"POST /darep/v2/inbox HTTP/1.1\r\nHost: x\r\nContent-Length: 0\r\n\r\n")
+                time.sleep(0.2)
+                with self.assertRaises(ConnectionResetError):
+                    while conn.recv(4096):
+                        pass
+        finally:
+            responder.close()
 
     def test_raw_framing_catches_a_client_that_keeps_chunk_framing(self):
         path = self.fixtures / "sender" / "raw-framing.json"

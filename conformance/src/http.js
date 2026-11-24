@@ -40,8 +40,27 @@ export const headerCount = (rawHeaders, name) =>
 
 // The exact response octets of a respond.raw script: text (UTF-8), base64 or fill segments, in order.
 export function rawOctets(raw) {
-  return Buffer.concat(raw.segments.map(s => s.text !== undefined ? Buffer.from(s.text, 'utf8')
-    : s.base64 !== undefined ? Buffer.from(s.base64, 'base64') : Buffer.alloc(s.fill.length, s.fill.octet)));
+  if (!['close', 'reset', undefined].includes(raw.end)) throw new Error('raw.end must be close or reset');
+  return Buffer.concat(raw.segments.map(s => {
+    if (s.text !== undefined) return Buffer.from(s.text, 'utf8');
+    if (s.base64 !== undefined) return strictBase64(s.base64);
+    if (Buffer.byteLength(s.fill.octet) !== 1) throw new Error('fill.octet must be one octet');
+    return Buffer.alloc(s.fill.length, s.fill.octet);
+  }));
+}
+// Strict base64 (RFC 4648 §4, padded): Buffer.from(…, 'base64') would silently drop invalid characters.
+export function strictBase64(text) {
+  if (!/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(text)) throw new Error('invalid base64 in vector');
+  return Buffer.from(text, 'base64');
+}
+// (status, lowercase headers) of a raw response; status null when the octets hold no complete head.
+export function rawHead(raw) {
+  const octets = rawOctets(raw);
+  const end = octets.indexOf('\r\n\r\n');
+  if (end < 0) return { status: null, headers: {} };
+  const lines = octets.subarray(0, end).toString('latin1').split('\r\n');
+  return { status: Number(lines[0].split(' ')[1]),
+    headers: Object.fromEntries(lines.slice(1).map(l => [l.slice(0, l.indexOf(':')).trim().toLowerCase(), l.slice(l.indexOf(':') + 1).trim()])) };
 }
 
 // A loopback endpoint that answers each request from a script and records what it received. An answer with raw
@@ -58,7 +77,10 @@ export async function scriptedServer() {
     if (answer.connection) { req.socket.destroy(); return; }
     if (answer.raw) {
       const socket = req.socket;
-      socket.write(rawOctets(answer.raw), () => (answer.raw.end === 'reset' ? socket.resetAndDestroy() : socket.end()));
+      socket.on('error', () => {}); // the sender may stop reading early, for example at its size limit
+      socket.write(rawOctets(answer.raw), () => {
+        if (!socket.destroyed) (answer.raw.end === 'reset' ? socket.resetAndDestroy() : socket.end());
+      });
       return;
     }
     res.writeHead(answer.status, answer.headers ?? {});
