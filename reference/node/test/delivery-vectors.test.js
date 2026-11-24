@@ -89,9 +89,11 @@ async function rawResponder() {
       if (data.length < end + 4 + length) return;
       socket.removeAllListeners('data');
       received.push({ requestLine: head[0], headers: head.slice(1), body: data.subarray(end + 4, end + 4 + length) });
-      socket.write(rawOctets(script), () => {
+      // Reset after a short pause, outside the write callback: the peer can read the octets first, and an RST from
+      // inside the callback was observed to go out as a FIN on Linux.
+      socket.write(rawOctets(script), () => setTimeout(() => {
         if (!socket.destroyed) (script.end === 'reset' ? socket.resetAndDestroy() : socket.end());
-      });
+      }, script.end === 'reset' ? 50 : 0));
     });
   });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));

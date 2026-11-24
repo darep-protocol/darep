@@ -78,9 +78,11 @@ export async function scriptedServer() {
     if (answer.raw) {
       const socket = req.socket;
       socket.on('error', () => {}); // the sender may stop reading early, for example at its size limit
-      socket.write(rawOctets(answer.raw), () => {
+      // Reset after a short pause, outside the write callback: the peer can read the octets first, and an RST from
+      // inside the callback was observed to go out as a FIN on Linux.
+      socket.write(rawOctets(answer.raw), () => setTimeout(() => {
         if (!socket.destroyed) (answer.raw.end === 'reset' ? socket.resetAndDestroy() : socket.end());
-      });
+      }, answer.raw.end === 'reset' ? 50 : 0));
       return;
     }
     res.writeHead(answer.status, answer.headers ?? {});
