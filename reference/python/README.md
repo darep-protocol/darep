@@ -67,7 +67,36 @@ Before an agent opens a handoff or sends a result, the owner approves the recipi
 "$P" "$PEER" grant --dir .darep/carol --output .darep/carol.client.json --verbs read,send,commit
 ```
 
-Grants use the verbs of records.md §1.3. `read` lists threads and messages. `send` opens a handoff or declines one. `commit` accepts work or completes it, because those bind the owner. `manage` is never granted to an agent. `revoke --id GRANT_ID` closes a grant. Every signed event carries `grant: {id, actor}`: the grant's opaque id with `actor: "agent"`, or an owner-act id with `actor: "owner"` for records the owner sends directly, such as `message --peer ADDRESS --text TEXT`.
+Grants use the verbs of records.md §1.3. `read` lists threads and messages. `send` opens a handoff or declines one. `commit` accepts work or completes it, because those bind the owner. `manage` is never granted to an agent. `revoke --id GRANT_ID` closes a grant. Every signed event carries `grant: {id, actor}`: the grant's opaque id with `actor: "agent"`, or an owner-act id with `actor: "owner"` for records the owner sends directly, such as `message --peer ADDRESS --text TEXT` (see [Send a message as the owner](#send-a-message-as-the-owner)).
+
+## Send a message as the owner
+
+`message` signs a `https://darep.org/ext/core/v2#message` record as the owner (`grant.actor` is `"owner"`) and queues it for one pinned contact. It needs no approval file and no agent grant. This example sends to a Node provider for `acct:alice@alice.test` which is serving on its inbox. Each owner has pinned the other's card with `trust`. Carol's own `serve` must also be running, because its outbox worker does the delivery.
+
+```sh
+"$P" "$PEER" message --dir .darep/carol --peer acct:alice@alice.test --text 'Hello from Carol.'
+```
+
+```json
+{"id": "0246d083-0081-449c-8b93-af09cbe78ff7", "thread": "0246d083-0081-449c-8b93-af09cbe78ff7"}
+```
+
+The command returns once the record is signed and queued; it does not wait for a receipt. Read the delivery state with a read-only grant:
+
+```sh
+"$P" "$PEER" grant --dir .darep/carol --output .darep/carol.read.json --verbs read
+"$P" "$PEER" call --grant .darep/carol.read.json --tool list_messages --json '{}'
+```
+
+For that record, with `"direction": "outgoing"`, the output includes:
+
+```json
+"attempts": 1, "delivery": "delivered", "receiptStoredAt": "2026-11-25T08:34:28.026Z", "outcome": "applied"
+```
+
+`delivery: "delivered"` means Carol's sender verified a signed receipt from the recipient (records.md §8 step 15), so the recipient has stored the record. `queued` means no verified receipt yet; read again after a few seconds. If the recipient is stopped, the record stays `queued` and the worker retries the same signed bytes with backoff until the recipient restarts or the delivery fails at `expires` plus 300 s. Read the state again rather than running `message` again, which would create another record.
+
+On an outgoing record, `outcome: "applied"` is Carol's local state: her peer applied its own record. It is not evidence that the recipient did anything with it. A receipt means stored, never done.
 
 ## Connect an agent
 

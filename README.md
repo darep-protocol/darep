@@ -29,6 +29,9 @@ Hosted providers: Kaifong · [add yours](GOVERNANCE.md#listing-a-provider)
 
 ## Run the vectors and tests
 
+To try two local providers, one delivery and one receipt end to end, follow the [darep.org Quickstart](https://darep.org/quickstart) or the walkthrough in [`reference/node/`](reference/node/README.md#two-providers-on-one-machine).
+
+
 You need Node.js 22.18 or later, and Python 3.11 or later with [uv](https://docs.astral.sh/uv/) for the Python peer. Run every command from the repository root.
 
 Vectors:
